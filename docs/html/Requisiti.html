@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  
+</head>
+<body>
+  <h2>Requisiti</h2>
+  <p>L'azienda ci chiede di realizzare un sistema software (chiamato <span class="blue">cargoservice</span>) che:</p>
+  <ol class="arabic">
+  <li><p>sia in grado di ricevere la <strong>richiesta di carico</strong> nella stiva di un contenitore di prodotto già registrato nel <span class="blue">productservice</span>.</p>
+  <p>La richiesta viene rifiutata quando:</p>
+  <ul class="simple">
+  <li><p>il peso del prodotto è valutato troppo elevato, poiché la nave può trasportare un carico massimo di <code class="docutils literal notranslate"><span class="pre">MaxLoad&gt;0</span>&#160; <span class="pre">kg</span></code>.</p></li>
+  <li><p>la stiva è già piena, ovvero i <code class="docutils literal notranslate"><span class="pre">4</span> <span class="pre">slot</span></code> sono già occupati.</p></li>
+  </ul>
+  <p>Se la richiesta è accettata, il <span class="blue">cargoservice</span> associa uno slot al prodotto con <code class="docutils literal notranslate"><span class="pre">PID</span></code> e restituisce il nome
+  dello slot riservato. Successivamente, attende che il contenitore del prodotto venga consegnato al <span class="blue">ioport</span>.
+  Nel frattempo, altre richieste non vengono elaborate.</p>
+  </li>
+  <li><p>sia in grado di rilevare (tramite il <span class="blue">sonar</span> <span class="slide3">sensor</span>) la presenza del contenitore del prodotto presso il <span class="blue">ioport</span></p></li>
+  <li><p>sia in grado di garantire che il contenitore del prodotto venga posizionato dal <span class="blue">cargorobot</span> nello slot a lui riservato.
+  Al termine dell'operazione:</p>
+  <ul class="simple">
+  <li><p>il <span class="blue">cargorobot</span> deve tornare alla sua posizione di <span class="brown">HOME</span>.</p></li>
+  <li><p>il <span class="blue">cargoservice</span> può elaborare una nuova <em>richiesta di carico</em></p></li>
+  </ul>
+  </li>
+  <li><p>sia in grado di mostrare lo stato corrente della <span class="blue">stiva</span>, tramite una <span class="slide3">web-gui</span> aggiornata dinamicamente.</p></li>
+  <li><p><span class="brown">interrompe</span> qualsiasi attività e accende un led se il <span class="blue">sensore sonar</span> misura una distanza <code class="docutils literal notranslate"><span class="pre">D</span> <span class="pre">&gt;</span> <span class="pre">DFREE</span></code>
+  per almeno <code class="docutils literal notranslate"><span class="pre">3</span></code> secondi (possibile guasto del sonar). Il servizio riprende le sue attività non appena il sonar
+  misura una distanza <code class="docutils literal notranslate"><span class="pre">D</span> <span class="pre">&lt;=</span> <span class="pre">DFREE</span></code>.</p></li>
+  </ol>
+</body>
+</html>
