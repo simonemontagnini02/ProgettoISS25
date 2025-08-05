@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="./css/style.css" />
+    <title>Sprint 0</title>
+</head>
+
+<body>
+
+    <h1>Contesti</h1>
+
+    <br/><br/>
+
+    <img src="./img/Contesti.png">
+
+    <p>
+
+    <h2>Gestione Carico</h2>
+
+    <div>
+
+        questo contesto si occupa di gestire la ricezione delle richieste di carico. Controlla che il peso del container
+        non ecceda la capacità massima, che ci siano slot disponibili, e di restituire lo slot dove il container con un
+        certo PID dovrà essere inserito. Inoltre, gestisce lo stato del processo di carico per una specifica richiesta,
+        rimanendo in attesa che il container venga consegnato sulla porta di input, e si occupa di segnalare quando un
+        nuovo carico può essere elaborato. Il contesto è fondamentale in quanto è responsabile della gestione di tutto
+        il processo di carico, determinando quando accettare o rifiutare un'operazione.
+
+    </div>
+
+    <h2>Gestione Prodotto</h2>
+
+    <div>
+        Questo contesto si occupa della gestione del ciclo di vita dei prodotti destinati al carico sulla nave. In fase
+        di registrazione, a ogni nuovo prodotto viene assegnato un identificativo univoco (PID) e, se necessario,
+        ulteriori
+        informazioni non specificate nei requisiti del cargoservice, ma rilevanti per i sistemi esterni (ad esempio:
+        tipo di merce, dimensioni, quantità, ecc.). Questo contesto permette al sistema cargoservice di reperire le
+        informazioni
+        sul prodotto attraverso il suo identificativo univoco.
+
+    </div>
+
+    <h2>Inventario Stiva</h2>
+
+    <div>
+
+        Questo contesto gestisce lo stato fisico della stiva, monitorando l'occupazione degli slot e associando a
+        ciascuno di essi l'identificativo univoco (PID) del prodotto contenuto. È inoltre responsabile della verifica
+        della disponibilità di slot liberi, consentendo al sistema di rifiutare eventuali richieste di carico nel caso
+        in cui non vi sia spazio sufficiente.
+
+
+    </div>
+
+    <h2>Visualizzazione Stiva</h2>
+
+    <div>
+
+        Questo contesto si occupa di aggiornare l'interfaccia utente mostrando lo stato corrente della stiva. Avere un
+        contesto separato che si occupa solo della visualizzazione dello stato della stiva è utile al fine di separare i
+        compiti.
+
+    </div>
+
+    <h2>Interazione Sensori</h2>
+
+    <div>
+
+        Questo contesto è incaricato della gestione del'interfaccia con i dispositivi fisici, in particolare con il
+        sensore sonar collocato presso l'IOPort. Le sue responsabilità includono la lettura dei dati provenienti dal
+        sensore, l'interpretazione di tali dati per rilevare la presenza di un container, e la gestione di eventuali
+        condizioni anomale del sensore (in caso di guasto e.g.). Inoltre, potrebbe essere coinvolto nell'interazione con
+        il cargorobot, per segnalare l'avvenuta movimentazione del container. Anche se i requisiti non lo specificano
+        esplicitamente, la necessità di "garantire che il container sia posizionato" suggerisce l'esistenza di un
+        meccanismo di validazione di coordinamento tra questo ed il robot.
+    </div>
+
+    <h2>Cargobotservice</h2>
+
+    <div>
+        Si occupa di comandare il robot. Per interagire col robot bisogna
+        rivolgersi a questo contesto
+    </div>
+
+    </p>
+
+    <br/>
+
+    <h1>Interazioni</h1>
+
+    <br/><br/>
+
+    <h2>Gestione Carico</h2>
+
+    <div>
+
+        Questo contesto si occupa di interagire con i seguenti contesti:
+
+        <ul>
+            <li>
+                Gestione Prodotto: In modo da permettere di recuperare le informazioni riguardanti il prodotto
+                registrato nel container.
+            </li>
+            <li>
+                Inventario Stiva: Per controllare che ci siano slot disponibili e registrare un container 
+                nello slot incui verrà caricato.
+            </li>
+            <li>
+                CarboBotService: Per indicare al robot lo slot in cui deve caricare il container.
+            </li>
+
+        </ul>
+
+    </div>
+
+    <h2>Inventario Stiva</h2>
+
+    <div>
+
+       Questo contesto si occupa di interagire con il contesto “Visualizzazione Stiva” fornendo le informazioni necessarie 
+       per la rappresentazione dei singoli slot del sistema.
+
+    </div>
+
+<h2>Interazione Sensore</h2>
+
+    <div>
+
+        Questo contesto interagisce con il contesto “Gestione Carico” per comunicare la presenza sull'ioport di un container.
+
+    </div>
+
+</body>
+
+</html>
