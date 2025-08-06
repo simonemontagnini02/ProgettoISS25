@@ -13,7 +13,7 @@
     <h1>Contesti</h1>
     <h2><a href="./Requisiti.html">Requisiti</a> </h2>
 
-    <br/><br/>
+    <br /><br />
 
     <img src="./img/Contesti.png">
 
@@ -36,13 +36,10 @@
 
     <div>
         Questo contesto si occupa della gestione del ciclo di vita dei prodotti destinati al carico sulla nave. In fase
-        di registrazione, a ogni nuovo prodotto viene assegnato un identificativo univoco (PID) e, se necessario,
-        ulteriori
-        informazioni non specificate nei requisiti del cargoservice, ma rilevanti per i sistemi esterni (ad esempio:
-        tipo di merce, dimensioni, quantità, ecc.). Questo contesto permette al sistema cargoservice di reperire le
-        informazioni
-        sul prodotto attraverso il suo identificativo univoco.
-
+        di registrazione, a ogni nuovo prodotto viene assegnato un identificativo univoco (PID), il suo peso e se
+        necessario, ulteriori informazioni non specificate nei requisiti del cargoservice, ma rilevanti per i sistemi
+        esterni (ad esempio: tipo di merce, dimensioni, quantità, ecc.). Questo contesto permette al sistema
+        cargoservice di reperire le informazioni sul prodotto attraverso il suo identificativo univoco.
     </div>
 
     <h2>Inventario Stiva</h2>
@@ -89,11 +86,11 @@
 
     </p>
 
-    <br/>
+    <br />
 
     <h1>Interazioni</h1>
 
-    <br/><br/>
+    <br /><br />
 
     <h2>Gestione Carico</h2>
 
@@ -107,7 +104,7 @@
                 registrato nel container.
             </li>
             <li>
-                Inventario Stiva: Per controllare che ci siano slot disponibili e registrare un container 
+                Inventario Stiva: Per controllare che ci siano slot disponibili e registrare un container
                 nello slot incui verrà caricato.
             </li>
             <li>
@@ -122,20 +119,22 @@
 
     <div>
 
-       Questo contesto si occupa di interagire con il contesto “Visualizzazione Stiva” fornendo le informazioni necessarie 
-       per la rappresentazione dei singoli slot del sistema.
+        Questo contesto si occupa di interagire con il contesto “Visualizzazione Stiva” fornendo le informazioni
+        necessarie
+        per la rappresentazione dei singoli slot del sistema.
 
     </div>
 
-<h2>Interazione Sensore</h2>
+    <h2>Interazione Sensore</h2>
 
     <div>
 
-        Questo contesto interagisce con il contesto “Gestione Carico” per comunicare la presenza sull'ioport di un container.
+        Questo contesto interagisce con il contesto “Gestione Carico” per comunicare la presenza sull'ioport di un
+        container.
 
     </div>
 
-    <br/>
+    <br />
     <h1>Testing</h1>
 
     <table>
@@ -143,16 +142,16 @@
             <th>
                 ID
             </th>
-             <th>
+            <th>
                 Titolo
-             </th>
+            </th>
             <th>
                 Tipo
             </th>
-             <th>
+            <th>
                 Descrizione
             </th>
-             <th>
+            <th>
                 Input
             </th>
             <th>
@@ -165,17 +164,17 @@
             <td>
                 T01
             </td>
-             <td>
+            <td>
                 Univocità del PID
             </td>
-             <td>
+            <td>
                 Unit Test
             </td>
-             <td>
-              Gestione Prodotto si occupa di registrare un prodotto e di assegnarli un PID univoco
+            <td>
+                Gestione Prodotto si occupa di registrare un prodotto e di assegnarli un PID univoco
             </td>
             <td>
-               Prodotto da registrare
+                Prodotto da registrare
             </td>
             <td>
                 PID univoco
@@ -186,20 +185,84 @@
             <td>
                 T02
             </td>
-             <td>
+            <td>
                 Salvataggio del prodotto
             </td>
-             <td>
+            <td>
                 Unit Test
             </td>
-             <td>
-                Gestione prodotto si occupa di registrare correttamente il prodotto 
+            <td>
+                Gestione prodotto si occupa di registrare correttamente il prodotto
             </td>
             <td>
-               Prodotto da registrare
+                Prodotto da registrare
             </td>
             <td>
                 Entry del prodotto
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                T03
+            </td>
+            <td>
+                Capacità massima
+            </td>
+            <td>
+                Unit Test
+            </td>
+            <td>
+                Gestione carico controlla che la capacità del container non ecceda la capacità massima
+            </td>
+            <td>
+                PID container
+            </td>
+            <td>
+                Accettazione o rifiuto della richiesta
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                T04
+            </td>
+            <td>
+                Disponibilità di slot
+            </td>
+            <td>
+                Integration Test
+            </td>
+            <td>
+                Gestione carico controlla che ci siano slot disponibili
+            </td>
+            <td>
+                PID container
+            </td>
+            <td>
+                Accettazione o rifiuto della richiesta
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                T05
+            </td>
+            <td>
+                Gestione delle richieste di carico
+            </td>
+            <td>
+                Unit Test
+            </td>
+            <td>
+                Gestione carico durante l'attesa che il container venga consegnato all'ioport non accetta richieste
+                dall'esterno
+            </td>
+            <td>
+                PID container
+            </td>
+            <td>
+                Rifiuto della richiesta
             </td>
         </tr>
 
