@@ -45,6 +45,24 @@ h2 {
     border-radius: 4px;
 }
 
+/* Link */
+a {
+    color: #2980b9;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease, text-decoration 0.3s ease;
+}
+
+a:hover {
+    color: #1c5980;
+    text-decoration: underline;
+}
+
+a:visited {
+    color: #6c5ce7;
+}
+
+
 /* Testo nei div */
 div {
     background-color: #ffffff;
@@ -61,11 +79,54 @@ ul {
     padding-left: 25px;
 }
 
-li {
+ol {
+    margin: 15px 0;
+    padding-left: 25px;
+}
+
+li{
     margin-bottom: 8px;
-    list-style-type: disc;
     color: #34495e;
 }
+
+.cerchio{
+
+    list-style-type: disc;
+}
+
+/* Tabelle */
+table {
+    width: 90%;
+    border-collapse: collapse;
+    margin:auto;
+    margin-bottom: 30px;
+    background-color: #ffffff;
+    border: 2px solid #2980b9;
+    overflow: hidden;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+
+thead {
+    background-color: #2980b9;
+    text-align: left;
+}
+
+
+th, td {
+    padding: 12px 15px;
+    border: 2px solid #2980b9;
+}
+
+
+@media (max-width: 600px) {
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}
+
 
 /* Responsive */
 @media (max-width: 600px) {

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 
 <head>
     <meta charset="UTF-8">
@@ -11,6 +11,7 @@
 <body>
 
     <h1>Contesti</h1>
+    <h2><a href="./Requisiti.html">Requisiti</a> </h2>
 
     <br/><br/>
 
@@ -22,7 +23,7 @@
 
     <div>
 
-        questo contesto si occupa di gestire la ricezione delle richieste di carico. Controlla che il peso del container
+        Questo contesto si occupa di gestire la ricezione delle richieste di carico. Controlla che il peso del container
         non ecceda la capacità massima, che ci siano slot disponibili, e di restituire lo slot dove il container con un
         certo PID dovrà essere inserito. Inoltre, gestisce lo stato del processo di carico per una specifica richiesta,
         rimanendo in attesa che il container venga consegnato sulla porta di input, e si occupa di segnalare quando un
@@ -133,6 +134,77 @@
         Questo contesto interagisce con il contesto “Gestione Carico” per comunicare la presenza sull'ioport di un container.
 
     </div>
+
+    <br/>
+    <h1>Testing</h1>
+
+    <table>
+        <tr>
+            <th>
+                ID
+            </th>
+             <th>
+                Titolo
+             </th>
+            <th>
+                Tipo
+            </th>
+             <th>
+                Descrizione
+            </th>
+             <th>
+                Input
+            </th>
+            <th>
+                Output
+            </th>
+
+        </tr>
+
+        <tr>
+            <td>
+                T01
+            </td>
+             <td>
+                Univocità del PID
+            </td>
+             <td>
+                Unit Test
+            </td>
+             <td>
+              Gestione Prodotto si occupa di registrare un prodotto e di assegnarli un PID univoco
+            </td>
+            <td>
+               Prodotto da registrare
+            </td>
+            <td>
+                PID univoco
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                T02
+            </td>
+             <td>
+                Salvataggio del prodotto
+            </td>
+             <td>
+                Unit Test
+            </td>
+             <td>
+                Gestione prodotto si occupa di registrare correttamente il prodotto 
+            </td>
+            <td>
+               Prodotto da registrare
+            </td>
+            <td>
+                Entry del prodotto
+            </td>
+        </tr>
+
+    </table>
+
 
 </body>
 
