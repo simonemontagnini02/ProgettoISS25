@@ -11,7 +11,7 @@
     L'azienda ci chiede di realizzare un sistema software (chiamato cargoservice) che:
     <ol>
       <li> sia in grado di ricevere la richiesta di carico nella stiva di un contenitore di prodotto
-        già registrato nel productservice . </li>
+        già registrato nel productservice. </li>
 
       La richiesta viene rifiutata quando:
 
@@ -26,7 +26,7 @@
       Se la richiesta è accettata, il cargoservice associa uno slot al prodotto con PID e
       restituisce il nome
       dello slot riservato. Successivamente, attende che il contenitore del prodotto venga consegnato al
-      ioport .
+      ioport.
       Nel frattempo, altre richieste non vengono elaborate.
 
 
@@ -36,7 +36,7 @@
         slot a lui riservato.
         Al termine dell'operazione:
 <ul>
-      <li class="cerchio"> il cargorobot deve tornare alla sua posizione di HOME .</li>
+      <li class="cerchio"> il cargorobot deve tornare alla sua posizione di HOME.</li>
       <li class="cerchio"> il cargoservice può elaborare una nuova richiesta di carico</li>
 </ul>      
 
@@ -46,7 +46,7 @@
         misura una distanza D >DFREE
         per almeno 3 secondi (possibile
         guasto del sonar). Il servizio riprende le sue attività non appena il sonar
-        misura una distanza D &lt;= DFREE .
+        misura una distanza D &lt;= DFREE.
       </li>
     </ol>
   </div>

@@ -13,7 +13,7 @@
     <h1>Contesti</h1>
     <h2><a href="./Requisiti.html">Requisiti</a> </h2>
 
-    <br /><br />
+    <br />
 
     <img src="./img/Contesti.png">
 
@@ -46,11 +46,10 @@
 
     <div>
 
-        Questo contesto gestisce lo stato fisico della stiva, monitorando l'occupazione degli slot e associando a
-        ciascuno di essi l'identificativo univoco (PID) del prodotto contenuto. È inoltre responsabile della verifica
-        della disponibilità di slot liberi, consentendo al sistema di rifiutare eventuali richieste di carico nel caso
-        in cui non vi sia spazio sufficiente.
-
+        Questo contesto gestisce lo stato fisico della stiva, monitorando l'occupazione degli slot, il peso totale dei
+        container presenti, e associando a ciascuno di essi l'identificativo univoco (PID) del prodotto contenuto. È
+        inoltre responsabile della verifica della disponibilità di slot liberi, consentendo al sistema di rifiutare
+        eventuali richieste di carico nel caso in cui non vi sia spazio sufficiente.
 
     </div>
 
@@ -81,7 +80,7 @@
 
     <div>
         Si occupa di comandare il robot. Per interagire col robot bisogna
-        rivolgersi a questo contesto
+        rivolgersi a questo contesto.
     </div>
 
     </p>
@@ -89,8 +88,6 @@
     <br />
 
     <h1>Interazioni</h1>
-
-    <br /><br />
 
     <h2>Gestione Carico</h2>
 
@@ -104,8 +101,9 @@
                 registrato nel container.
             </li>
             <li>
-                Inventario Stiva: Per controllare che ci siano slot disponibili e registrare un container
-                nello slot incui verrà caricato.
+                Inventario Stiva: Per controllare che ci siano slot disponibili, per registrare un container
+                nello slot in cui verrà caricato e per verificare che il peso dei container nella stiva non ecceda il
+                limite massimo.
             </li>
             <li>
                 CarboBotService: Per indicare al robot lo slot in cui deve caricare il container.
@@ -125,7 +123,7 @@
 
     </div>
 
-    <h2>Interazione Sensore</h2>
+    <h2>Interazione Sensori</h2>
 
     <div>
 
@@ -192,7 +190,7 @@
                 Unit Test
             </td>
             <td>
-                Gestione prodotto si occupa di registrare correttamente il prodotto
+                Gestione Prodotto si occupa di registrare correttamente il prodotto
             </td>
             <td>
                 Prodotto da registrare
@@ -210,10 +208,11 @@
                 Capacità massima
             </td>
             <td>
-                Unit Test
+                Integration Test
             </td>
             <td>
-                Gestione carico controlla che la capacità del container non ecceda la capacità massima
+                Gestione Carico si interfaccia con Inventario Stiva per controllare che la capacità del container non
+                ecceda la capacità massima
             </td>
             <td>
                 PID container
@@ -234,7 +233,7 @@
                 Integration Test
             </td>
             <td>
-                Gestione carico controlla che ci siano slot disponibili
+                Gestione Carico controlla che ci siano slot disponibili
             </td>
             <td>
                 PID container
@@ -255,7 +254,7 @@
                 Unit Test
             </td>
             <td>
-                Gestione carico durante l'attesa che il container venga consegnato all'ioport non accetta richieste
+                Gestione Carico durante l'attesa che il container venga consegnato all'ioport non accetta richieste
                 dall'esterno
             </td>
             <td>
@@ -266,7 +265,134 @@
             </td>
         </tr>
 
+        <tr>
+            <td>
+                T06
+            </td>
+            <td>
+                Fallimento del sonar
+            </td>
+            <td>
+                Integration Test
+            </td>
+            <td>
+                Nel caso la distanza misurata dal sonar sia maggiore di DFREE per più di tre secondi, Interazione
+                Sensori dovrà interrompere il sistema, segnalando l'anomalia a Gestione Carico, e accendere
+                il LED
+            </td>
+            <td>
+                D (> DFREE)
+            </td>
+            <td>
+                Interruzione dell'attività e accensione del LED
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                T07
+            </td>
+            <td>
+                Ripristino del sistema
+            </td>
+            <td>
+                Integration Test
+            </td>
+            <td>
+                Nel caso la distanza misurata dal sonar sia minore o uguale di DFREE, Interazione Sensori dovrà
+                comunicare a Gestione Carico di ripristinare il sistema
+            </td>
+            <td>
+                D (<= DFREE) </td>
+            <td>
+                Ripristino dell'attività
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                T08
+            </td>
+            <td>
+                Corretto funzionamento sonar
+            </td>
+            <td>
+                Integration Test
+            </td>
+            <td>
+                Interazione Sensori dovrà segnalare a Gestione Carico l'arrivo di un container sull'ioport in modo da
+                poter avviare la procedura di carico
+            </td>
+            <td>
+                Container sull'ioport
+            </td>
+            <td>
+                Avvenuta segnalazione a Gestione Carico
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                T09
+            </td>
+            <td>
+                Comunicazione dello slot di scarico del container
+            </td>
+            <td>
+                Integration Test
+            </td>
+            <td>
+                Gestione Carico dovrà comunicare a Cargobotservice l'identificativo dello slot in cui il container
+                presente sull'ioport dovrà essere scaricato.
+            </td>
+            <td>
+                Container sull'ioport
+            </td>
+            <td>
+                Identificativo dello slot
+            </td>
+        </tr>
+
     </table>
+
+    <br />
+    <h1>Modello delle macro-parti del sistema</h1>
+
+    <div>
+        I componenti forniti dal committente sono:
+        <ul>
+            <li>DDRobot</li>
+            <li>Sonar</li>
+        </ul>
+        I componenti che dovranno essere sviluppati sono:
+        <ul>
+            <li>Gestione Prodotto</li>
+            <li>Gestione Carico</li>
+            <li>Inventario Stiva</li>
+            <li>Visualizzazione Stiva</li>
+            <li>Interazione Sensori</li>
+        </ul>
+    </div>
+
+    <br/>
+    <h1>Piano di lavoro</h1>
+
+    <div>
+        Il piano di lavoro prevede l'implementazione dei contesti legati al core-business, ovvero gestioneCarico,
+        intentarioStiva e gestioneProdotto. In questo modo sarebbe possibile proporre un'architettura eseguibile e funzionante,
+        procedendo poi allo sviluppo degli altri componenti associati alle funzionalità di contorno. In questo Sprint si prevede
+        l'implementazione di un sottoinsieme mirato dei casi di test precedentemente discussi, con lo scopo di validare il
+        corretto funzionamento del core-business del sistema. In particolare, verranno implementati i test relativi alla
+        gestione dei prodotti, alla valutazione delle richieste di carico e alla gestione dello stato fisico della stiva, in
+        quanto sono direttamente connessi ai contesti da realizzare. I testi selezionati per questo Sprint sono:
+        <ul>
+            <li>T01 - Univocità del PID</li>
+            <li>T02 - Salvataggio del prodotto</li>
+            <li>T03 - Capacità massima</li>
+            <li>T04 - Disponibilità di slot</li>
+            <li>T05 - Gestione delle richieste di carico</li>
+        </ul>
+    </div>
 
 
 </body>
