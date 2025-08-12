@@ -8,4 +8,4 @@ Membri del gruppo:
 
 # Sprint
 
-[Sprint0](docs/html/Sprint0.html)
+[Sprint0](https://github.com/simonemontagnini02/ProgettoISS25/blob/Sprint-0/docs/html/Sprint0.html)
