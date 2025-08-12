@@ -8,4 +8,4 @@ Membri del gruppo:
 
 # Sprint
 
-[Strint0](docs/html/Sprint0.html)
+[Sprint0](docs/html/Sprint0.html)
