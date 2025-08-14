@@ -190,6 +190,195 @@
         </tr>
 
     </table>
+
+    <h2>Gestione Prodotto</h2>
+
+    <br />
+
+    <table>
+        <tr>
+            <th>
+                ID
+            </th>
+            <th>
+                Descrizione 
+            </th>
+            <th>
+                Tipo
+            </th>
+            <th>
+                Priorità
+            </th>
+            <th>
+                Vincoli
+            </th>
+
+        </tr>
+
+        <tr>
+            <td>
+                GC1
+            </td>
+            <td>
+                Ricezione richiesta di carico per un PID già registrato
+            </td>
+            <td>
+                Funzionale
+            </td>
+            <td>
+                Alta
+            </td>
+            <td>
+                PID valido (PID > 0 e già registrato)
+            </td>
+
+        </tr>
+
+        <tr>
+            <td>
+                GC2
+            </td>
+            <td>
+                Il sistema deve verificare che il peso massimo non venga superato 
+            </td>
+            <td>
+                Funzionale
+            </td>
+            <td>
+                Alta
+            </td>
+            <td>
+                Peso nuovo container + peso attuale &le; MaxLoad, con MaxLoad configurabile e peso attuale ottenuto da InventarioStiva
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                GC3
+            </td>
+            <td>
+                Il sistema deve verificare la disponibilità di slot liberi in stiva
+            </td>
+            <td>
+                Funzionale
+            </td>
+            <td>
+                Alta
+            </td>
+            <td>
+                La stiva dispone di 4 slot, InventarioStiva fornisce le informazioni associate 
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                GC4
+            </td>
+            <td>
+                Il sistema deve rifiutare una richiesta in caso di superamento peso massimo o slot non disponibile
+            </td>
+            <td>
+                Funzionale
+            </td>
+            <td>
+                Alta
+            </td>
+            <td>
+                
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                GC5
+            </td>
+            <td>
+                Il sistema deve assegnare uno slot libero al PID in caso di richiesta valida
+            </td>
+            <td>
+                Funzionale
+            </td>
+            <td>
+                Alta
+            </td>
+            <td>
+                Slot scelto restituito al chiamante
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                GC8
+            </td>
+            <td>
+                Il sistema deve interagire per garantire il corretto posizionamento del container nello slot assegnato
+            </td>
+            <td>
+                Funzionale
+            </td>
+            <td>
+                Alta
+            </td>
+            <td>
+
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                GC7
+            </td>
+            <td>
+                Il sistema deve bloccare l'elaborazione di nuove richieste fino al completamento della precedente
+            </td>
+            <td>
+                Funzionale
+            </td>
+            <td>
+                Media
+            </td>
+            <td>
+                
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                GC8
+            </td>
+            <td>
+                Il sistema deve comunicare in output l'esito dell'assegnazione
+            </td>
+            <td>
+                Funzionale
+            </td>
+            <td>
+                Alta
+            </td>
+            <td>
+                In caso di successo ok + slot, altrimenti fail + motivo
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                GC9
+            </td>
+            <td>
+                Operazioni di verifica richiesta e assegnazione slot devono essere eseguite in &le;500ms
+            </td>
+            <td>
+                Non funzionale
+            </td>
+            <td>
+                Media 
+            </td>
+            <td>
+                
+            </td>
+        </tr>
+        
+    </table>
     
 </body>
 
