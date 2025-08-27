@@ -10,23 +10,171 @@
 
 <body>
 
-    <h1>Goal</h1>
-    <h2><a href="./Requisiti.html">Requisiti del committente</a></h2>
-    <h2><a href="./Sprint0.html">Sprint0</a></h2>
-    <br />
+    <h1>Sprint 1</h1>
+    <h2><a href="./Sprint0_v1.html">Sprint 0</a></h2>
 
+    <h2>productservice</h2>
+    <div>
+        L'implementazione fornita dal committente dell'attore productservice è reperibile dalla seguente pagina:
+        <a href="./htmlCorso/cargosystem25.html">productservice</a>.
+    </div>
+
+    <h2>Goal dello sprint</h2>
     <div>
 
         L'obiettivo di questo Sprint consiste nella realizzazione e nell'integrazione dei componenti core-business del
         sistema.
         Al termine di questa fase di sviluppo sarà possibile consentire la registrazione dei prodotti con l'assegnazione
         di un identificativo univoco, la gestione di una richiesta di carico tenendo in considerazione i vincoli dati
-        dal peso massimo e dalla disponibilità degli slot e infine la gestione dell'occupazione della stiva.
+        dal peso massimo e dalla disponibilità degli Slot e infine la gestione dell'occupazione della Hold.
     </div>
 
-    <h1>Requisiti dei contesti</h1>
+    <h2>Requisiti degli attori</h2>
 
-    <h2>Gestione Prodotto</h2>
+    <h3>cargoservice</h3>
+    <br />
+    <table>
+        <tr>
+            <th>
+                ID
+            </th>
+            <th>
+                Descrizione
+            </th>
+            <th>
+                Tipo
+            </th>
+            <th>
+                Vincoli
+            </th>
+
+        </tr>
+
+        <tr>
+            <td>
+                CS1
+            </td>
+            <td>
+                Ricezione richiesta di carico per un product container
+            </td>
+            <td>
+                Funzionale
+            </td>
+            <td>
+                productId > 0 e già registrato nel database
+            </td>
+
+        </tr>
+
+        <tr>
+            <td>
+                CS2
+            </td>
+            <td>
+                L'attore deve verificare che il peso totale della Hold non superi il suo peso massimo
+            </td>
+            <td>
+                Funzionale
+            </td>
+            <td>
+                Product.weight + Hold.totalWeight &le; Hold.maxLoad (maxLoad con valore arbitrario)
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                CS3
+            </td>
+            <td>
+                L'attore deve verificare la disponibilità di Slot liberi nella Hold
+            </td>
+            <td>
+                Funzionale
+            </td>
+            <td>
+                La Hold dispone di 4 Slot inizialmente liberi
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                CS4
+            </td>
+            <td>
+                L'attore deve accettare le richieste di carico valide inviando un messaggio load_accepted
+            </td>
+            <td>
+                Funzionale
+            </td>
+            <td>
+                Vincoli CS1, CS2 e CS3 validi
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                CS5
+            </td>
+            <td>
+                L'attore deve rifiutare le richieste di carico non valide inviando un messaggio load_refused
+            </td>
+            <td>
+                Funzionale
+            </td>
+            <td>
+                Vincolo CS1/CS2/CS3 non valido
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                CS6
+            </td>
+            <td>
+                L'attore deve interagire con cargorobot per garantire il corretto posizionamento del product container nello Slot
+                assegnato
+            </td>
+            <td>
+                Funzionale
+            </td>
+            <td>
+
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                CS7
+            </td>
+            <td>
+                L'attore rimane in attesa che il product container venga consegnato all'IOPort
+            </td>
+            <td>
+                Funzionale
+            </td>
+            <td>
+                Richiesta di carico accettata
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                CS8
+            </td>
+            <td>
+                L'attore deve bloccare l'elaborazione di nuove richieste fino al completamento della precedente
+            </td>
+            <td>
+                Funzionale
+            </td>
+            <td>
+                Richiesta di carico accettata
+            </td>
+        </tr>
+
+    </table>
+
+    <h3>hold</h3>
 
     <br />
 
@@ -42,9 +190,6 @@
                 Tipo
             </th>
             <th>
-                Priorità
-            </th>
-            <th>
                 Vincoli
             </th>
 
@@ -52,35 +197,11 @@
 
         <tr>
             <td>
-                GP1
+                H1
             </td>
 
             <td>
-                Il sistema deve permettere la registrazione di un nuovo prodotto, specificando almeno il peso
-            </td>
-
-            <td>
-                Funzionale
-            </td>
-
-            <td>
-                Alta
-            </td>
-
-            <td>
-                Il peso deve essere espresso in kg, > 0
-            </td>
-
-        </tr>
-
-        <tr>
-            <td>
-                GP2
-            </td>
-
-            <td>
-                Alla registrazione di un prodotto, il sistema deve generare un identificativo univoco (PID) intero
-                positivo
+                L'attore gestisce lo stato di occupazione degli Slot
             </td>
 
             <td>
@@ -88,22 +209,18 @@
             </td>
 
             <td>
-                Alta
-            </td>
-
-            <td>
-                L'univocità del PID deve essere garantita
+                Ciascuno Slot può essere "occupato" o "libero"
             </td>
 
         </tr>
 
         <tr>
             <td>
-                GP3
+                H2
             </td>
 
             <td>
-                Il sistema deve consentire di ottenere il peso di un prodotto a partire dal PID
+                Per ciascun Slot occupato, l'attore mantiene all'interno del database il productId del product container presente
             </td>
 
             <td>
@@ -111,22 +228,17 @@
             </td>
 
             <td>
-                Alta
-            </td>
-
-            <td>
-                
             </td>
 
         </tr>
 
         <tr>
             <td>
-                GP4
+                H3
             </td>
 
             <td>
-                Il sistema deve mantenere le informazioni sui prodotti registrati per tutta la durata dell'esecuzione
+                L'attore mantiene il peso totale (Hold.totalWeight) dei product container attualmente presenti nella Hold
             </td>
 
             <td>
@@ -134,22 +246,18 @@
             </td>
 
             <td>
-                Alta
-            </td>
 
-            <td>
-                Persistenza delle informazioni in memoria
             </td>
 
         </tr>
 
         <tr>
             <td>
-                GP5
+                H4
             </td>
 
             <td>
-                Il sistema può memorizzare anche informazioni opzionali sul prodotto 
+                L'attore fornisce le informazioni sullo stato della stiva comunicando con cargoservice
             </td>
 
             <td>
@@ -157,422 +265,35 @@
             </td>
 
             <td>
-                Bassa
-            </td>
 
-            <td>
-                
             </td>
 
         </tr>
 
         <tr>
             <td>
-                GP6
+                H5
             </td>
-
             <td>
-                Il PID viene generato in modo incrementale
+                L'attore deve comunicare l'identificativo dello Slot assegnato al product container (slotId) alla webgui
             </td>
-
             <td>
-                Non Funzionale
+                Funzionale
             </td>
-
             <td>
-                Alta
+                Richiesta accettata
             </td>
-
-            <td>
-                L'incremento deve essere unitario e costante per ogni nuovo prodotto registrato.
-            </td>
-
         </tr>
 
     </table>
 
-    <h2>Gestione Carico</h2>
-
-    <br />
-
-    <table>
-        <tr>
-            <th>
-                ID
-            </th>
-            <th>
-                Descrizione 
-            </th>
-            <th>
-                Tipo
-            </th>
-            <th>
-                Priorità
-            </th>
-            <th>
-                Vincoli
-            </th>
-
-        </tr>
-
-        <tr>
-            <td>
-                GC1
-            </td>
-            <td>
-                Ricezione richiesta di carico per un PID già registrato
-            </td>
-            <td>
-                Funzionale
-            </td>
-            <td>
-                Alta
-            </td>
-            <td>
-                PID valido (PID > 0 e già registrato)
-            </td>
-
-        </tr>
-
-        <tr>
-            <td>
-                GC2
-            </td>
-            <td>
-                Il sistema deve verificare che il peso massimo non venga superato 
-            </td>
-            <td>
-                Funzionale
-            </td>
-            <td>
-                Alta
-            </td>
-            <td>
-                Peso nuovo container + peso attuale &le; MaxLoad, con MaxLoad configurabile e peso attuale ottenuto da InventarioStiva
-            </td>
-        </tr>
-
-        <tr>
-            <td>
-                GC3
-            </td>
-            <td>
-                Il sistema deve verificare la disponibilità di slot liberi in stiva
-            </td>
-            <td>
-                Funzionale
-            </td>
-            <td>
-                Alta
-            </td>
-            <td>
-                La stiva dispone di 4 slot, InventarioStiva fornisce le informazioni associate 
-            </td>
-        </tr>
-
-        <tr>
-            <td>
-                GC4
-            </td>
-            <td>
-                Il sistema deve rifiutare una richiesta in caso di superamento peso massimo o slot non disponibile
-            </td>
-            <td>
-                Funzionale
-            </td>
-            <td>
-                Alta
-            </td>
-            <td>
-                
-            </td>
-        </tr>
-
-        <tr>
-            <td>
-                GC5
-            </td>
-            <td>
-                Il sistema deve assegnare uno slot libero al PID in caso di richiesta valida
-            </td>
-            <td>
-                Funzionale
-            </td>
-            <td>
-                Alta
-            </td>
-            <td>
-                Slot scelto restituito al chiamante
-            </td>
-        </tr>
-
-        <tr>
-            <td>
-                GC6
-            </td>
-            <td>
-                Il sistema deve interagire per garantire il corretto posizionamento del container nello slot assegnato
-            </td>
-            <td>
-                Funzionale
-            </td>
-            <td>
-                Alta
-            </td>
-            <td>
-
-            </td>
-        </tr>
-
-        <tr>
-            <td>
-                GC7
-            </td>
-            <td>
-                Dopo l'accettazione di una richiesta di carico, il sistema rimane in attesa che il container venga consegnato sulla porta di input
-            </td>
-            <td>
-                Funzionale
-            </td>
-            <td>
-                Alta
-            </td>
-            <td>
-
-            </td>
-        </tr>
-
-        <tr>
-            <td>
-                GC8
-            </td>
-            <td>
-                Il sistema deve bloccare l'elaborazione di nuove richieste fino al completamento della precedente
-            </td>
-            <td>
-                Funzionale
-            </td>
-            <td>
-                Media
-            </td>
-            <td>
-                
-            </td>
-        </tr>
-
-        <tr>
-            <td>
-                GC9
-            </td>
-            <td>
-                Il sistema deve comunicare in output l'esito dell'assegnazione
-            </td>
-            <td>
-                Funzionale
-            </td>
-            <td>
-                Alta
-            </td>
-            <td>
-                In caso di successo viene restituito lo slot, altrimenti un codice di errore 
-            </td>
-        </tr>
-
-        <tr>
-            <td>
-                GC10
-            </td>
-            <td>
-                Operazioni di verifica richiesta e assegnazione slot devono essere eseguite in &le;500ms
-            </td>
-            <td>
-                Non funzionale
-            </td>
-            <td>
-                Media 
-            </td>
-            <td>
-                
-            </td>
-        </tr>
-
-        
-        
-    </table>
-
-    <h2>Inventario Stiva</h2>
-
-    <br/>
-
-    <table>
-        <tr>
-            <th>
-                ID
-            </th>
-            <th>
-                Descrizione 
-            </th>
-            <th>
-                Tipo
-            </th>
-            <th>
-                Priorità
-            </th>
-            <th>
-                Vincoli
-            </th>
-
-        </tr>
-
-        <tr>
-            <td>
-                IS1
-            </td>
-
-            <td>
-                Il sistema monitora lo stato di occupazione degli slot
-            </td>
-
-            <td>
-                Funzionale
-            </td>
-
-            <td>
-                Alta
-            </td>
-
-            <td>
-                Ciascuno slot puo essere "occupato" o "libero"
-            </td>
-
-        </tr>
-
-        <tr>
-            <td>
-                IS2
-            </td>
-
-            <td>
-                Per ciascun slot occupato, il sistema mantiene il PID del container presente
-            </td>
-
-            <td>
-                Funzionale
-            </td>
-
-            <td>
-                Alta
-            </td>
-
-            <td>
-                
-            </td>
-
-        </tr>
-
-        <tr>
-            <td>
-                IS3
-            </td>
-
-            <td>
-                Per ciascun slot occupato, il sistema mantiene il peso del container presente
-            </td>
-
-            <td>
-                Funzionale
-            </td>
-
-            <td>
-                Alta
-            </td>
-
-            <td>
-                
-            </td>
-
-        </tr>
-
-        <tr>
-            <td>
-                IS4
-            </td>
-
-            <td>
-                Il sistema mantiene il peso totale dei container attualmente presenti nella stiva
-            </td>
-
-            <td>
-                Funzionale
-            </td>
-
-            <td>
-                Alta
-            </td>
-
-            <td>
-                
-            </td>
-
-        </tr>
-
-         <tr>
-            <td>
-                IS5
-            </td>
-
-            <td>
-                Il sistema fornisce le informazioni sullo stato della stiva 
-            </td>
-
-            <td>
-                Funzionale
-            </td>
-
-            <td>
-                Alta
-            </td>
-
-            <td>
-                Comunicazione con Gestione Carico 
-            </td>
-
-        </tr>
-
-        <tr>
-            <td>
-                IS6
-            </td>
-
-            <td>
-                Il sistema comunica ogni modifica dello stato della stiva
-            </td>
-
-            <td>
-                Funzionale
-            </td>
-
-            <td>
-                Alta
-            </td>
-
-            <td>
-                Interazione con Visualizzazione Stiva
-            </td>
-
-        </tr>
-
-    </table>
-    
     <h1>Modello del dominio</h1>
-    <h2>Gestione Prodotto</h2>
-    <img src="./img/Modello_Dominio_Gestione_Prodotto.png">
 
-    <h2>Gestione Carico</h2>
-    <img src="./img/Modello_Dominio_Gestione_Carico.png">
+    <h2>cargoservice</h2>
+    <img src="./img/Modello_Dominio_CargoService.png">
 
-    <h2>Inventario Stiva</h2>
-    <img src="./img/Modello_Dominio_Inventario_Stiva.png">
+    <h2>hold</h2>
+    <img src="./img/Modello_Dominio_Hold.png">
 </body>
 
 </html>
