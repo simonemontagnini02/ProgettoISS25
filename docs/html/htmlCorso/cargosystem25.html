@@ -1,0 +1,418 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>cargosystem25 &#8212; iss25 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="UsingEureka" href="UsingEureka.html" />
+    <link rel="prev" title="UsingELK" href="UsingELK.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="UsingEureka.html" title="UsingEureka"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="UsingELK.html" title="UsingELK"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">iss25 1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">cargosystem25</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="cargosystem25">
+<h1>cargosystem25<a class="headerlink" href="#cargosystem25" title="Permalink to this heading">¶</a></h1>
+<section id="requisiti">
+<h2>Requisiti<a class="headerlink" href="#requisiti" title="Permalink to this heading">¶</a></h2>
+<p>Progettare e costruire un <span class="blue">sistema software</span> per il carico/scarico di prodotti
+in modo automatizzato mediante robot-DDR su di un cargo navale.
+I prodotti da caricare/scaricare devono essere stati precedentemente registrati su database.</p>
+<p>Versione precedente: <span class="xref std std-ref">Cargo24</span></p>
+</section>
+<section id="impostazioni-preliminari">
+<h2>Impostazioni preliminari<a class="headerlink" href="#impostazioni-preliminari" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Analisi dei requisiti e del problema: individuazione dei <span class="blue">BoundedContexts</span> applicativi</p></li>
+<li><p>Introduzione alla Clean Architecture e ai principi SOLID</p></li>
+<li><p>Comunicazione tra componenti software in termini di <span class="blue">Business Concepts</span></p></li>
+<li><p>Introduzione allo sviluppo agile con <code class="docutils literal notranslate"><span class="pre">SCRUM</span></code></p></li>
+<li><p>Vesro componenti con <span class="brown">loose-coupling e high-coesion</span></p></li>
+<li><p>Idea di <span class="blue">DevOps</span> e sua evoluzione</p></li>
+<li><p>Micro-servizi di supporto attivabili con il file <a class="reference external" href="../../../../uniboyamls/iss2025.yml">iss2025.yml</a>  (<strong>uniboyamls/iss2025.yml</strong>)</p></li>
+</ul>
+<section id="video-richiami-sui-primipassioperativi25">
+<h3>VIDEO Richiami sui <a class="reference internal" href="Primipassioperativi25.html#primipassioperativi25"><span class="std std-ref">Primipassioperativi25</span></a><a class="headerlink" href="#video-richiami-sui-primipassioperativi25" title="Permalink to this heading">¶</a></h3>
+<table class="docutils align-default" style="width: 100%">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 75%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><span class="blue">VIDEO PRIMI PASSI</span></p></td>
+<td><p><a class="reference external" href="https://unibo.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=7ab5ed80-3df7-488c-b59d-b1dd00e8583b">https://unibo.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=7ab5ed80-3df7-488c-b59d-b1dd00e8583b</a>
+<a class="reference internal" href="Primipassioperativi25.html#primipassioperativi25"><span class="std std-ref">Primipassioperativi25</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p><span class="blue">VIDEO COMPLETAMENTO WORKSPACE</span></p></td>
+<td><p><a class="reference external" href="https://unibo.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=349d30ac-87b7-4890-a09b-b1e7008e50ee">https://unibo.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=349d30ac-87b7-4890-a09b-b1e7008e50ee</a>
+- Usa cargoproduct.qak VUOTO per generare build2025S e le directories</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="id1">
+<h2>Progetto cargoproduct<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h2>
+<p><span class="slide3">Goal</span>: Costruire un applicativo Java che realizza la logica <strong>CRUD</strong> di gestione di prodotti in uno storage
+di diverse forme: inizialmente una semplice lista in memoria volatile, poi un database <a class="reference external" href="https://en.wikipedia.org/wiki/MongoDB">MongoDB</a>.</p>
+<blockquote>
+<div><a class="reference internal image-reference" href="_images/ProductServiceLogic.JPG"><img alt="_images/ProductServiceLogic.JPG" class="align-center" src="_images/ProductServiceLogic.JPG" style="width: 60%;" /></a>
+<a class="reference internal image-reference" href="_images/ProductServiceLogicUML1.JPG"><img alt="_images/ProductServiceLogicUML1.JPG" class="align-center" src="_images/ProductServiceLogicUML1.JPG" style="width: 80%;" /></a>
+</div></blockquote>
+<p>Si veda: <a class="reference external" href="../../../../cargoproduct">progetto cargoproduct</a> e i video seguenti:</p>
+<section id="video-sul-progetto-cargoproduct">
+<h3>VIDEO sul <a class="reference external" href="../../../../cargoproduct">progetto cargoproduct</a><a class="headerlink" href="#video-sul-progetto-cargoproduct" title="Permalink to this heading">¶</a></h3>
+<table class="docutils align-default" style="width: 100%">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 75%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><span class="blue">VIDEO CARGOPRODDUCT</span></p></td>
+<td><p><a class="reference external" href="https://unibo.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=d3598b13-35a6-4732-9924-b1e800f3eec0">https://unibo.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=d3598b13-35a6-4732-9924-b1e800f3eec0</a></p>
+<ul class="simple">
+<li><p>Dopo 3:10 mostra cargoproduct_v0.html</p></li>
+<li><p>Dopo 3:10 mostra la creazione del <span class="slide3">package main.java.domain</span></p></li>
+<li><p>Dopo 4:44 msostra l’uso di un <span class="slide3">logger</span></p></li>
+<li><p>Dopo 6:30 parla di <strong>CommUtils</strong></p></li>
+<li><p>Dopo 8:38 mostra l’uso di gradlew run e la produzione del file di log</p></li>
+<li><p>Dopo 9:20 mostra JUnit e testlog + <span class="slide3">gradle test con report</span></p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-even"><td><p><span class="blue">VIDEO PRODDUCTSERVICELOGICINTRODUCION</span></p></td>
+<td><p><a class="reference external" href="https://unibo.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=ff1c4610-af3f-423f-a09e-b1ea00f74ba1">https://unibo.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=ff1c4610-af3f-423f-a09e-b1ea00f74ba1</a></p>
+<ul class="simple">
+<li><p>Dopo 3:55 introduce la specifica <a class="reference external" href="../../../../cargoproduct/src/main/java/domain/IStorage.java">IStorage</a> e relativo adapter</p></li>
+<li><p>Dopo 4:53 introduce la <span class="slide3">memoria volatile</span> <a class="reference external" href="../../../../cargoproduct/src/main/java/storage/StorageVolatile.java">StorageVolatile</a></p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-odd"><td><p><span class="blue">VIDEO PRODDUCTSERVICELOGICDISTRIBUTION</span></p></td>
+<td><p><a class="reference external" href="https://unibo.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=ea12ece8-ff3c-41df-b160-b1ea00f6944b">https://unibo.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=ea12ece8-ff3c-41df-b160-b1ea00f6944b</a></p>
+<p>Breve aggiunta al precedente</p>
+</td>
+</tr>
+<tr class="row-even"><td><p><span class="blue">VIDEO PRODDUCTSERVICELOGICIMPLEMENTATION</span></p></td>
+<td><p><a class="reference external" href="https://unibo.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=aafd07fe-f4cb-469a-9b68-b1ea00f4ce84">https://unibo.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=aafd07fe-f4cb-469a-9b68-b1ea00f4ce84</a></p>
+<ul class="simple">
+<li><p>Dopo 0:27 nuovi <em>package main.java.domain.adapter</em>  e <em>main.java.storage</em></p></li>
+<li><p>Dopo 2:22 clssse astratta <a class="reference external" href="../../../../cargoproduct/src/main/java/domain/adapter/AdapterStorage.java">AdapterStorage</a> e <a class="reference external" href="../../../../cargoproduct/src/main/java/domain/adapter/AdapterStorageVolatile.java">AdapterStorageVolatile</a></p></li>
+<li><p>Dopo 3:44 discute il <a class="reference external" href="../../../../cargoproduct/src/main/java/domain/ProductServiceLogic.java">ProductServiceLogic</a>  che viene eseguita a 6:10</p></li>
+</ul>
+<p>Verso la fine: test con report, <strong>distribuzione fat</strong> ed esecuzione</p>
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="key-points-cargoproduct">
+<h3>Key-points cargoproduct<a class="headerlink" href="#key-points-cargoproduct" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Impostazione del Workspace Eclipse e di un progetto Gradle con relativo build file.</p></li>
+<li><p>Adapter (<a class="reference external" href="../../../../cargoproduct/src/main/java/domain/adapter/AdapterStorage.java">AdapterStorage</a>) per rendere la logica applicativa indipendente dai dispositivi
+usati per la persistenza.</p></li>
+<li><p>Predisposizione di <a class="reference external" href="../../../../cargoproduct/src/main/java/domain/adapter/AdapterStorage.java">AdapterStorage</a> per  selezionare la memoria volatile o il database <a class="reference external" href="https://en.wikipedia.org/wiki/MongoDB">MongoDB</a>
+usando variabili di ambiente. In assenza, uso del singleton <a class="reference external" href="../../../../cargoproduct/src/main/java/storage/StorageVolatile.java">StorageVolatile</a>.</p></li>
+<li><p>Testing in modo automatizzato con JUnit.</p></li>
+<li><p>Logging locale su file.</p></li>
+<li><p>Deployment mediante file <span class="slide3">cargoproduct-1.0.jar</span> di un componente software che:</p>
+<ul>
+<li><p>non è autonomo</p></li>
+<li><p>produce effetti perchè esegue procedure specificate nell’interfaccia <a class="reference external" href="../../../../cargoproduct/src/main/java/domain/ICrudOps.java">ICrudOps</a></p></li>
+<li><p>nel caso di memoria piena, esegue il metodo <code class="docutils literal notranslate"><span class="pre">createProduct</span></code> restituendo una stringa generica di errore</p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+</section>
+<section id="cargosystem25-con-attori-qak">
+<h1>cargosystem25 con attori qak<a class="headerlink" href="#cargosystem25-con-attori-qak" title="Permalink to this heading">¶</a></h1>
+<section id="id2">
+<h2>Progetto cargoserviceQak<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h2>
+<p>Il <span class="slide3">project</span> <a class="reference external" href="../../../../cargoserviceQak">progetto cargoserviceQak</a> realizza il microservizio come tecnologia Qak definendo
+un <strong>modello</strong> (<a class="reference external" href="../../../../cargoserviceQak/src/cargoservice.qak">cargoservice.qak</a>) in cui:</p>
+<section id="key-points-cargoserviceqak">
+<h3>Key-points cargoserviceQak<a class="headerlink" href="#key-points-cargoserviceqak" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>il servizio è gestito  da un attore <strong>produceservice</strong> che si <span class="slide3">registra su Eureka</span> con il nome
+del sup contesto <strong>ctxcargoservice</strong> e che <strong>emette messaggi di log</strong>  avvalendosi dello <a class="reference internal" href="UsingELK.html#stack-elk"><span class="std std-ref">Stack ELK</span></a></p></li>
+<li><p><strong>emette messaggi di log</strong> usando <span class="slide3">Logging su ElasticSearch e Kibana</span>, avvalendosi dello <a class="reference internal" href="UsingELK.html#stack-elk"><span class="std std-ref">Stack ELK</span></a>
+attivato come insieme di micorservizi  su Docker.</p></li>
+<li><p>le richieste di creazione/eliminazione di un prodotto sono <span class="slide3">delegate</span> da <em>produceservice</em> ad un attore <strong>exec_createdelete</strong></p></li>
+<li><p>le richieste di lettura di un prodotto sono <span class="slide3">delegate</span> a un actor <strong>exec_get</strong> <span class="slide3">creato dinamicamente</span>
+cosi’ come le richieste di visualizzazione di tutti i prodotti (delegate a un actor <strong>exec_getall</strong> creato dinamicamente)</p></li>
+<li><p>Uso del <span class="slide3">pattern CQRS</span> (<span class="slide2">Command and Query Responsibility Segregation</span>)</p>
+<ul>
+<li><p>Si veda: <a class="reference external" href="https://en.wikipedia.org/wiki/Command_Query_Responsibility_Segregation">https://en.wikipedia.org/wiki/Command_Query_Responsibility_Segregation</a></p></li>
+<li><p>Interessante anche: <a class="reference external" href="https://mia-platform.eu/it/blog/event-sourcing-e-cqrs-pattern-scopriamoli/">https://mia-platform.eu/it/blog/event-sourcing-e-cqrs-pattern-scopriamoli/</a></p></li>
+</ul>
+</li>
+</ul>
+<a class="reference internal image-reference" href="_images/ArchProductServiceFull.JPG"><img alt="_images/ArchProductServiceFull.JPG" class="align-center" src="_images/ArchProductServiceFull.JPG" style="width: 100%;" /></a>
+<section id="id3">
+<h4>ProductServiceDiscoverCallerTcp<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h4>
+<p>Il programma Java <a class="reference external" href="../../../../cargoserviceQak/src/main/java/caller/ProductServiceDiscoverCallerTcp.java">ProductServiceDiscoverCallerTcp</a> è un esempio di come fare il doscovery e la chiamata al servizio.
+(<span class="remark">WARNING</span>: va attivato invocando  <span class="slide3">gradlew runCaller</span>)</p>
+</section>
+</section>
+<section id="struttura-del-workspace-di-cargoserviceqak">
+<h3>Struttura del workspace di cargoserviceQak<a class="headerlink" href="#struttura-del-workspace-di-cargoserviceqak" title="Permalink to this heading">¶</a></h3>
+<a class="reference internal image-reference" href="_images/cargoserviceqakworkspacecommented.jpg"><img alt="_images/cargoserviceqakworkspacecommented.jpg" class="align-center" src="_images/cargoserviceqakworkspacecommented.jpg" style="width: 70%;" /></a>
+</section>
+</section>
+<section id="progetto-cargoserviceqakgui">
+<h2>Progetto cargoserviceQakGui<a class="headerlink" href="#progetto-cargoserviceqakgui" title="Permalink to this heading">¶</a></h2>
+<p><span class="slide3">Goal</span>: dotare il sistema del <span class="xref std std-ref">Progetto cargoservice</span> di una GUI per la interazione uomo-macchina.</p>
+<section id="key-points-cargoserviceqakgui">
+<h3>Key-points cargoserviceQakGui<a class="headerlink" href="#key-points-cargoserviceqakgui" title="Permalink to this heading">¶</a></h3>
+</section>
+</section>
+<section id="progetto-cargoservicem2mqaklocal">
+<h2>Progetto cargoserviceM2MQakLocal<a class="headerlink" href="#progetto-cargoservicem2mqaklocal" title="Permalink to this heading">¶</a></h2>
+<section id="key-points-cargoservicem2mqaklocal">
+<h3>Key-points cargoserviceM2MQakLocal<a class="headerlink" href="#key-points-cargoservicem2mqaklocal" title="Permalink to this heading">¶</a></h3>
+<p><span class="slide3">Goal</span>: dotare il sistema del <span class="xref std std-ref">Progetto cargoservice</span> di una GUI per la interazione uomo-macchina
+evitando la comunicazione via rete tra il RestController della GUI e il serviceqak.</p>
+</section>
+</section>
+</section>
+<section id="distribuzione-su-docker-di-cargoserviceqak">
+<h1>Distribuzione su docker di cargoserviceqak<a class="headerlink" href="#distribuzione-su-docker-di-cargoserviceqak" title="Permalink to this heading">¶</a></h1>
+<section id="iss2025new-yaml-con-network">
+<h2>iss2025new.yaml con network<a class="headerlink" href="#iss2025new-yaml-con-network" title="Permalink to this heading">¶</a></h2>
+<p>La nuova versione di <a class="reference external" href="../../../../uniboyamls/iss2025new.yaml">iss2025new.yaml</a> dei servizi utili alle applicazioni, include la definizione
+di un <a class="reference internal" href="DockerNotes.html#dockernotes"><span class="std std-ref">docker network</span></a> che fa da ‘collante’ per i nostri (micro)servizi</p>
+<p>La rete (di nome <span class="slide3">iss-network</span>) va creata con il comando:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">network</span> <span class="n">create</span> <span class="n">iss</span><span class="o">-</span><span class="n">network</span>
+</pre></div>
+</div>
+</section>
+<section id="products-su-database-mongo">
+<h2>Products su database Mongo<a class="headerlink" href="#products-su-database-mongo" title="Permalink to this heading">¶</a></h2>
+<p>Nella distribuzione finale si vuole inserire i prodotti nel dabase NOSQL <a class="reference external" href="https://en.wikipedia.org/wiki/MongoDB">MongoDB</a> che viene attivato
+come servizio usando il file <a class="reference internal" href="#iss2025new-yaml-con-network"><span class="std std-ref">iss2025new.yaml con network</span></a>.</p>
+<p>Per raggiungere lo scipo, occoore definire la <span class="slide3">variabile di ambiente MOMGO_HOST</span></p>
+<ul>
+<li><p>su Windows:</p>
+<blockquote>
+<div><p>set <code class="docutils literal notranslate"><span class="pre">MONGO_HOSY=localhost</span></code> ad uso di programmi Java locali come <a class="reference external" href="../../../../cargoserviceQak/src/main/java/caller/ProductServiceDiscoverCallerTcp.java">ProductServiceDiscoverCallerTcp</a></p>
+</div></blockquote>
+</li>
+<li><p>con Docker:</p>
+<ul>
+<li><p>nel <a class="reference external" href="../../../../cargoserviceQak/Dockerfile">Dockerfile</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">FROM</span> <span class="n">eclipse</span><span class="o">-</span><span class="n">temurin</span><span class="p">:</span><span class="mf">17.0.5_8</span><span class="o">-</span><span class="n">jre</span><span class="o">-</span><span class="n">focal</span> <span class="k">as</span> <span class="n">builder</span>
+<span class="o">...</span>
+<span class="n">ENV</span> <span class="n">MONGO_HOST</span><span class="o">=</span><span class="n">mongodb</span>         <span class="c1">#NOME DEL SERIZIO in iss2025new.yaml</span>
+<span class="n">ENV</span> <span class="n">EUREKA_CLIENT_SERVICEURL_DEFAULTZONE</span><span class="o">=</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">eureka</span><span class="p">:</span><span class="mi">8761</span><span class="o">/</span><span class="n">eureka</span><span class="o">/</span>
+<span class="n">ENV</span> <span class="n">SERVICE_IP</span><span class="o">=</span><span class="mf">192.168.1.132</span>   <span class="c1">#utile per GUI</span>
+<span class="n">ENV</span> <span class="n">SERVICE_URL</span><span class="o">=</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="mf">192.168.1.132</span><span class="p">:</span><span class="mi">8111</span>
+<span class="n">RUN</span> <span class="n">mkdir</span> <span class="n">logs</span>
+</pre></div>
+</div>
+</li>
+<li><p>oppure (meglio) nel file <a class="reference external" href="../../../../cargoserviceQak/cargoserviceqak.yaml">cargoserviceqak.yaml</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">services</span><span class="p">:</span>
+  <span class="n">cargoserviceqak</span><span class="p">:</span>
+    <span class="n">container_name</span><span class="p">:</span> <span class="n">cargoserviceqak</span>
+    <span class="n">image</span><span class="p">:</span> <span class="n">cargoserviceqak</span><span class="p">:</span><span class="mf">1.0</span>
+    <span class="n">environment</span><span class="p">:</span>
+      <span class="o">-</span> <span class="n">EUREKA_CLIENT_SERVICEURL_DEFAULTZONE</span><span class="o">=</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">eureka</span><span class="p">:</span><span class="mi">8761</span><span class="o">/</span><span class="n">eureka</span><span class="o">/</span>
+      <span class="o">-</span> <span class="n">MONGO_HOST</span><span class="o">=</span><span class="n">mongodb</span>   <span class="c1">#NOME DEL SERIZIO in iss2025new.yaml</span>
+    <span class="n">ports</span><span class="p">:</span>
+      <span class="o">-</span> <span class="mi">8111</span><span class="p">:</span><span class="mi">8111</span><span class="o">/</span><span class="n">tcp</span>
+      <span class="o">-</span> <span class="mi">8111</span><span class="p">:</span><span class="mi">8111</span><span class="o">/</span><span class="n">udp</span>
+    <span class="n">networks</span><span class="p">:</span>
+      <span class="o">-</span> <span class="n">iss</span><span class="o">-</span><span class="n">network</span>
+<span class="n">networks</span><span class="p">:</span>
+    <span class="n">iss</span><span class="o">-</span><span class="n">network</span><span class="p">:</span>
+      <span class="n">external</span><span class="p">:</span> <span class="n">true</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+<section id="variabili-di-ambiente">
+<h3>Variabili di ambiente<a class="headerlink" href="#variabili-di-ambiente" title="Permalink to this heading">¶</a></h3>
+<p>La presenza di una variabile di ambiente può essere testata con la funzione</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CommUtils</span><span class="o">.</span><span class="n">getEnvvarValue</span><span class="p">(</span><span class="s2">&quot;MONGO_HOST&quot;</span><span class="p">);</span>
+<span class="o">//</span><span class="n">oppure</span> <span class="n">direttemente</span> <span class="n">con</span>
+<span class="n">System</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;MONGO_HOST&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Ciò viene fatto nell’adapter <a class="reference external" href="../../../../cargoproduct/src/main/java/domain/adapter/AdapterStorage.java">AdapterStorage</a>, che attiva <a class="reference external" href="../../../../cargoproduct/src/main/java/domain/adapter/AdapterStorageMongo.java">AdapterStorageMongo</a> (o altri servizi di supporto alla
+memoriizazione di prodotti se la variabile non esiste).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">public</span> <span class="n">static</span> <span class="n">AdapterStorage</span> <span class="n">setup</span><span class="p">()</span> <span class="p">{</span>
+  <span class="n">String</span> <span class="n">mongourl</span>       <span class="o">=</span> <span class="n">CommUtils</span><span class="o">.</span><span class="n">getEnvvarValue</span><span class="p">(</span><span class="s2">&quot;MONGO_HOST&quot;</span><span class="p">);</span>
+  <span class="n">String</span> <span class="n">storageramAddr</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;STORAGERAM_URL&quot;</span><span class="p">);</span>  <span class="o">//</span><span class="ow">in</span> <span class="n">yaml</span>
+  <span class="k">if</span><span class="p">(</span> <span class="n">storageramAddr</span> <span class="o">!=</span> <span class="n">null</span> <span class="p">)</span> <span class="k">return</span> <span class="n">new</span> <span class="n">AdapterStorageramservice</span><span class="p">(</span> <span class="n">storageramAddr</span> <span class="p">);</span>
+  <span class="k">if</span><span class="p">(</span> <span class="n">mongourl</span> <span class="o">!=</span> <span class="n">null</span> <span class="p">)</span> <span class="k">return</span> <span class="n">new</span> <span class="n">AdapterStorageMongo</span><span class="p">(</span><span class="n">mongourl</span><span class="p">);</span>
+  <span class="n">CommUtils</span><span class="o">.</span><span class="n">outred</span><span class="p">(</span><span class="s2">&quot;WARNING: NO URL for external storage - using StorageVolatile&quot;</span>  <span class="p">);</span>
+  <span class="n">StorageVolatile</span> <span class="n">storage</span> <span class="o">=</span> <span class="n">StorageVolatile</span><span class="o">.</span><span class="n">getStorageSingleton</span><span class="p">();</span>
+  <span class="k">return</span> <span class="n">new</span> <span class="n">AdapterStorageVolatile</span><span class="p">(</span><span class="n">storage</span> <span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>La classe <a class="reference external" href="../../../../cargoproduct/src/main/java/domain/adapter/AdapterStorageMongo.java">AdapterStorageMongo</a> fa riferimento a un database di nome <span class="slide3">cargodb</span> e a collezioni di nome
+<span class="slide3">products</span>.</p>
+</section>
+<section id="id4">
+<h3>MongoDBCompass<a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h3>
+<p>Il data base può essere consultato usando l’app <a class="reference external" href="https://www.mongodb.com/products/tools/compass">MongoDBCompass</a></p>
+</section>
+</section>
+<section id="i-file-docker-per-il-microservizio-cargoserviceqak">
+<h2>I file docker per il microservizio cargoserviceqak<a class="headerlink" href="#i-file-docker-per-il-microservizio-cargoserviceqak" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="../../../../cargoserviceQak/Dockerfile">Dockerfile</a> : crea la immagine <strong>cargoserviceqak:1.0</strong></p></li>
+<li><p><a class="reference external" href="../../../../cargoserviceQak/cargoserviceqak.yaml">cargoserviceqak.yaml</a></p></li>
+</ul>
+<p>Un caller esterno in Java</p>
+<ul class="simple">
+<li><p><a class="reference external" href="../../../../cargoserviceQak/src/main/java/caller/ProductServiceDiscoverCallerTcp.java">ProductServiceDiscoverCallerTcp</a></p></li>
+</ul>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">cargosystem25</a><ul>
+<li><a class="reference internal" href="#requisiti">Requisiti</a></li>
+<li><a class="reference internal" href="#impostazioni-preliminari">Impostazioni preliminari</a><ul>
+<li><a class="reference internal" href="#video-richiami-sui-primipassioperativi25">VIDEO Richiami sui <span class="xref std std-ref">Primipassioperativi25</span></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id1">Progetto cargoproduct</a><ul>
+<li><a class="reference internal" href="#video-sul-progetto-cargoproduct">VIDEO sul progetto cargoproduct</a></li>
+<li><a class="reference internal" href="#key-points-cargoproduct">Key-points cargoproduct</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cargosystem25-con-attori-qak">cargosystem25 con attori qak</a><ul>
+<li><a class="reference internal" href="#id2">Progetto cargoserviceQak</a><ul>
+<li><a class="reference internal" href="#key-points-cargoserviceqak">Key-points cargoserviceQak</a><ul>
+<li><a class="reference internal" href="#id3">ProductServiceDiscoverCallerTcp</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#struttura-del-workspace-di-cargoserviceqak">Struttura del workspace di cargoserviceQak</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#progetto-cargoserviceqakgui">Progetto cargoserviceQakGui</a><ul>
+<li><a class="reference internal" href="#key-points-cargoserviceqakgui">Key-points cargoserviceQakGui</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#progetto-cargoservicem2mqaklocal">Progetto cargoserviceM2MQakLocal</a><ul>
+<li><a class="reference internal" href="#key-points-cargoservicem2mqaklocal">Key-points cargoserviceM2MQakLocal</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#distribuzione-su-docker-di-cargoserviceqak">Distribuzione su docker di cargoserviceqak</a><ul>
+<li><a class="reference internal" href="#iss2025new-yaml-con-network">iss2025new.yaml con network</a></li>
+<li><a class="reference internal" href="#products-su-database-mongo">Products su database Mongo</a><ul>
+<li><a class="reference internal" href="#variabili-di-ambiente">Variabili di ambiente</a></li>
+<li><a class="reference internal" href="#id4">MongoDBCompass</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#i-file-docker-per-il-microservizio-cargoserviceqak">I file docker per il microservizio cargoserviceqak</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="UsingELK.html"
+                          title="previous chapter">UsingELK</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="UsingEureka.html"
+                          title="next chapter">UsingEureka</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/cargosystem25.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="UsingEureka.html" title="UsingEureka"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="UsingELK.html" title="UsingELK"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">iss25 1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">cargosystem25</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2025, Antonio Natali.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

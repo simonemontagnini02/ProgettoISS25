@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprint1</title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+
+    <h1>Goal</h1>
+    <h2><a href="./Requisiti.html">Requisiti del committente</a></h2>
+    <h2><a href="./Sprint0.html">Sprint0</a></h2>
+    <br />
+
+    <div>
+
+        L'obiettivo di questo Sprint consiste nella realizzazione e nell'integrazione dei componenti core-business del
+        sistema.
+        Al termine di questa fase di sviluppo sarà possibile consentire la registrazione dei prodotti con l'assegnazione
+        di un identificativo univoco, la gestione di una richiesta di carico tenendo in considerazione i vincoli dati
+        dal peso massimo e dalla disponibilità degli slot e infine la gestione dell'occupazione della stiva.
+    </div>
+
+    <h1>Requisiti dei contesti</h1>
+
+    <h2>Gestione Prodotto</h2>
+
+    <br />
+
+    <table>
+        <tr>
+            <th>
+                ID
+            </th>
+            <th>
+                Descrizione 
+            </th>
+            <th>
+                Tipo
+            </th>
+            <th>
+                Priorità
+            </th>
+            <th>
+                Vincoli
+            </th>
+
+        </tr>
+
+        <tr>
+            <td>
+                GP1
+            </td>
+
+            <td>
+                Il sistema deve permettere la registrazione di un nuovo prodotto, specificando almeno il peso
+            </td>
+
+            <td>
+                Funzionale
+            </td>
+
+            <td>
+                Alta
+            </td>
+
+            <td>
+                Il peso deve essere espresso in kg, > 0
+            </td>
+
+        </tr>
+
+        <tr>
+            <td>
+                GP2
+            </td>
+
+            <td>
+                Alla registrazione di un prodotto, il sistema deve generare un identificativo univoco (PID) intero
+                positivo.
+            </td>
+
+            <td>
+                Funzionale
+            </td>
+
+            <td>
+                Alta
+            </td>
+
+            <td>
+                L'univocità del PID deve essere garantita
+            </td>
+
+        </tr>
+
+        <tr>
+            <td>
+                GP3
+            </td>
+
+            <td>
+                Il sistema deve consentire di ottenere il peso di un prodotto a partire dal PID
+            </td>
+
+            <td>
+                Funzionale
+            </td>
+
+            <td>
+                Alta
+            </td>
+
+            <td>
+                
+            </td>
+
+        </tr>
+
+        <tr>
+            <td>
+                GP4
+            </td>
+
+            <td>
+                Il sistema deve mantenere le informazioni sui prodotti registrati per tutta la durata dell'esecuzione
+            </td>
+
+            <td>
+                Funzionale
+            </td>
+
+            <td>
+                Alta
+            </td>
+
+            <td>
+                Persistenza delle informazioni in memoria
+            </td>
+
+        </tr>
+
+        <tr>
+            <td>
+                GP5
+            </td>
+
+            <td>
+                Il sistema può memorizzare anche informazioni opzionali sul prodotto 
+            </td>
+
+            <td>
+                Funzionale
+            </td>
+
+            <td>
+                Bassa
+            </td>
+
+            <td>
+                
+            </td>
+
+        </tr>
+
+        <tr>
+            <td>
+                GP6
+            </td>
+
+            <td>
+                Il PID viene generato in modo incrementale
+            </td>
+
+            <td>
+                Non Funzionale
+            </td>
+
+            <td>
+                Alta
+            </td>
+
+            <td>
+                L'incremento deve essere unitario e costante per ogni nuovo prodotto registrato.
+            </td>
+
+        </tr>
+
+    </table>
+    
+</body>
+
+</html>

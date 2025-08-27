@@ -45,6 +45,36 @@ h2 {
     border-radius: 4px;
 }
 
+h3 {
+    font-size: 1.4em;
+    color: #3498db;
+    margin-bottom: 8px;
+    margin-top: 20px;
+    border-left: 4px solid #3498db;
+    padding-left: 8px;
+    background-color: #f5f7f8;
+    padding: 6px 10px;
+    border-radius: 3px;
+}
+
+/* Link */
+a {
+    color: #2980b9;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease, text-decoration 0.3s ease;
+}
+
+a:hover {
+    color: #1c5980;
+    text-decoration: underline;
+}
+
+a:visited {
+    color: #6c5ce7;
+}
+
+
 /* Testo nei div */
 div {
     background-color: #ffffff;
@@ -57,15 +87,58 @@ div {
 
 /* Liste puntate */
 ul {
-    margin: 15px 0;
+    margin-bottom: 6px;
     padding-left: 25px;
 }
 
-li {
-    margin-bottom: 8px;
-    list-style-type: disc;
+ol {
+    margin-bottom: 6px;
+    padding-left: 25px;
+}
+
+li{
+    margin-bottom: 4px;
     color: #34495e;
 }
+
+.cerchio{
+
+    list-style-type: disc;
+}
+
+/* Tabelle */
+table {
+    width: 90%;
+    border-collapse: collapse;
+    margin:auto;
+    margin-bottom: 30px;
+    background-color: #ffffff;
+    border: 2px solid #2980b9;
+    overflow: hidden;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+
+thead {
+    background-color: #2980b9;
+    text-align: left;
+}
+
+
+th, td {
+    padding: 12px 15px;
+    border: 2px solid #2980b9;
+}
+
+
+@media (max-width: 600px) {
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}
+
 
 /* Responsive */
 @media (max-width: 600px) {

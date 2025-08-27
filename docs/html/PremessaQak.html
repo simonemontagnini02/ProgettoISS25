@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <link rel="stylesheet" type="text/css" href="./css/style.css" />
+</head>
+
+<body>
+    <h1>Premessa sul metamodello QAK</h1>
+</body>
+<p>
+    Riteniamo opportuno introdurre una premessa relativa al metamodello <strong>QAK</strong> e alle motivazioni del suo
+    impiego, in
+    quanto l'analisi dei requisiti sarà condotta basandosi sul concetto di attore definito da tale metamodello.
+</p>
+</br>
+<p>
+    Il modello Java si basa principalmente sull’utilizzo di <strong>POJO</strong> (Plain Old Java Object), ossia componenti passivi con
+    cui si interagisce tramite chiamate di procedura per realizzare un applicativo. Al contrario, il metamodello QAK
+    fonda il proprio funzionamento sul concetto di <strong>attori</strong>, che comunicano tra loro attraverso messaggi per
+    l’implementazione dei servizi.
+</p>
+</br>
+<p>
+    Gli attori sono entità <strong>message-driven</strong>, in quanto offrono la possibilità di comunicare tramite lo
+    scambio di varie tipologie di messaggi (<strong>Dispatch, Event, Request</strong>).
+    Sono componenti attivi che operano come un <strong>automa di Moore</strong>, permettendo di interpretare i messaggi ricevuti sulla
+    base dello stato attuale.
+</p>
+</br>
+<p>
+    Questo modello introduce il concetto di <strong>contesto</strong>, fondamentale per la rappresentazione dei nodi
+    logici all'interno di un sistema distribuito.
+    Infine, il metamodello QAK integra una software factory che consente la generazione
+    automatica di codice eseguibile a partire dai modelli, riducendo così i tempi di sviluppo e possibilità di errore.
+</p>
+</br>
+<p>
+    Le funzionalità offerte da tale metamodello rispecchiano particolarmente il modello richiesto dal
+    committente; per questo motivo è stato ritenuto opportuno adottare gli attori QAK per la modellazione del
+    sistema software.
+
+</p>
+
+</html>

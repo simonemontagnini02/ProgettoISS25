@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="./css/style.css" />
+    <title>Sprint0_v1</title>
+</head>
+
+<body>
+    <h1>Sprint 0</h1>
+    <h2><a href="./htmlCorso/TemaFinale25.html">Requisiti del committente</a> </h2>
+    <h2><a href="./PremessaQak.html">Premessa sul metamodello QAK</a> </h2>
+    <h2>Analisi dei Requisiti</h2>
+    <div>
+        Seguendo le indicazioni del committente, <strong>Hold</strong> (stiva) è una griglia rettangolare ed è
+        modellabile come un
+        oggetto Java singleton, contenente i seguenti attributi relativi alle sue dimensioni:
+        <ul>
+            <li><strong>base</strong>: variabile positiva di tipo intero</li>
+            <li><strong>altezza</strong>: variabile positiva di tipo intero</li>
+        </ul>
+
+        La Hold è caratterizzata da una <strong>IOPort</strong>, situata in una determinata posizione dell'area della
+        stiva. L'IOPort
+        sarà dotata di una certa lunghezza.
+        </br></br>
+        La Hold prevede 4 aree rettangolari di deposito per i <strong>product container</strong>. Queste quattro aree
+        sono chiamate <strong>Slot</strong>
+        e sono rappresentate da un array di oggetti Java, contenenti i seguenti attributi relativi alle loro dimensioni:
+        <ul>
+            <li><strong>base</strong>: variabile positiva di tipo intero</li>
+            <li><strong>altezza</strong>: variabile positiva di tipo intero</li>
+        </ul>
+        Dai requisiti si evince che sarà presente un quinto Slot, che, tuttavia, sarà sempre occupato e perciò sarà
+        semplicemente rappresentato come un'ostacolo.
+
+        </br></br>
+        <p>Inoltre, sarà installato un sensore davanti all’IOPort, basato su tecnologia <strong>sonar</strong>,
+            utilizzato per rilevare
+            la presenza di un product container. La segnalazione della presenza del container verrà effettuata quando
+            sarà misurata una distanza <strong>D</strong>, tale che <strong>D &lt; DFREE / 2</strong>, per un certo
+            periodo di tempo (ad esempio 3
+            secondi).
+        </p>
+        </br>
+
+        <img src="./htmlCorso/_images/tf25sceneAnnotated.jpg" width="700">
+
+        Il committente fornisce una realizzazione di un <strong>Differential Drive Robot</strong>, chiamato <a
+            href="./htmlCorso/BasicRobot24.html">basicrobot</a>. Con Differential Drive Robot si intende un robot a
+        guida differenziale, cioè un tipo di robot mobile che è in grado di muoversi grazie a due ruote motrici
+        indipendenti montate sullo stesso asse.
+        Il componente basicrobot viene visto dall’esterno come un servizio che realizza un insieme di funzionalità:
+        <ul>
+            <li>Esecuzione di richieste di ingaggio: messaggio <span style="background-color: lightblue;">Request
+                    engage:engage(CALLER)</span></li>
+            <li>Esecuzione di comandi elementari di movimento: messaggio <span
+                    style="background-color: lightblue;">Dispatch cmd:cmd(MOVE)</span></li>
+            <li>Esecuzione di step (movimento in avanti per un tempo dato): messaggio <span
+                    style="background-color: lightblue;">Request step:step(TIME)</span></li>
+            <li>Esecuzione di sequenze di movimento (piani): messaggio <span
+                    style="background-color: lightblue;">Request doplan:doplan(PATH,STEPTIME)</span></li>
+            <li>Esecuzione di posizionamento: messaggio <span style="background-color: lightblue;">Request
+                    moverobot:moverobot(TARGETX, TARGETY)</span></li>
+        </ul>
+        Il componente basicrobot fornisce le funzionalità necessarie per muoversi all'interno della Hold, tuttavia
+        non possiede la capacità di gestire le richieste di carico descritte nei requisiti. Per la realizzazione del
+        componente <strong>cargorobot</strong> sarà necessario estendere basicrobot, introducendo le funzionalità di
+        trasporto e carico/scarico dei product container.
+        </br></br>
+        A supporto del movimento del robot all'interno della Hold sarà necessaria una mappatura della stiva
+        attraverso la suddivisione della sua area in una <strong>matrice di celle</strong>. La cella è un quadrato con
+        lato pari all'unità di misura robotica, ovvero <strong>2R</strong> (R: raggio del robot).
+        </br>
+        Il deposito può essere pertanto modellato come una griglia rettangolare composta da <strong>HHxHW</strong> celle
+        (HH: Hold
+        Height, HW: Hold Width).
+        </br>
+        Il concetto di posizione viene formalizzato introducendo una coppia di coordinate cartesiane x e y con lo
+        scopo di identificare ogni singola cella della mappa.
+
+        </br></br>
+        Il committente fornisce anche una mappa della Hold, contenente le aree rilevate al suo interno.
+        </br>
+        Legenda:
+        <ul>
+            <li><strong>'1'</strong>: denota una cella libera</li>
+            <li><strong>'X'</strong>: denota una cella occupata da un ostacolo</li>
+            <li><strong>'r'</strong>: denota la posizione corrente del robot</li>
+        </ul>
+
+        <div style="text-align: center; background-color: lightblue;">
+            <pre style="display: inline-block; padding: 10px; margin: 0; font-size: 15px;">
+r,  1,  1,  1,  1,  1,  1,
+1,  1,  X,  X,  1,  1,  1,
+1,  1,  1,  1,  X,  1,  1,
+1,  1,  X,  X,  1,  1,  1,
+1,  1,  1,  1,  1,  1,  1,
+X,  X,  X,  X,  X,  X,  X,
+</pre>
+        </div>
+
+        Legenda:
+        <ul>
+            <li><strong>'H'</strong>: denota la cella in cui si trova la Home</li>
+            <li><strong>'SN'</strong>: denota la cella dello Slot N</li>
+            <li><strong>'UN'</strong>: denota la cella in cui si trova l'area di scarico dello Slot N (Unload Position)
+            </li>
+            <li><strong>'IO'</strong>: denota la cella in cui si trova l'IOPort</li>
+            <li><strong>'L'</strong>: denota la cella in cui robot preleverà il product container (Load Position)</li>
+        </ul>
+
+        <div style="text-align: center; background-color: lightblue;">
+            <pre style="display: inline-block; padding: 10px; margin: 0; font-size: 15px;">
+H,  1,  1,  1,  1,  1,  1,
+r,  U1, S1, S2, U2, 1,  1,
+1,  1,  1,  1,  X,  1,  1,
+1,  U3, S3, S4, U4, 1,  1,
+L,  1,  1,  1,  1,  1,  1,
+IO, X,  X,  X,  X,  X,  X,
+</pre>
+        </div>
+
+        Le aree notevoli presentano le seguenti coordinate:
+        <ul>
+            <li><strong>Home</strong>: x=0, y=0</li>
+            <li><strong>Slot[0..3]</strong>: {(x=2, y=1), (x=3, y=1), (x=2, y=3), (x=3, y=3)}</li>
+            <li><strong>UnloadPos[0..3]</strong>: {(x=1, y=1), (x=4, y=1), (x=1, y=3), (x=4, y=3)}</li>
+            <li><strong>IOPort</strong>: x=0, y=5</li>
+            <li><strong>LoadPos</strong>: x=0, y=4</li>
+        </ul>
+
+        </br>
+        In questa maniera sono state formalizzate le posizioni degli elementi rilevanti all'interno della Hold.
+
+        </br></br>
+        Il committente fornisce una realizzazione del <a href="./htmlCorso/cargosystem25.html">productservice</a>
+        rappresentata dal progetto <strong>cargoproduct</strong>. In conformità ai requisiti del committente, questo
+        componente
+        registra i prodotti nel database a partire dal loro nome e dal loro peso, assegnando a ciascuno un PID univoco
+        (variabile intera positiva).
+        </br>I prodotti sono degli oggetti Java contenenti una serie di variabili:
+        <ul>
+            <li><strong>productId</strong>: variabile intera relativa all'identificatore univoco del prodotto</li>
+            <li><strong>name</strong>: stringa relativa al nome del prodotto</li>
+            <li><strong>weight</strong>: variabile intera relativa al peso del prodotto</li>
+        </ul>
+
+        </br>
+        Il committente richiede la costruzione di un sistema software, chiamato <strong>cargoservice</strong>, che si
+        occuperà della
+        gestione delle richieste di carico dei product container.
+        Il componente cargoservice viene visto dall’esterno come un servizio che tramite scambio di messaggi
+        realizza le seguenti funzionalità:
+        <ul>
+            <li>Esecuzione di richieste di carico di product container: messaggio <span
+                    style="background-color: lightblue;">Request
+                    load_request:load(PID)</span>. 
+                </br>Questa richiesta prevede due tipologie di risposte a seconda del suo
+                esito:
+                <ul>
+                    <li><span style="background-color: lightblue;">Reply load_accepted : slot(SlotID)</span>: richiesta
+                        accettata con indicazione dell'id dello Slot associato al product container</li>
+                    <li><span style="background-color: lightblue;">Reply load_refused : reason(String)</span>: richiesta
+                        rifiutata con motivazione del rifiuto</li>
+                </ul>
+            </li>
+            <li>Rilevazione della presenza del product container sull'IOPort tramite utilizzo di un sonar</li>
+            <li>Posizionamento da parte del cargorobot del product container nello Slot a lui assegnato</li>
+            <li>Visualizzazione dello stato interno della Hold tramite l'utilizzo di una web-gui dinamicamente
+                aggiornata</li>
+            <li>Interruzione di tutte le attività e accensione del led nel caso il sonar misuri una distanza <strong>D
+                    &gt;
+                    DFREE</strong> per un periodo di tempo pari ad almeno tre secondi. Il servizio riprenderà le sue
+                attività non
+                appena il sonar misurerà una distanza <strong>D &le; DFREE</strong></li>
+        </ul>
+        </br>
+        Dopo aver depositato il container nello Slot:
+        <ul>
+            <li>cargorobot dovrà ritornare sulla cella della Home</li>
+            <li>cargoservice potrà gestire nuove load_request di product container</li>
+        </ul>
+        </br>
+        Le richieste di carico dei product container vengono rifiutate se:
+        <ul>
+            <li>Il peso del container presenta un valore tale per cui il peso totale della Hold
+                (<strong>totalWeight</strong>) supera il peso massimo di essa (<strong>maxLoad</strong>)</li>
+            <li>I 4 Slot nella Hold sono già occupati</li>
+        </ul>
+
+
+        <h2>Sistema logico di riferimento</h2>
+        Dai requisiti del committente sono emersi tre tipi di nodi computazionali diversi, che saranno rappresentati da
+        tre contesti differenti:
+        <ul>
+            <li><strong>cargoservice</strong>: relativo al core business del sistema, prevede al suo interno i seguenti
+                attori:
+                <ul>
+                    <li><strong>cargoservice</strong>: si occuperà della gestione delle richieste di carico dei product
+                        container.</li>
+                    <li><strong>productservice</strong>: si occuperà di fornire le funzionalità necessarie per la
+                        registrazione dei
+                        prodotti all'interno del database.</li>
+                    <li><strong>basicrobot</strong>: si occuperà di fornire le funzionalità necessarie per muovere il
+                        robot all'interno
+                        della Hold.</li>
+                    <li><strong>cargorobot</strong>: si occuperà di implementare le funzionalità aggiuntive necessarie
+                        per trasportare il
+                        product container allo Slot a lui assegnato. Questo attore sfrutterà le funzionalità basilari
+                        legate al movimento fornite dall'attore basicrobot.</li>
+                    <li><strong>hold</strong>: si occuperà di fornire una rappresentazione della stiva, all'interno
+                        della quale verranno
+                        caricati i vari product container.</li>
+                    <li><strong>webgui</strong>: si occuperà di fornire una visualizzazione lato client delle
+                        informazioni relative alla
+                        Hold.</li>
+                </ul>
+            </li>
+            <li><strong>cargoservice_clients</strong>: client applicativo che interagisce con productservice tramite la
+                Request load_request. Questo nodo risiede nella macchina dell'utente finale. Siccome sarà necesssaria la
+                realizzazione di una sola funzionalità, questo contesto prevede un singolo attore, chiamato
+                <strong>client</strong>.
+            </li>
+            <li><strong>iodevices</strong>: si occupa dell'interfacciamento con i dispositivi fisici, come il sensore
+                sonar all'IOPort e l'accensione del LED. Questo nodo risiede nel dispositivo Raspberry. Questo contesto
+                prevede i seguenti attori:
+                <ul>
+                    <li><strong>sonar</strong>: si occuperà di comunicare le misurazioni effettuate dal sensore
+                        sull'IOPort all'attore cargoservice.</li>
+                    <li><strong>led</strong>: si occuperà dell'accessione e spegnimento del LED.</li>
+                </ul>
+            </li>
+        </ul>
+        </br>
+        I componenti forniti dal committente sono i seguenti:
+        <ul>
+            <li>productservice</li>
+            <li>basicrobot</li>
+            <li>sonar</li>
+            <li>led</li>
+        </ul>
+        </br>
+        I componenti che dovranno essere realizzati dallo sviluppatore sono i seguenti:
+        <ul>
+            <li>cargoservice</li>
+            <li>cargorobot</li>
+            <li>hold</li>
+            <li>webgui</li>
+            <li>client</li>
+        </ul>
+        <img src="./img/sprint0_arch.png" width="800">
+        <h2>Testing</h2>
+
+        <table>
+            <tr>
+                <th>
+                    ID
+                </th>
+                <th>
+                    Titolo
+                </th>
+                <th>
+                    Tipo
+                </th>
+                <th>
+                    Descrizione
+                </th>
+                <th>
+                    Input
+                </th>
+                <th>
+                    Output
+                </th>
+
+            </tr>
+
+            <tr>
+                <td>
+                    T01
+                </td>
+                <td>
+                    <strong>Univocità del PID</strong>
+                </td>
+                <td>
+                    Unit Test
+                </td>
+                <td>
+                    L'attore productservice si occupa di registrare un prodotto e di assegnargli un PID univoco
+                </td>
+                <td>
+                    Prodotto
+                </td>
+                <td>
+                    PID univoco
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    T02
+                </td>
+                <td>
+                    <strong>Salvataggio del prodotto</strong>
+                </td>
+                <td>
+                    Unit Test
+                </td>
+                <td>
+                    L'attore productservice si occupa di registrare correttamente il prodotto
+                </td>
+                <td>
+                    Prodotto
+                </td>
+                <td>
+                    Entry di Prodotto
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    T03
+                </td>
+                <td>
+                    <strong>Capacità massima</strong>
+                </td>
+                <td>
+                    Integration Test
+                </td>
+                <td>
+                    L'attore cargoservice si interfaccia con l'attore hold per controllare che la variabile totalWeight
+                    della Hold non superi il valore di maxLoad
+                </td>
+                <td>
+                    PID container
+                </td>
+                <td>
+                    Response: load_accepted o load_refused
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    T04
+                </td>
+                <td>
+                    <strong>Disponibilità di Slot</strong>
+                </td>
+                <td>
+                    Integration Test
+                </td>
+                <td>
+                    L'attore cargoservice, interagendo con l'attore hold, controlla che ci siano Slot disponibili
+                </td>
+                <td>
+                    PID container
+                </td>
+                <td>
+                    Response: load_accepted o load_refused
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    T05
+                </td>
+                <td>
+                    <strong>Gestione delle richieste di carico</strong>
+                </td>
+                <td>
+                    Unit Test
+                </td>
+                <td>
+                    L'attore cargoservice durante l'attesa che il product container venga consegnato all'IOPort non
+                    accetta richieste
+                    dall'esterno
+                </td>
+                <td>
+                    PID container
+                </td>
+                <td>
+                    Response: load_refused
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    T06
+                </td>
+                <td>
+                    <strong>Fallimento del sonar</strong>
+                </td>
+                <td>
+                    Integration Test
+                </td>
+                <td>
+                    Nel caso la distanza misurata dal sonar sia maggiore di DFREE per più di tre secondi, l'attore sonar
+                    dovrà interrompere il sistema, segnalando l'anomalia all'attore cargoservice, e comunicando
+                    all'attore led di accendere il LED.
+                </td>
+                <td>
+                    D (> DFREE)
+                </td>
+                <td>
+                    Interruzione dell'attività e accensione del LED da parte dell'attore led
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    T07
+                </td>
+                <td>
+                    <strong>Ripristino del sistema</strong>
+                </td>
+                <td>
+                    Integration Test
+                </td>
+                <td>
+                    Nel caso la distanza misurata dal sonar sia minore o uguale di DFREE, l'attore sonar dovrà
+                    comunicare all'attore cargoservice di ripristinare il sistema
+                </td>
+                <td>
+                    D (<= DFREE) </td>
+                <td>
+                    Ripristino dell'attività
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    T08
+                </td>
+                <td>
+                    <strong>Corretto funzionamento sonar</strong>
+                </td>
+                <td>
+                    Integration Test
+                </td>
+                <td>
+                    L'attore sonar dovrà segnalare all'attore cargoservice l'arrivo di un container sull'IOPort in modo
+                    da poter avviare la procedura di carico
+                </td>
+                <td>
+                    Product container sull'IOPort
+                </td>
+                <td>
+                    Messaggio inviato all'attore cargoservice
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    T09
+                </td>
+                <td>
+                    <strong>Comunicazione dello Slot di scarico del container</strong>
+                </td>
+                <td>
+                    Integration Test
+                </td>
+                <td>
+                    L'attore cargoservice dovrà comunicare all'attore cargorobot l'identificativo dello Slot in cui il
+                    product container presente sull'IOPort dovrà essere scaricato.
+                </td>
+                <td>
+                    Product container sull'IOPort
+                </td>
+                <td>
+                    Identificativo dello Slot
+                </td>
+            </tr>
+
+        </table>
+
+        <h2>Piano di lavoro</h2>
+
+        <div>
+            Il piano di lavoro prevede l'implementazione degli attori legati al core-business, ovvero cargoservice,
+            hold e productservice. Lo Sprint 1 sarà incentrato sulla realizzazione dei primi due attori, in quanto il
+            terzo è già fornito dal committente. In questo modo sarà possibile proporre un'architettura eseguibile e
+            funzionante, procedendo in seguito allo sviluppo degli altri attori associati alle funzionalità secondarie.
+            In questo Sprint si prevede l'implementazione di un sottoinsieme mirato dei casi di test precedentemente
+            discussi, con lo scopo di validare il corretto funzionamento delle principali funzionalità del sistema. In
+            particolare,
+            verranno implementati i test relativi alla gestione dei prodotti, alla valutazione delle richieste di carico
+            e alla gestione dello
+            stato fisico della Hold, in quanto sono direttamente connessi agli attori da realizzare. I test
+            selezionati per questo Sprint sono:
+            <ul>
+                <li>T01 - Univocità del PID</li>
+                <li>T02 - Salvataggio del prodotto</li>
+                <li>T03 - Capacità massima</li>
+                <li>T04 - Disponibilità di slot</li>
+                <li>T05 - Gestione delle richieste di carico</li>
+            </ul>
+        </div>
+</body>
+
+</html>

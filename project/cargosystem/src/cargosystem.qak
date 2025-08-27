@@ -1,0 +1,62 @@
+System cargosystem
+
+Request load_request : load(PID)       // richiesta di carico di un container
+Reply   load_accepted : slot(SlotID) for load_request
+Reply   load_refused  : reason(String) for load_request
+
+Context ctx_cargoservice ip [ host="localhost" port=8110]
+
+Context ctx_iodevices ip [ host="localhost" port=8112]
+
+Context ctx_cargoservice_clients ip [ host="localhost" port=8111]
+
+QActor client context ctx_cargoservice_clients {
+  	State s0 initial{
+  		request cargoservice -m load_request : load($PID)
+    }
+}
+
+QActor cargoservice context ctx_cargoservice {
+  	State s0 initial {
+    }
+  	Transition t0 
+  		whenRequest load_request -> handle_loadRequest
+  		
+  	State handle_loadRequest{
+  	}
+}
+
+QActor productservice context ctx_cargoservice {
+  State s0 initial{
+    }
+}
+
+QActor hold context ctx_cargoservice {
+  State s0 initial{
+    }
+}
+
+QActor basicrobot context ctx_cargoservice {
+  State s0 initial{
+    }
+}
+
+QActor cargorobot context ctx_cargoservice {
+  State s0 initial{
+    }
+}
+
+QActor webgui context ctx_cargoservice {
+  State s0 initial{
+    }
+}
+
+QActor sonar context ctx_iodevices {
+  State s0 initial{
+    }
+}
+
+QActor led context ctx_iodevices {
+  State s0 initial{
+    }
+}
