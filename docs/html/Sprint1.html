@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sprint1</title>
+    <title>Sprint 1</title>
     <link rel="stylesheet" href="./css/style.css">
 </head>
 
@@ -36,7 +36,7 @@
                 ID
             </th>
             <th>
-                Descrizione 
+                Descrizione
             </th>
             <th>
                 Tipo
@@ -80,7 +80,7 @@
 
             <td>
                 Alla registrazione di un prodotto, il sistema deve generare un identificativo univoco (PID) intero
-                positivo.
+                positivo
             </td>
 
             <td>
@@ -190,7 +190,389 @@
         </tr>
 
     </table>
+
+    <h2>Gestione Carico</h2>
+
+    <br />
+
+    <table>
+        <tr>
+            <th>
+                ID
+            </th>
+            <th>
+                Descrizione 
+            </th>
+            <th>
+                Tipo
+            </th>
+            <th>
+                Priorità
+            </th>
+            <th>
+                Vincoli
+            </th>
+
+        </tr>
+
+        <tr>
+            <td>
+                GC1
+            </td>
+            <td>
+                Ricezione richiesta di carico per un PID già registrato
+            </td>
+            <td>
+                Funzionale
+            </td>
+            <td>
+                Alta
+            </td>
+            <td>
+                PID valido (PID > 0 e già registrato)
+            </td>
+
+        </tr>
+
+        <tr>
+            <td>
+                GC2
+            </td>
+            <td>
+                Il sistema deve verificare che il peso massimo non venga superato 
+            </td>
+            <td>
+                Funzionale
+            </td>
+            <td>
+                Alta
+            </td>
+            <td>
+                Peso nuovo container + peso attuale &le; MaxLoad, con MaxLoad configurabile e peso attuale ottenuto da InventarioStiva
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                GC3
+            </td>
+            <td>
+                Il sistema deve verificare la disponibilità di slot liberi in stiva
+            </td>
+            <td>
+                Funzionale
+            </td>
+            <td>
+                Alta
+            </td>
+            <td>
+                La stiva dispone di 4 slot, InventarioStiva fornisce le informazioni associate 
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                GC4
+            </td>
+            <td>
+                Il sistema deve rifiutare una richiesta in caso di superamento peso massimo o slot non disponibile
+            </td>
+            <td>
+                Funzionale
+            </td>
+            <td>
+                Alta
+            </td>
+            <td>
+                
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                GC5
+            </td>
+            <td>
+                Il sistema deve assegnare uno slot libero al PID in caso di richiesta valida
+            </td>
+            <td>
+                Funzionale
+            </td>
+            <td>
+                Alta
+            </td>
+            <td>
+                Slot scelto restituito al chiamante
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                GC6
+            </td>
+            <td>
+                Il sistema deve interagire per garantire il corretto posizionamento del container nello slot assegnato
+            </td>
+            <td>
+                Funzionale
+            </td>
+            <td>
+                Alta
+            </td>
+            <td>
+
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                GC7
+            </td>
+            <td>
+                Dopo l'accettazione di una richiesta di carico, il sistema rimane in attesa che il container venga consegnato sulla porta di input
+            </td>
+            <td>
+                Funzionale
+            </td>
+            <td>
+                Alta
+            </td>
+            <td>
+
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                GC8
+            </td>
+            <td>
+                Il sistema deve bloccare l'elaborazione di nuove richieste fino al completamento della precedente
+            </td>
+            <td>
+                Funzionale
+            </td>
+            <td>
+                Media
+            </td>
+            <td>
+                
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                GC9
+            </td>
+            <td>
+                Il sistema deve comunicare in output l'esito dell'assegnazione
+            </td>
+            <td>
+                Funzionale
+            </td>
+            <td>
+                Alta
+            </td>
+            <td>
+                In caso di successo viene restituito lo slot, altrimenti un codice di errore 
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                GC10
+            </td>
+            <td>
+                Operazioni di verifica richiesta e assegnazione slot devono essere eseguite in &le;500ms
+            </td>
+            <td>
+                Non funzionale
+            </td>
+            <td>
+                Media 
+            </td>
+            <td>
+                
+            </td>
+        </tr>
+
+        
+        
+    </table>
+
+    <h2>Inventario Stiva</h2>
+
+    <br/>
+
+    <table>
+        <tr>
+            <th>
+                ID
+            </th>
+            <th>
+                Descrizione 
+            </th>
+            <th>
+                Tipo
+            </th>
+            <th>
+                Priorità
+            </th>
+            <th>
+                Vincoli
+            </th>
+
+        </tr>
+
+        <tr>
+            <td>
+                IS1
+            </td>
+
+            <td>
+                Il sistema monitora lo stato di occupazione degli slot
+            </td>
+
+            <td>
+                Funzionale
+            </td>
+
+            <td>
+                Alta
+            </td>
+
+            <td>
+                Ciascuno slot puo essere "occupato" o "libero"
+            </td>
+
+        </tr>
+
+        <tr>
+            <td>
+                IS2
+            </td>
+
+            <td>
+                Per ciascun slot occupato, il sistema mantiene il PID del container presente
+            </td>
+
+            <td>
+                Funzionale
+            </td>
+
+            <td>
+                Alta
+            </td>
+
+            <td>
+                
+            </td>
+
+        </tr>
+
+        <tr>
+            <td>
+                IS3
+            </td>
+
+            <td>
+                Per ciascun slot occupato, il sistema mantiene il peso del container presente
+            </td>
+
+            <td>
+                Funzionale
+            </td>
+
+            <td>
+                Alta
+            </td>
+
+            <td>
+                
+            </td>
+
+        </tr>
+
+        <tr>
+            <td>
+                IS4
+            </td>
+
+            <td>
+                Il sistema mantiene il peso totale dei container attualmente presenti nella stiva
+            </td>
+
+            <td>
+                Funzionale
+            </td>
+
+            <td>
+                Alta
+            </td>
+
+            <td>
+                
+            </td>
+
+        </tr>
+
+         <tr>
+            <td>
+                IS5
+            </td>
+
+            <td>
+                Il sistema fornisce le informazioni sullo stato della stiva 
+            </td>
+
+            <td>
+                Funzionale
+            </td>
+
+            <td>
+                Alta
+            </td>
+
+            <td>
+                Comunicazione con Gestione Carico 
+            </td>
+
+        </tr>
+
+        <tr>
+            <td>
+                IS6
+            </td>
+
+            <td>
+                Il sistema comunica ogni modifica dello stato della stiva
+            </td>
+
+            <td>
+                Funzionale
+            </td>
+
+            <td>
+                Alta
+            </td>
+
+            <td>
+                Interazione con Visualizzazione Stiva
+            </td>
+
+        </tr>
+
+    </table>
     
+    <h1>Modello del dominio</h1>
+    <h2>Gestione Prodotto</h2>
+    <img src="./img/Modello_Dominio_Gestione_Prodotto.png">
+
+    <h2>Gestione Carico</h2>
+    <img src="./img/Modello_Dominio_Gestione_Carico.png">
+
+    <h2>Inventario Stiva</h2>
+    <img src="./img/Modello_Dominio_Inventario_Stiva.png">
 </body>
 
 </html>
