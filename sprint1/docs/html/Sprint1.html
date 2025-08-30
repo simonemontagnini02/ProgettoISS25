@@ -289,10 +289,129 @@
     <h1>Modello del dominio</h1>
 
     <h2>cargoservice</h2>
+
     <img src="./img/Modello_Dominio_CargoService.png">
 
     <h2>hold</h2>
     <img src="./img/Modello_Dominio_Hold.png">
+
+    <h2>Testing</h2>
+
+    <table>
+
+            <tr>
+                <td>
+                    T05
+                </td>
+                <td>
+                    <strong>Gestione delle richieste di carico</strong>
+                </td>
+                <td>
+                    Unit Test
+                </td>
+                <td>
+                    L'attore cargoservice durante l'attesa che il product container venga consegnato all'IOPort non
+                    accetta richieste
+                    dall'esterno
+                </td>
+                <td>
+                    PID container
+                </td>
+                <td>
+                    Response: load_refused
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    T06
+                </td>
+                <td>
+                    <strong>Fallimento del sonar</strong>
+                </td>
+                <td>
+                    Integration Test
+                </td>
+                <td>
+                    Nel caso la distanza misurata dal sonar sia maggiore di DFREE per più di tre secondi, l'attore sonar
+                    dovrà interrompere il sistema, segnalando l'anomalia all'attore cargoservice, e comunicando
+                    all'attore led di accendere il LED.
+                </td>
+                <td>
+                    D (> DFREE)
+                </td>
+                <td>
+                    Interruzione dell'attività e accensione del LED da parte dell'attore led
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    T07
+                </td>
+                <td>
+                    <strong>Ripristino del sistema</strong>
+                </td>
+                <td>
+                    Integration Test
+                </td>
+                <td>
+                    Nel caso la distanza misurata dal sonar sia minore o uguale di DFREE, l'attore sonar dovrà
+                    comunicare all'attore cargoservice di ripristinare il sistema
+                </td>
+                <td>
+                    D (<= DFREE) </td>
+                <td>
+                    Ripristino dell'attività
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    T08
+                </td>
+                <td>
+                    <strong>Corretto funzionamento sonar</strong>
+                </td>
+                <td>
+                    Integration Test
+                </td>
+                <td>
+                    L'attore sonar dovrà segnalare all'attore cargoservice l'arrivo di un container sull'IOPort in modo
+                    da poter avviare la procedura di carico
+                </td>
+                <td>
+                    Product container sull'IOPort
+                </td>
+                <td>
+                    Messaggio inviato all'attore cargoservice
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    T09
+                </td>
+                <td>
+                    <strong>Comunicazione dello Slot di scarico del container</strong>
+                </td>
+                <td>
+                    Integration Test
+                </td>
+                <td>
+                    L'attore cargoservice dovrà comunicare all'attore cargorobot l'identificativo dello Slot in cui il
+                    product container presente sull'IOPort dovrà essere scaricato.
+                </td>
+                <td>
+                    Product container sull'IOPort
+                </td>
+                <td>
+                    Identificativo dello Slot
+                </td>
+            </tr>
+
+        </table>
+
 </body>
 
 </html>
