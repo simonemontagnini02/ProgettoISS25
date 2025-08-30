@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprint 1</title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+
+    <h1>Sprint 1</h1>
+    <h2>Sprint 0</h2>
+    <div>Lo Sprint 0 è consultabile alla seguente pagina: <a href="../../../sprint0/docs/html/Sprint0_v1.html">Sprint
+            0</a></div>
+
+    <h2>Goal dello sprint</h2>
+    <div>
+
+        L'obiettivo di questo Sprint consiste nella realizzazione e nell'integrazione dei componenti core-business del
+        sistema.
+        Al termine di questa fase di sviluppo sarà possibile consentire la gestione di una richiesta di carico tenendo
+        in considerazione i vincoli dati dal peso massimo e dalla disponibilità degli Slot e infine la gestione
+        dell'occupazione della Hold.
+    </div>
+
+    <h2>Requisiti degli attori</h2>
+
+    <h3>cargoservice</h3>
+    <br />
+    <table>
+        <tr>
+            <th>
+                ID
+            </th>
+            <th>
+                Descrizione
+            </th>
+            <th>
+                Tipo
+            </th>
+            <th>
+                Vincoli
+            </th>
+
+        </tr>
+
+        <tr>
+            <td>
+                CS1
+            </td>
+            <td>
+                Ricezione richiesta di carico per un product container
+            </td>
+            <td>
+                Funzionale
+            </td>
+            <td>
+                productId > 0 e già registrato nel database
+            </td>
+
+        </tr>
+
+        <tr>
+            <td>
+                CS2
+            </td>
+            <td>
+                L'attore deve verificare che il peso totale della Hold non superi il suo peso massimo
+            </td>
+            <td>
+                Funzionale
+            </td>
+            <td>
+                Product.weight + Hold.totalWeight &le; Hold.maxLoad (maxLoad con valore arbitrario)
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                CS3
+            </td>
+            <td>
+                L'attore deve verificare la disponibilità di Slot liberi nella Hold
+            </td>
+            <td>
+                Funzionale
+            </td>
+            <td>
+                La Hold dispone di 4 Slot inizialmente liberi
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                CS4
+            </td>
+            <td>
+                L'attore deve accettare le richieste di carico valide inviando un messaggio load_accepted
+            </td>
+            <td>
+                Funzionale
+            </td>
+            <td>
+                Vincoli CS1, CS2 e CS3 validi
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                CS5
+            </td>
+            <td>
+                L'attore deve rifiutare le richieste di carico non valide inviando un messaggio load_refused
+            </td>
+            <td>
+                Funzionale
+            </td>
+            <td>
+                Vincolo CS1/CS2/CS3 non valido
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                CS6
+            </td>
+            <td>
+                L'attore deve interagire con cargorobot per garantire il corretto posizionamento del product container
+                nello Slot
+                assegnato
+            </td>
+            <td>
+                Funzionale
+            </td>
+            <td>
+
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                CS7
+            </td>
+            <td>
+                L'attore rimane in attesa che il product container venga consegnato all'IOPort
+            </td>
+            <td>
+                Funzionale
+            </td>
+            <td>
+                Richiesta di carico accettata
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                CS8
+            </td>
+            <td>
+                L'attore deve bloccare l'elaborazione di nuove richieste fino al completamento della precedente
+            </td>
+            <td>
+                Funzionale
+            </td>
+            <td>
+                Richiesta di carico accettata
+            </td>
+        </tr>
+
+    </table>
+
+    <h3>hold</h3>
+
+    <br />
+
+    <table>
+        <tr>
+            <th>
+                ID
+            </th>
+            <th>
+                Descrizione
+            </th>
+            <th>
+                Tipo
+            </th>
+            <th>
+                Vincoli
+            </th>
+
+        </tr>
+
+        <tr>
+            <td>
+                H1
+            </td>
+
+            <td>
+                L'attore gestisce lo stato di occupazione degli Slot
+            </td>
+
+            <td>
+                Funzionale
+            </td>
+
+            <td>
+                Ciascuno Slot può essere "occupato" o "libero"
+            </td>
+
+        </tr>
+
+        <tr>
+            <td>
+                H2
+            </td>
+
+            <td>
+                Per ciascun Slot occupato, l'attore mantiene all'interno del database il productId del product container
+                presente
+            </td>
+
+            <td>
+                Funzionale
+            </td>
+
+            <td>
+            </td>
+
+        </tr>
+
+        <tr>
+            <td>
+                H3
+            </td>
+
+            <td>
+                L'attore mantiene il peso totale (Hold.totalWeight) dei product container attualmente presenti nella
+                Hold
+            </td>
+
+            <td>
+                Funzionale
+            </td>
+
+            <td>
+
+            </td>
+
+        </tr>
+
+        <tr>
+            <td>
+                H4
+            </td>
+
+            <td>
+                L'attore fornisce le informazioni sullo stato della stiva comunicando con cargoservice
+            </td>
+
+            <td>
+                Funzionale
+            </td>
+
+            <td>
+
+            </td>
+
+        </tr>
+
+        <tr>
+            <td>
+                H5
+            </td>
+            <td>
+                L'attore deve comunicare l'identificativo dello Slot assegnato al product container (slotId) alla webgui
+            </td>
+            <td>
+                Funzionale
+            </td>
+            <td>
+                Richiesta accettata
+            </td>
+        </tr>
+
+    </table>
+
+    <h1>Modello del dominio</h1>
+
+    <h2>cargoservice</h2>
+    <img src="./img/Modello_Dominio_CargoService.png">
+
+    <h2>hold</h2>
+    <img src="./img/Modello_Dominio_Hold.png">
+</body>
+
+</html>
