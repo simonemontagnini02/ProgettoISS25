@@ -290,127 +290,188 @@
 
     <h2>cargoservice</h2>
 
-    <img src="./img/Modello_Dominio_CargoService.png">
+    <p>
+        L'attore cargoservice si occupa della gestione del core-business del servizio, realizzando le seguenti
+        funzionalità:
+    <ul>
+        <li>Esecuzione di richieste di carico di product container: messaggio <span
+                style="background-color: lightblue;">Request
+                load_request:load(PID)</span>.
+            </br>Questa richiesta prevede due tipologie di risposte a seconda del suo
+            esito:
+            <ul>
+                <li><span style="background-color: lightblue;">Reply load_accepted : slot(SlotID)</span>: richiesta
+                    accettata con indicazione dell'id dello Slot associato al product container</li>
+                <li><span style="background-color: lightblue;">Reply load_refused : reason(Motivation)</span>: richiesta
+                    rifiutata con motivazione del rifiuto</li>
+            </ul>
+        </li>
+        <li>Rilevazione della presenza del product container sull'IOPort tramite utilizzo di un sonar</li>
+        <li>Posizionamento da parte del cargorobot del product container nello Slot a lui assegnato</li>
+        <li>Visualizzazione dello stato interno della Hold tramite l'utilizzo di una web-gui dinamicamente
+            aggiornata</li>
+        <li>Interruzione di tutte le attività e accensione del led nel caso il sonar misuri una distanza <strong>D
+                &gt;
+                DFREE</strong> per un periodo di tempo pari ad almeno tre secondi. Il servizio riprenderà le sue
+            attività non
+            appena il sonar misurerà una distanza <strong>D &le; DFREE</strong></li>
+    </ul>
 
-    <h2>hold</h2>
+    </br>
+    Per l'implementazione di questo attore si rendono necessarie una serie di classi Java helper, introdotte con
+    l’obiettivo di rispettare il <strong>Single Responsibility Principle</strong>. Ciascuna classe è infatti progettata
+    per occuparsi di
+    un compito specifico e ben definito, riducendo la complessità dell’attore e favorendo una maggiore manutenibilità ed
+    estendibilità del sistema.
+
+    </br></br>
+
+    La classe <strong>Hold</strong> fornisce informazioni sull'occupazione della stiva, permettendo così di:
+    <ul>
+        <li> Gestire lo stato fisico della stiva: la classe sarà responsabile della rappresentazione della stiva
+        </li>
+        <li> Tracciare gli Slot: dovrà memorizzare gli stati dei 4 Slot, fornendo un metodo per identificare quelli
+            liberi </li>
+        <li> Associare prodotti agli slot: per ogni Slot occupato, dovrà conservare il productId associato al product
+            container posizionato al suo interno </li>
+    </ul>
+    Per la realizzazione di questo componente si è deciso di adottare un <strong>design pattern Singleton</strong>, in
+    modo da garantire
+    che la classe abbia una sola istanza come un unico punto d'accesso globale ad essa.
+    È stato scelto di utilizzare un <strong>POJO</strong> anziché un attore, poiché le richieste di carico vengono
+    gestite in maniera
+    sequenziale; di conseguenza anche le modifiche allo stato della Hold avvengono nello stesso ordine, senza la
+    necessità di introdurre concorrenza.
+    </br></br>
     <img src="./img/Modello_Dominio_Hold.png">
+
+    È prevista inoltre la realizzazione di una seconda classe helper, denominata <strong>CargoServiceHelper</strong>.
+    Al suo interno saranno implementate tutte le funzionalità necessarie a gestire le richieste di carico:
+    <ul>
+        <li> int handleLoadrequest(int productId): gestisce la richiesta di carico relativa ad un certo productId </li>
+        <li> boolean checkWeight(): ritorna true nel caso in cui Product.weight + Hold.totalWeight &le; Hold.maxLoad, altrimenti false </li>
+        <li> int checkFreeSlots(): ritorna lo slotId relativo al primo Slot libero, altrimenti -1 in assenza di Slot
+            liberi </li>
+    </ul>
+
+    <img src="./img/Modello_Dominio_CargoService.png">
 
     <h2>Testing</h2>
 
     <table>
 
-            <tr>
-                <td>
-                    T05
-                </td>
-                <td>
-                    <strong>Gestione delle richieste di carico</strong>
-                </td>
-                <td>
-                    Unit Test
-                </td>
-                <td>
-                    L'attore cargoservice durante l'attesa che il product container venga consegnato all'IOPort non
-                    accetta richieste
-                    dall'esterno
-                </td>
-                <td>
-                    PID container
-                </td>
-                <td>
-                    Response: load_refused
-                </td>
-            </tr>
+        <tr>
+            <td>
+                T05
+            </td>
+            <td>
+                <strong>Gestione delle richieste di carico</strong>
+            </td>
+            <td>
+                Unit Test
+            </td>
+            <td>
+                L'attore cargoservice durante l'attesa che il product container venga consegnato all'IOPort non
+                accetta richieste
+                dall'esterno
+            </td>
+            <td>
+                PID container
+            </td>
+            <td>
+                Response: load_refused
+            </td>
+        </tr>
 
-            <tr>
-                <td>
-                    T06
-                </td>
-                <td>
-                    <strong>Fallimento del sonar</strong>
-                </td>
-                <td>
-                    Integration Test
-                </td>
-                <td>
-                    Nel caso la distanza misurata dal sonar sia maggiore di DFREE per più di tre secondi, l'attore sonar
-                    dovrà interrompere il sistema, segnalando l'anomalia all'attore cargoservice, e comunicando
-                    all'attore led di accendere il LED.
-                </td>
-                <td>
-                    D (> DFREE)
-                </td>
-                <td>
-                    Interruzione dell'attività e accensione del LED da parte dell'attore led
-                </td>
-            </tr>
+        <tr>
+            <td>
+                T06
+            </td>
+            <td>
+                <strong>Fallimento del sonar</strong>
+            </td>
+            <td>
+                Integration Test
+            </td>
+            <td>
+                Nel caso la distanza misurata dal sonar sia maggiore di DFREE per più di tre secondi, l'attore sonar
+                dovrà interrompere il sistema, segnalando l'anomalia all'attore cargoservice, e comunicando
+                all'attore led di accendere il LED.
+            </td>
+            <td>
+                D &gt; DFREE
+            </td>
+            <td>
+                Interruzione dell'attività e accensione del LED da parte dell'attore led
+            </td>
+        </tr>
 
-            <tr>
-                <td>
-                    T07
-                </td>
-                <td>
-                    <strong>Ripristino del sistema</strong>
-                </td>
-                <td>
-                    Integration Test
-                </td>
-                <td>
-                    Nel caso la distanza misurata dal sonar sia minore o uguale di DFREE, l'attore sonar dovrà
-                    comunicare all'attore cargoservice di ripristinare il sistema
-                </td>
-                <td>
-                    D (<= DFREE) </td>
-                <td>
-                    Ripristino dell'attività
-                </td>
-            </tr>
+        <tr>
+            <td>
+                T07
+            </td>
+            <td>
+                <strong>Ripristino del sistema</strong>
+            </td>
+            <td>
+                Integration Test
+            </td>
+            <td>
+                Nel caso la distanza misurata dal sonar sia minore o uguale di DFREE, l'attore sonar dovrà
+                comunicare all'attore cargoservice di ripristinare il sistema
+            </td>
+            <td>
+                D &le; DFREE </td>
+            <td>
+                Ripristino dell'attività
+            </td>
+        </tr>
 
-            <tr>
-                <td>
-                    T08
-                </td>
-                <td>
-                    <strong>Corretto funzionamento sonar</strong>
-                </td>
-                <td>
-                    Integration Test
-                </td>
-                <td>
-                    L'attore sonar dovrà segnalare all'attore cargoservice l'arrivo di un container sull'IOPort in modo
-                    da poter avviare la procedura di carico
-                </td>
-                <td>
-                    Product container sull'IOPort
-                </td>
-                <td>
-                    Messaggio inviato all'attore cargoservice
-                </td>
-            </tr>
+        <tr>
+            <td>
+                T08
+            </td>
+            <td>
+                <strong>Corretto funzionamento sonar</strong>
+            </td>
+            <td>
+                Integration Test
+            </td>
+            <td>
+                L'attore sonar dovrà segnalare all'attore cargoservice l'arrivo di un container sull'IOPort in modo
+                da poter avviare la procedura di carico
+            </td>
+            <td>
+                Product container sull'IOPort
+            </td>
+            <td>
+                Messaggio inviato all'attore cargoservice
+            </td>
+        </tr>
 
-            <tr>
-                <td>
-                    T09
-                </td>
-                <td>
-                    <strong>Comunicazione dello Slot di scarico del container</strong>
-                </td>
-                <td>
-                    Integration Test
-                </td>
-                <td>
-                    L'attore cargoservice dovrà comunicare all'attore cargorobot l'identificativo dello Slot in cui il
-                    product container presente sull'IOPort dovrà essere scaricato.
-                </td>
-                <td>
-                    Product container sull'IOPort
-                </td>
-                <td>
-                    Identificativo dello Slot
-                </td>
-            </tr>
+        <tr>
+            <td>
+                T09
+            </td>
+            <td>
+                <strong>Comunicazione dello Slot di scarico del container</strong>
+            </td>
+            <td>
+                Integration Test
+            </td>
+            <td>
+                L'attore cargoservice dovrà comunicare all'attore cargorobot l'identificativo dello Slot in cui il
+                product container presente sull'IOPort dovrà essere scaricato.
+            </td>
+            <td>
+                Product container sull'IOPort
+            </td>
+            <td>
+                Identificativo dello Slot
+            </td>
+        </tr>
 
-        </table>
+    </table>
 
 </body>
 
