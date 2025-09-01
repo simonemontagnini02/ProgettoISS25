@@ -1,0 +1,45 @@
+System cargoservice
+
+Request load_request : load(PID)       // richiesta di carico di un container
+Reply   load_accepted : slot(SlotID) for load_request
+Reply   load_refused  : reason(Motivation) for load_request
+
+Context ctx_cargoservice ip [ host="localhost" port=8110]
+
+//CARGOSERVICE
+QActor cargoservice context ctx_cargoservice
+	withobj helper using "main.java.domain.CargoServiceHelper"{
+  	State s0 initial {
+    }
+  	Transition t0 
+  		whenRequest load_request -> handle_loadRequest
+  		
+  	State handle_loadRequest{
+  		onMsg( load_request : load(PID) ) {
+  		[#
+  			val pid = payloadArg(0).toInt()
+  			
+  			val weight = ...
+  			val slotId = helper.handleLoadRequest(pid)
+  			 
+  			if(slotId > 0){
+         		replyTo load_request with load_accepted : slot(slotId)
+	      	} else {
+	         	replyTo load_request with load_refused : reason("no slot disponibile")
+	      	}	
+  		#]
+  			
+  			
+  		}
+  	}
+}
+
+QActor cargorobot context ctx_cargoservice {
+  State s0 initial{
+    }
+}
+
+QActor webgui_mock context ctx_cargoservice {
+  State s0 initial{
+    }
+}
