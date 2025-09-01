@@ -108,6 +108,7 @@ li{
 
 /* Tabelle */
 table {
+    font-size: 15px;
     width: 90%;
     border-collapse: collapse;
     margin:auto;
