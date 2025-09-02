@@ -45,16 +45,46 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 						if( checkMsgContent( Term.createTerm("load(PID)"), Term.createTerm("load(PID)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
-								  			val pid = payloadArg(0).toInt()
-								  			
-								  			val weight = ...
-								  			val slotId = helper.handleLoadRequest(pid)
-								  			 
-								  			if(slotId > 0){
-								         		replyTo load_request with load_accepted : slot(slotId)
-									      	} else {
-									         	replyTo load_request with load_refused : reason("no slot disponibile")
-									      	}	
+								              val PID = payloadArg(0).toInt()
+								              CommUtils.outgreen("Ricevuta richiesta di carico per PID: $PID")
+								request("getProduct", "product($PID)" ,"productservice" )  
+						}
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t11",targetState="handle_productcontainer",cond=whenReply("getProductAnswer"))
+				}	 
+				state("handle_productcontainer") { //this:State
+					action { //it:State
+						if( checkMsgContent( Term.createTerm("product(JSonString)"), Term.createTerm("product(JSonString)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								
+									            val jsonStr = payloadArg(0)
+								                val obj = org.json.JSONObject(jsonStr)
+								                val weight = obj.getInt("weight")
+									
+									            CommUtils.outgreen("Trovato prodotto con peso: $weight")
+									
+									            val res = helper.handleLoadRequest(weight)
+									            if(res > 0){
+									            	CommUtils.outgreen("Product container associato allo Slot n.$res")
+								answer("load_request", "load_accepted", "slot(res)"   )  
+								
+									            } else {
+									            	if(res == -1) {
+									            		CommUtils.outred("MAX_LOAD_EXCEEDED")
+								answer("load_request", "load_refused", "reason("MAX_LOAD_EXCEEDED")"   )  
+								
+									            	} else {
+									            		if(res == -2) {
+									            			CommUtils.outred("NO_FREE_SLOTS")
+								answer("load_request", "load_refused", "reason("NO_FREE_SLOTS")"   )  
+								
+										            	}
+									            	}
+									            }
 						}
 						//genTimer( actor, state )
 					}

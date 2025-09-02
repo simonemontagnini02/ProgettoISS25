@@ -203,7 +203,7 @@ IO, X,  X,  X,  X,  X,  X,
         da
         cinque contesti differenti:
         <ul>
-            <li><strong>ctx_cargoservice</strong>: relativo al core business del sistema, prevede al suo interno i
+            <li><strong>ctxcargoservice</strong>: relativo al core business del sistema, prevede al suo interno i
                 seguenti attori:
                 <ul>
                     <li><strong>cargoservice</strong>: si occuperà della gestione delle richieste di carico dei product
@@ -217,24 +217,24 @@ IO, X,  X,  X,  X,  X,  X,
                 </ul>
             </li>
             <li>
-                <strong>ctx_productservice</strong>: questo contesto contiene l'attore <strong>productservice</strong>,
+                <strong>ctxproductservice</strong>: questo contesto contiene l'attore <strong>productservice</strong>,
                 che si occuperà
                 di
                 fornire le funzionalità necessarie per la registrazione dei prodotti all'interno del database.
             </li>
             <li>
-                <strong>ctx_basicrobot</strong>: questo contesto contiene l'attore <strong>basicrobot</strong>, che si
+                <strong>ctxbasicrobot</strong>: questo contesto contiene l'attore <strong>basicrobot</strong>, che si
                 occuperà di
                 fornire le funzionalità necessarie per muovere il robot all'interno della Hold.
             </li>
             </li>
-            <li><strong>ctx_cargoservice_clients</strong>: client applicativo che interagisce con productservice tramite
+            <li><strong>ctxcargoserviceclients</strong>: client applicativo che interagisce con productservice tramite
                 la
                 Request load_request. Questo nodo risiede nella macchina dell'utente finale. Siccome sarà necesssaria la
                 realizzazione di una sola funzionalità, questo contesto prevede un singolo attore, chiamato
                 <strong>client</strong>.
             </li>
-            <li><strong>ctx_iodevices</strong>: si occupa dell'interfacciamento con i dispositivi fisici, come il
+            <li><strong>ctxiodevices</strong>: si occupa dell'interfacciamento con i dispositivi fisici, come il
                 sensore
                 sonar all'IOPort e l'accensione del LED. Questo nodo risiede nel dispositivo Raspberry. Questo contesto
                 prevede i seguenti attori:

@@ -4,25 +4,25 @@ Request load_request : load(PID)       // richiesta di carico di un container
 Reply   load_accepted : slot(SlotID) for load_request
 Reply   load_refused  : reason(Motivation) for load_request
 
-Context ctx_cargoservice_clients ip [ host="localhost" port=8111]
+Context ctxcargoserviceclients ip [ host="localhost" port=8111]
 
-Context ctx_cargoservice ip [ host="localhost" port=8110]
+Context ctxcargoservice ip [ host="localhost" port=8110]
 
-Context ctx_productservice ip [ host="localhost" port=8113]
+Context ctxproductservice ip [ host="localhost" port=8113]
 
-Context ctx_basicrobot ip [ host="localhost" port=8114]
+Context ctxbasicrobot ip [ host="localhost" port=8114]
 
-Context ctx_iodevices ip [ host="localhost" port=8112]
+Context ctxiodevices ip [ host="localhost" port=8112]
 
 //CLIENT
-QActor client context ctx_cargoservice_clients {
+QActor client context ctxcargoserviceclients {
   	State s0 initial{
   		request cargoservice -m load_request : load($PID)
     }
 }
 
 //CARGOSERVICE
-QActor cargoservice context ctx_cargoservice {
+QActor cargoservice context ctxcargoservice {
   	State s0 initial {
     }
   	Transition t0 
@@ -32,35 +32,35 @@ QActor cargoservice context ctx_cargoservice {
   	}
 }
 
-QActor cargorobot context ctx_cargoservice {
+QActor cargorobot context ctxcargoservice {
   State s0 initial{
     }
 }
 
-QActor webgui_mock context ctx_cargoservice {
+QActor webgui_mock context ctxcargoservice {
   State s0 initial{
     }
 }
 
 //PRODUCTSERVICE
-QActor productservice context ctx_productservice {
+QActor productservice context ctxproductservice {
   State s0 initial{
     }
 }
 
 //BASICROBOT
-QActor basicrobot context ctx_basicrobot {
+QActor basicrobot context ctxbasicrobot {
   State s0 initial{
     }
 }
 
 //IODEVICES
-QActor sonar context ctx_iodevices {
+QActor sonar context ctxiodevices {
   State s0 initial{
     }
 }
 
-QActor led context ctx_iodevices {
+QActor led context ctxiodevices {
   State s0 initial{
     }
 }

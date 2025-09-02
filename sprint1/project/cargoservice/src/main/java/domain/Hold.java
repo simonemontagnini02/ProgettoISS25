@@ -8,10 +8,8 @@ public class Hold implements IHold {
     private final int maxLoad;
     private Slot[] slots;
 
-    // 🔹 Istanza unica della classe
     private static Hold instance = null;
 
-    // 🔹 Costruttore privato
     private Hold() {
         this.length = 10;
         this.width = 10;
@@ -23,7 +21,6 @@ public class Hold implements IHold {
         }
     }
 
-    // 🔹 Metodo pubblico per ottenere l’istanza
     public static synchronized Hold getInstance() {
         if (instance == null) {
             instance = new Hold();
@@ -34,7 +31,6 @@ public class Hold implements IHold {
     @Override
     public void addContainer(int slotId, int productId, int weight) {
         slots[slotId - 1].setProductId(productId);
-        // aggiorno anche il peso totale
         totalWeight += weight;
     }
 
