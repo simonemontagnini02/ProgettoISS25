@@ -29,6 +29,7 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		//IF actor.withobj !== null val actor.withobj.name» = actor.withobj.method»ENDIF
+		val helper = main.java.domain.CargoServiceHelper
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -43,6 +44,17 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("load(PID)"), Term.createTerm("load(PID)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
+								
+								  			val pid = payloadArg(0).toInt()
+								  			
+								  			val weight = ...
+								  			val slotId = helper.handleLoadRequest(pid)
+								  			 
+								  			if(slotId > 0){
+								         		replyTo load_request with load_accepted : slot(slotId)
+									      	} else {
+									         	replyTo load_request with load_refused : reason("no slot disponibile")
+									      	}	
 						}
 						//genTimer( actor, state )
 					}

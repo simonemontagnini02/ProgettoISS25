@@ -6,9 +6,13 @@ Reply   load_refused  : reason(Motivation) for load_request
 
 Context ctx_cargoservice ip [ host="localhost" port=8110]
 
+Context ctx_productservice ip [ host="localhost" port=8111]
+
 //CARGOSERVICE
 QActor cargoservice context ctx_cargoservice
 	withobj helper using "main.java.domain.CargoServiceHelper"{
+	import "main.java.*"
+		
   	State s0 initial {
     }
   	Transition t0 
@@ -19,7 +23,8 @@ QActor cargoservice context ctx_cargoservice
   		[#
   			val pid = payloadArg(0).toInt()
   			
-  			val weight = ...
+  			val req = MsgUtil.buildRequest(cargoservice, "getProduct", "product($PID)", "productservice")
+  			ActorBasic.sendMessageToActor(req, "productservice", null)
   			val slotId = helper.handleLoadRequest(pid)
   			 
   			if(slotId > 0){
