@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 Edg/139.0.0.0" version="28.1.2">
   <diagram name="Pagina-1" id="GgiSy_o0B-wYwsL7T4W4">
-    <mxGraphModel dx="823" dy="483" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="988" dy="580" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -22,22 +22,22 @@
         <mxCell id="VQ0eAfim4QqAl5D8Itry-25" value="IHold" style="swimlane;fontStyle=1;align=center;verticalAlign=middle;childLayout=stackLayout;horizontal=1;startSize=29;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;whiteSpace=wrap;" parent="1" vertex="1">
           <mxGeometry x="50" y="316" width="360" height="59" as="geometry" />
         </mxCell>
-        <mxCell id="VQ0eAfim4QqAl5D8Itry-5" value="public int : addContainer(int slotId, int productId, double weight);" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="VQ0eAfim4QqAl5D8Itry-25" vertex="1">
+        <mxCell id="VQ0eAfim4QqAl5D8Itry-5" value="public void : addContainer(int slotId, int productId, int weight);" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="VQ0eAfim4QqAl5D8Itry-25" vertex="1">
           <mxGeometry y="29" width="360" height="30" as="geometry" />
         </mxCell>
         <mxCell id="VQ0eAfim4QqAl5D8Itry-31" value="Hold" style="swimlane;fontStyle=1;align=center;verticalAlign=middle;childLayout=stackLayout;horizontal=1;startSize=29;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;whiteSpace=wrap;" parent="1" vertex="1">
           <mxGeometry x="112.5" y="550" width="235" height="134" as="geometry" />
         </mxCell>
-        <mxCell id="USMdIJ-KYJaWLVwbsa3t-1" value="private int : length;" style="text;strokeColor=none;fillColor=none;align=center;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="VQ0eAfim4QqAl5D8Itry-31">
+        <mxCell id="USMdIJ-KYJaWLVwbsa3t-1" value="private int : length;" style="text;strokeColor=none;fillColor=none;align=center;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="VQ0eAfim4QqAl5D8Itry-31" vertex="1">
           <mxGeometry y="29" width="235" height="25" as="geometry" />
         </mxCell>
-        <mxCell id="USMdIJ-KYJaWLVwbsa3t-2" value="private int : width;" style="text;strokeColor=none;fillColor=none;align=center;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="VQ0eAfim4QqAl5D8Itry-31">
+        <mxCell id="USMdIJ-KYJaWLVwbsa3t-2" value="private int : width;" style="text;strokeColor=none;fillColor=none;align=center;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="VQ0eAfim4QqAl5D8Itry-31" vertex="1">
           <mxGeometry y="54" width="235" height="25" as="geometry" />
         </mxCell>
         <mxCell id="VQ0eAfim4QqAl5D8Itry-17" value="private int: totalWeight;" style="text;strokeColor=none;fillColor=none;align=center;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="VQ0eAfim4QqAl5D8Itry-31" vertex="1">
           <mxGeometry y="79" width="235" height="25" as="geometry" />
         </mxCell>
-        <mxCell id="VQ0eAfim4QqAl5D8Itry-18" value="private constant int : maxLoad;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeWidth=0;strokeColor=default;" parent="VQ0eAfim4QqAl5D8Itry-31" vertex="1">
+        <mxCell id="VQ0eAfim4QqAl5D8Itry-18" value="private final int : maxLoad;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeWidth=0;strokeColor=none;" parent="VQ0eAfim4QqAl5D8Itry-31" vertex="1">
           <mxGeometry y="104" width="235" height="30" as="geometry" />
         </mxCell>
         <mxCell id="VQ0eAfim4QqAl5D8Itry-36" value="" style="endArrow=block;dashed=1;endFill=0;endSize=12;html=1;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;dashPattern=8 8;" parent="1" edge="1">
