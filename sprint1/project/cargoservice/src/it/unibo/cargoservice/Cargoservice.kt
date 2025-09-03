@@ -29,7 +29,9 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		//IF actor.withobj !== null val actor.withobj.name» = actor.withobj.method»ENDIF
-		val helper = main.java.domain.CargoServiceHelper
+		val helper = main.java.domain.CargoServiceHelper.getSingleton()
+		
+				var PID = -1	
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -38,15 +40,15 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t00",targetState="handle_loadRequest",cond=whenRequest("load_request"))
+					 transition(edgeName="t03",targetState="handle_loadRequest",cond=whenRequest("load_request"))
 				}	 
 				state("handle_loadRequest") { //this:State
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("load(PID)"), Term.createTerm("load(PID)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
-								              val PID = payloadArg(0).toInt()
-								              CommUtils.outgreen("Ricevuta richiesta di carico per PID: $PID")
+								              PID = payloadArg(0).toInt()
+								              CommUtils.outgreen("Ricevuta richiesta di carico per PID:" + PID)
 								request("getProduct", "product($PID)" ,"productservice" )  
 						}
 						//genTimer( actor, state )
@@ -54,7 +56,7 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t11",targetState="handle_productcontainer",cond=whenReply("getProductAnswer"))
+					 transition(edgeName="t14",targetState="handle_productcontainer",cond=whenReply("getProductAnswer"))
 				}	 
 				state("handle_productcontainer") { //this:State
 					action { //it:State
@@ -62,28 +64,38 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
 									            val jsonStr = payloadArg(0)
-								                val obj = org.json.JSONObject(jsonStr)
-								                val weight = obj.getInt("weight")
-									
-									            CommUtils.outgreen("Trovato prodotto con peso: $weight")
-									
-									            val res = helper.handleLoadRequest(weight)
-									            if(res > 0){
-									            	CommUtils.outgreen("Product container associato allo Slot n.$res")
-								answer("load_request", "load_accepted", "slot(res)"   )  
+									            
+									            if(jsonStr == "unknown") {
+									            	CommUtils.outred("PID_NOT_REGISTERED")
+									            	val Motivation = "PID_NOT_REGISTERED"
+								answer("load_request", "load_refused", "reason($Motivation)"   )  
 								
 									            } else {
-									            	if(res == -1) {
-									            		CommUtils.outred("MAX_LOAD_EXCEEDED")
-								answer("load_request", "load_refused", "reason("MAX_LOAD_EXCEEDED")"   )  
+									            	val obj = org.json.JSONObject(jsonStr)
+									                val weight = obj.getInt("weight")
+										
+										            CommUtils.outgreen("Trovato prodotto con peso:" + weight)
+										
+										            val RESULT = helper.handleLoadRequest(PID, weight)
+										            if(RESULT > 0){
+										            	CommUtils.outgreen("Product container associato allo Slot n." + RESULT)
+								answer("load_request", "load_accepted", "slot($RESULT)"   )  
 								
-									            	} else {
-									            		if(res == -2) {
-									            			CommUtils.outred("NO_FREE_SLOTS")
-								answer("load_request", "load_refused", "reason("NO_FREE_SLOTS")"   )  
+										            } else {
+										            	if(RESULT == -1) {
+										            		CommUtils.outred("MAX_LOAD_EXCEEDED")
+										            		val Motivation = "MAX_LOAD_EXCEEDED"
+								answer("load_request", "load_refused", "reason($Motivation)"   )  
 								
+										            	} else {
+										            		if(RESULT == -2) {
+										            			CommUtils.outred("NO_FREE_SLOTS")
+										            			val Motivation = "NO_FREE_SLOTS"
+								answer("load_request", "load_refused", "reason($Motivation)"   )  
+								
+											            	}
 										            	}
-									            	}
+										            }	
 									            }
 						}
 						//genTimer( actor, state )

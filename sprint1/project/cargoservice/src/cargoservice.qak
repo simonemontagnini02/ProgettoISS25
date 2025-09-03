@@ -1,5 +1,9 @@
 System cargoservice
 
+//Richiesta di registrazione del prodotto
+Request createProduct : product(String)
+Reply   createdProduct: productid(ID) for createProduct
+
 //Richiesta di carico di un container
 Request load_request : load(PID)
 Reply   load_accepted : slot(SlotID) for load_request
@@ -15,18 +19,74 @@ Context ctxproductservice ip [ host="localhost" port=8111]
 //CARGOSERVICE
 Context ctxcargoservice ip [ host="localhost" port=8110]
 
-QActor cargoservice context ctxcargoservice
-    withobj helper using "main.java.domain.CargoServiceHelper"{
-      State s0 initial {
+QActor productservice context ctxproductservice {
+    State s0 initial {
     }
+}
+
+QActor exec_createdelete context ctxproductservice {
+    State s0 initial {
+    }
+}
+
+QActor clientmock context ctxcargoservice {
+    State s0 initial {
+    	[#
+    	var PROD = "{\"productId\":31,\"name\":\"p31\",\"weight\":311}"
+    	#]
+		request exec_createdelete -m createProduct : product($PROD)
+    }
+    Transition t1
+    	whenReply createdProduct -> handle_createdProduct
+      	
+      State handle_createdProduct{
+          onMsg( createdProduct : productid(ID) ) {
+          [#
+              val PIDC = payloadArg(0).toInt()
+              CommUtils.outblue("Prodotto registrato con PID: " + PIDC)
+          #]
+          request cargoservice -m load_request : load($PIDC)
+          }
+      }
+      
+      Transition t2
+      	whenReply load_accepted -> handle_loadaccepted
+      	whenReply load_refused -> handle_loadrefused
+      	
+      State handle_loadaccepted{
+          onMsg( load_accepted : slot(SlotID) ) {
+          [#
+              val ID = payloadArg(0)
+              CommUtils.outblue("Richiesta di carico accettata, product container associato allo Slot n." + ID)
+          #]
+          }
+      }
+      
+      State handle_loadrefused{
+          onMsg( load_refused : reason(Motivation) ) {
+          [#
+              val res = payloadArg(0)
+              CommUtils.outblue("Richiesta di carico rifiutata, motivo: " + res)
+          #]
+          }
+      }
+}
+
+QActor cargoservice context ctxcargoservice withobj helper using "main.java.domain.CargoServiceHelper.getSingleton()"{
+		[#
+		var PID = -1	
+		#]
+		
+		State s0 initial {
+		}
       Transition t0 
           whenRequest load_request -> handle_loadRequest
 
       State handle_loadRequest{
           onMsg( load_request : load(PID) ) {
           [#
-              val PID = payloadArg(0).toInt()
-              CommUtils.outgreen("Ricevuta richiesta di carico per PID: $PID")
+              PID = payloadArg(0).toInt()
+              CommUtils.outgreen("Ricevuta richiesta di carico per PID:" + PID)
           #]
           request productservice -m getProduct : product($PID)
           }
@@ -38,31 +98,42 @@ QActor cargoservice context ctxcargoservice
     	onMsg( getProductAnswer : product(JSonString) ) {
 	        [#
 	            val jsonStr = payloadArg(0)
-                val obj = org.json.JSONObject(jsonStr)
-                val weight = obj.getInt("weight")
-	
-	            CommUtils.outgreen("Trovato prodotto con peso: $weight")
-	
-	            val res = helper.handleLoadRequest(weight)
-	            if(res > 0){
-	            	CommUtils.outgreen("Product container associato allo Slot n.$res")
-	            	#]
-	                replyTo load_request with load_accepted : slot(res)
+	            
+	            if(jsonStr == "unknown") {
+	            	CommUtils.outred("PID_NOT_REGISTERED")
+	            	val Motivation = "PID_NOT_REGISTERED"
+            	 	#]
+	                replyTo load_request with load_refused : reason($Motivation)
 	                [#
 	            } else {
-	            	if(res == -1) {
-	            		CommUtils.outred("MAX_LOAD_EXCEEDED")
-	            	 	#]
-		                replyTo load_request with load_refused : reason("MAX_LOAD_EXCEEDED")
+	            	val obj = org.json.JSONObject(jsonStr)
+	                val weight = obj.getInt("weight")
+		
+		            CommUtils.outgreen("Trovato prodotto con peso:" + weight)
+		
+		            val RESULT = helper.handleLoadRequest(PID, weight)
+		            if(RESULT > 0){
+		            	CommUtils.outgreen("Product container associato allo Slot n." + RESULT)
+		            	#]
+		                replyTo load_request with load_accepted : slot($RESULT)
 		                [#
-	            	} else {
-	            		if(res == -2) {
-	            			CommUtils.outred("NO_FREE_SLOTS")
+		            } else {
+		            	if(RESULT == -1) {
+		            		CommUtils.outred("MAX_LOAD_EXCEEDED")
+		            		val Motivation = "MAX_LOAD_EXCEEDED"
 		            	 	#]
-			                replyTo load_request with load_refused : reason("NO_FREE_SLOTS")
+			                replyTo load_request with load_refused : reason($Motivation)
 			                [#
+		            	} else {
+		            		if(RESULT == -2) {
+		            			CommUtils.outred("NO_FREE_SLOTS")
+		            			val Motivation = "NO_FREE_SLOTS"
+			            	 	#]
+				                replyTo load_request with load_refused : reason($Motivation)
+				                [#
+			            	}
 		            	}
-	            	}
+		            }	
 	            }
 	        #]
     	}
@@ -74,12 +145,7 @@ QActor cargorobot context ctxcargoservice {
     }
 }
 
-QActor webgui_mock context ctxcargoservice {
+QActor webguimock context ctxcargoservice {
   State s0 initial{
-    }
-}
-
-QActor productservice context ctxproductservice {
-    State s0 initial {
     }
 }

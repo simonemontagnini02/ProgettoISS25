@@ -334,7 +334,7 @@
     È prevista inoltre la realizzazione di una seconda classe helper, denominata <strong>CargoServiceHelper</strong>.
     Al suo interno saranno implementate tutte le funzionalità necessarie a gestire le richieste di carico:
     <ul>
-        <li> int handleLoadrequest(int productId): gestisce la richiesta di carico relativa ad un certo productId </li>
+        <li> int handleLoadrequest(int productId, int weight): gestisce la richiesta di carico relativa ad un certo productId </li>
         <li> boolean checkWeight(): ritorna true nel caso in cui Product.weight + Hold.totalWeight &le; Hold.maxLoad,
             altrimenti false </li>
         <li> int checkFreeSlots(): ritorna lo slotId relativo al primo Slot libero, altrimenti -1 in assenza di Slot
