@@ -33,8 +33,8 @@ class Clientmock ( name: String, scope: CoroutineScope, isconfined: Boolean=fals
 				state("s0") { //this:State
 					action { //it:State
 						
-						    	var PROD = "{\"productId\":31,\"name\":\"p31\",\"weight\":311}"
-						request("createProduct", "product($PROD)" ,"exec_createdelete" )  
+						    	val PROD = "{'\"productId\":31,\"name\":\"p31\",\"weight\":311'}"
+						request("createProduct", "product($PROD)" ,"productservice" )  
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

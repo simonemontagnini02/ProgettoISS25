@@ -14,7 +14,7 @@ Request getProduct : product( PID )
 Reply   getProductAnswer : product( JSonString ) for getProduct
 
 //PRODUCTSERVICE
-Context ctxproductservice ip [ host="localhost" port=8111]
+Context ctxproductservice ip [ host="127.0.0.1" port=8111]
 
 //CARGOSERVICE
 Context ctxcargoservice ip [ host="localhost" port=8110]
@@ -24,17 +24,12 @@ QActor productservice context ctxproductservice {
     }
 }
 
-QActor exec_createdelete context ctxproductservice {
-    State s0 initial {
-    }
-}
-
 QActor clientmock context ctxcargoservice {
     State s0 initial {
     	[#
-    	var PROD = "{\"productId\":31,\"name\":\"p31\",\"weight\":311}"
+    	val PROD = "{'\"productId\":31,\"name\":\"p31\",\"weight\":311'}"
     	#]
-		request exec_createdelete -m createProduct : product($PROD)
+		request productservice -m createProduct : product($PROD)
     }
     Transition t1
     	whenReply createdProduct -> handle_createdProduct

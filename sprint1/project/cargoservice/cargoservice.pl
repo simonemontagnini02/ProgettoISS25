@@ -9,12 +9,10 @@ reply( load_refused, reason(Motivation) ).  %%for load_request
 request( getProduct, product(PID) ).
 reply( getProductAnswer, product(JSonString) ).  %%for getProduct
 %====================================================================================
-context(ctxproductservice, "localhost",  "TCP", "8111").
+context(ctxproductservice, "127.0.0.1",  "TCP", "8111").
 context(ctxcargoservice, "localhost",  "TCP", "8110").
  qactor( productservice, ctxproductservice, "it.unibo.productservice.Productservice").
  static(productservice).
-  qactor( exec_createdelete, ctxproductservice, "it.unibo.exec_createdelete.Exec_createdelete").
- static(exec_createdelete).
   qactor( clientmock, ctxcargoservice, "it.unibo.clientmock.Clientmock").
  static(clientmock).
   qactor( cargoservice, ctxcargoservice, "it.unibo.cargoservice.Cargoservice").
