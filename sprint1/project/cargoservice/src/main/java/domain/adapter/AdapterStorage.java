@@ -9,7 +9,7 @@ public abstract class AdapterStorage implements IStorage {
 
 	
 	public static AdapterStorage setup() {
-		String mongourl = System.getenv("MONGO_URL");       //in yaml
+		String mongourl = "mongodb://localhost:27017";    //in yaml
 //		                = CommUtils.getEnvvarValue("MONGO_URL\"); 
 		CommUtils.outmagenta("AdapterStorage mongoUrl=" + mongourl );
 		String storageramAddr = System.getenv("STORAGERAM_URL");  //in yaml

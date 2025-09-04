@@ -43,7 +43,7 @@ public class Hold implements IHold {
 
     @Override
     public void addContainer(int slotId, int productId, int weight) {
-        int res = createSlot(slots[slotId-1], productId);
+        int res = createSlot(slots[slotId], productId);
         totalWeight += weight;
     }
     
@@ -58,11 +58,11 @@ public class Hold implements IHold {
     	if ( slotIdStr == null ) { 
       		CommUtils.delay(4000);
 			dataStore.createItem(slotId,slot.toString());
-			slots[slotId - 1].setProductId(productId);
+			slots[slotId].setProductId(productId);
 			slotAnswer = slotId;
 	   } else {  //ESISTE GIA' UNO SLOT CON LO STESSO SLOTID
 		   CommUtils.outmagenta("Hold | WARNING - Duplicate key, Slot Id: " + slotId);
-		   slots[slotId - 1] = new Slot(slotIdStr);
+		   slots[slotId] = new Slot(slotIdStr);
 		   slotAnswer = -1;
 	   } 
 	   logger.info( "Hold | createSlot:"+ slotAnswer );
