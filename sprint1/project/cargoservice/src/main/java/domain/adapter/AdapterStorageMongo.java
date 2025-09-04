@@ -24,14 +24,14 @@ public class AdapterStorageMongo extends AdapterStorage implements IStorage {
 	      // Accedere al database
 		   MongoDatabase database = mongoClient.getDatabase("cargodb");
 	      // Accedere a una collezione (crea se non esiste)
-		   collection = database.getCollection("products");		  
+		   collection = database.getCollection("slots");		  
 		   CommUtils.outcyan("AdapterStorageMongo | Documents collection num: " + collection.estimatedDocumentCount()); //
 	}
 
 
 	@Override
 	public void createItem(int id, String jsonRep) {
-		  CommUtils.outmagenta("AdapterStorageMongo | createProduct   " + jsonRep );
+		  CommUtils.outmagenta("AdapterStorageMongo | createSlot   " + jsonRep );
 		  
 //		  Document productdoc = new Document("_id", new ObjectId());
 //		  productdoc.append("productId", id);
@@ -39,7 +39,7 @@ public class AdapterStorageMongo extends AdapterStorage implements IStorage {
 		  
 		  
 		  
-	        Document document = new Document("productId", id);
+	        Document document = new Document("slotId", id);
 	        document.append("jsonRep", jsonRep);
 			collection.insertOne(document);
 	}
@@ -49,7 +49,7 @@ public class AdapterStorageMongo extends AdapterStorage implements IStorage {
 	    //LOG.debug("/product return the found product for productId={}", productId);
 //		System.out.println("AdapterStorageMongo | getItem: " + id);	
         // 2. Mongo Read
-        FindIterable<Document> myDocs = collection.find( new Document("productId", id) );
+        FindIterable<Document> myDocs = collection.find( new Document("slotId", id) );
         Document myDoc = myDocs.first();
 //        MongoCursor<Document> myDocsIter = myDocs.iterator();
 //        while( myDocsIter.hasNext() ) {
@@ -67,7 +67,7 @@ public class AdapterStorageMongo extends AdapterStorage implements IStorage {
 	}
 	
 	public Document getDocument(int id) {
-        FindIterable<Document> myDocs = collection.find( new Document("productId", id) );
+        FindIterable<Document> myDocs = collection.find( new Document("slotId", id) );
         Document myDoc = myDocs.first();
         return myDoc;
 	}
@@ -88,10 +88,10 @@ public class AdapterStorageMongo extends AdapterStorage implements IStorage {
 	} 
 
 	@Override 
-	public boolean deleteItem(int productId) {
-		Document myDoc = getDocument(productId);
+	public boolean deleteItem(int slotId) {
+		Document myDoc = getDocument(slotId);
 		if( myDoc == null ) return false;
-        DeleteResult answer = collection.deleteOne( myDoc );  //new Document("id", productId));
+        DeleteResult answer = collection.deleteOne( myDoc );  //new Document("id", slotId));
         CommUtils.outcyan("Document deleted id=" + answer.getDeletedCount() );
         return answer.getDeletedCount() == 1;
 	}

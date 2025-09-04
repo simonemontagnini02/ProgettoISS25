@@ -1,5 +1,7 @@
 package main.java.domain;
 
+import unibo.basicomm23.utils.CommUtils;
+
 public class CargoServiceHelper {
 	private static CargoServiceHelper csh;
     private final Hold hold;
@@ -9,8 +11,9 @@ public class CargoServiceHelper {
 		return csh;
 	}
 
-    public CargoServiceHelper() {
+    private CargoServiceHelper() {
         this.hold = Hold.getInstance();
+        CommUtils.outgreen("CargoServiceHelper | constructor  ");
     }
 
     public int handleLoadRequest(int productId, int weight) {
