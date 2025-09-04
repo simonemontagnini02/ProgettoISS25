@@ -25,7 +25,8 @@ public class CargoServiceHelper {
         if (freeSlot == -1) {
             return -2;
         }
-
+        
+        CommUtils.outgreen("CargoServiceHelper | slotId: "+freeSlot+", productId: "+productId+", weight: "+weight);
         hold.addContainer(freeSlot, productId, weight);
         return freeSlot;
     }

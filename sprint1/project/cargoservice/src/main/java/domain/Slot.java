@@ -17,6 +17,12 @@ public class Slot {
 		this.slotId = slotId;
 		this.productId = productId;
 	}
+	
+	public Slot(String jsonStr) {
+		this( getJsonInt(jsonStr, "slotId"), getJsonInt(jsonStr, "productId"));
+		//CommUtils.outmagenta("Slot | creation json : " + jsonStr);
+		logger.info( "Slot | created json:"+ this.toString() + " in tread:" + Thread.currentThread().getId());
+	}
 
 	public int getProductId() {
 		return productId;
@@ -40,15 +46,8 @@ public class Slot {
 		}
 	}
 	
-	public Slot(String jsonStr)   {
-		this( getJsonInt(jsonStr, "slotId"), getJsonInt(jsonStr, "productId"));
-		//CommUtils.outmagenta("Slot | creation json : " + jsonStr);
-		logger.info( "Slot | created json:"+ this.toString() + " in tread:" + Thread.currentThread().getId());
-	}
-	
 	@Override
 	public String toString() {
-		return "{\"slotId\":SID,\"productId\":ID}"
-				.replace("SID", ""+slotId).replace("ID", ""+productId);
+		return "{\"slotId\":SID,\"productId\":ID}".replace("SID", ""+slotId).replace("ID", ""+productId);
 	}
 }

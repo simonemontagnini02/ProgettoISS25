@@ -1,8 +1,6 @@
 /*
 ================================================================================
 build.gradle
-Spring Boot + Kotlin + CargoService
-Pulito e funzionante
 ================================================================================
 */
 plugins {
@@ -81,8 +79,10 @@ dependencies {
     implementation name: 'unibo.qakactor23-5.0'
     implementation name: 'unibo.basicomm23-1.0'
 
-    // MongoDB
-    implementation 'org.mongodb:mongodb-driver-sync:4.11.0'
+    // MongoDB (driver completo)
+    implementation 'org.mongodb:bson:4.11.1'
+	implementation 'org.mongodb:mongodb-driver-core:4.11.1'
+	implementation 'org.mongodb:mongodb-driver-sync:4.11.1'
 
     // Test
     testImplementation 'org.jetbrains.kotlin:kotlin-test'
@@ -90,8 +90,12 @@ dependencies {
 }
 
 sourceSets {
-    main.java.srcDirs += ['src', 'src/main/java', 'src/main/kotlin', 'src/main/resources']
-    test.java.srcDirs += ['src/main/java/test', 'src/main/kotlin/test']
+    main.java.srcDirs += 'src'
+    main.java.srcDirs += 'src/main/java'
+    main.java.srcDirs += 'src/main/kotlin'
+    main.java.srcDirs += 'src/main/resources'
+    test.java.srcDirs += 'src/main/java/test'
+    test.java.srcDirs += 'src/main/kotlin/test'
 }
 
 eclipse {

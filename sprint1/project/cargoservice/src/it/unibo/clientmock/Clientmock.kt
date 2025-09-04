@@ -47,8 +47,8 @@ class Clientmock ( name: String, scope: CoroutineScope, isconfined: Boolean=fals
 						if( checkMsgContent( Term.createTerm("productid(ID)"), Term.createTerm("productid(ID)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
-								              val PIDC = payloadArg(0).toInt()
-								              CommUtils.outblue("Prodotto registrato con PID: " + PIDC)
+								            val PIDC = payloadArg(0).toInt()
+								            CommUtils.outblue("client | Prodotto registrato con PID: " + PIDC)
 								request("load_request", "load($PIDC)" ,"cargoservice" )  
 						}
 						//genTimer( actor, state )
@@ -64,8 +64,8 @@ class Clientmock ( name: String, scope: CoroutineScope, isconfined: Boolean=fals
 						if( checkMsgContent( Term.createTerm("slot(SlotID)"), Term.createTerm("slot(SlotID)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
-								              val ID = payloadArg(0)
-								              CommUtils.outblue("Richiesta di carico accettata, product container associato allo Slot n." + ID)
+								            val ID = payloadArg(0)
+								            CommUtils.outblue("client | Richiesta di carico accettata, product container associato allo Slot n." + ID)
 						}
 						//genTimer( actor, state )
 					}
@@ -78,8 +78,8 @@ class Clientmock ( name: String, scope: CoroutineScope, isconfined: Boolean=fals
 						if( checkMsgContent( Term.createTerm("reason(Motivation)"), Term.createTerm("reason(Motivation)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
-								              val res = payloadArg(0)
-								              CommUtils.outblue("Richiesta di carico rifiutata, motivo: " + res)
+								            val res = payloadArg(0)
+								            CommUtils.outblue("client | Richiesta di carico rifiutata, motivo: " + res)
 						}
 						//genTimer( actor, state )
 					}

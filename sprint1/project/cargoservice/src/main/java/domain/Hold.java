@@ -13,12 +13,13 @@ public class Hold implements IHold {
     private int totalWeight;
     private final int maxLoad;
     private Slot[] slots;
-    private IStorage dataStore = AdapterStorage.setup();
+    private IStorage dataStore;
     private  final Logger logger  = LoggerFactory.getLogger(Hold.class);
 
     private static Hold instance = null;
 
     private Hold() {
+    	this.dataStore = AdapterStorage.setup();;
         this.length = 10;
         this.width = 10;
         this.totalWeight = 0;
@@ -43,6 +44,7 @@ public class Hold implements IHold {
 
     @Override
     public void addContainer(int slotId, int productId, int weight) {
+    	slots[slotId].setProductId(productId);
         int res = createSlot(slots[slotId], productId);
         totalWeight += weight;
     }
@@ -53,12 +55,10 @@ public class Hold implements IHold {
     	int slotId = slot.getSlotId();
     	int slotAnswer;
     	String slotIdStr = dataStore.getItem(slotId);
-    	CommUtils.outgreen("Hold | createSlot " + slotId + " slotIdStr: " + slotIdStr);
     	
     	if ( slotIdStr == null ) { 
       		CommUtils.delay(4000);
 			dataStore.createItem(slotId,slot.toString());
-			slots[slotId].setProductId(productId);
 			slotAnswer = slotId;
 	   } else {  //ESISTE GIA' UNO SLOT CON LO STESSO SLOTID
 		   CommUtils.outmagenta("Hold | WARNING - Duplicate key, Slot Id: " + slotId);

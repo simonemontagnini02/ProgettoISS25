@@ -13,6 +13,10 @@ Reply   load_refused  : reason(Motivation) for load_request
 Request getProduct : product( PID )
 Reply   getProductAnswer : product( JSonString ) for getProduct
 
+//Autodispatch
+Dispatch accepted : accepted(ARG)
+Dispatch refused : refused(ARG)
+
 //PRODUCTSERVICE
 Context ctxproductservice ip [ host="127.0.0.1" port=8111]
 
@@ -34,37 +38,36 @@ QActor clientmock context ctxcargoservice {
     Transition t1
     	whenReply createdProduct -> handle_createdProduct
       	
-      State handle_createdProduct{
-          onMsg( createdProduct : productid(ID) ) {
-          [#
-              val PIDC = payloadArg(0).toInt()
-              CommUtils.outblue("Prodotto registrato con PID: " + PIDC)
-          #]
-          request cargoservice -m load_request : load($PIDC)
-          }
-      }
-      
-      Transition t2
-      	whenReply load_accepted -> handle_loadaccepted
-      	whenReply load_refused -> handle_loadrefused
+    State handle_createdProduct{
+    	onMsg( createdProduct : productid(ID) ) {
+        [#
+            val PIDC = payloadArg(0).toInt()
+            CommUtils.outblue("client | Prodotto registrato con PID: " + PIDC)
+        #]
+        request cargoservice -m load_request : load($PIDC)
+        }
+    }
+    Transition t2
+    	whenReply load_accepted -> handle_loadaccepted
+	    whenReply load_refused -> handle_loadrefused
       	
-      State handle_loadaccepted{
-          onMsg( load_accepted : slot(SlotID) ) {
-          [#
-              val ID = payloadArg(0)
-              CommUtils.outblue("Richiesta di carico accettata, product container associato allo Slot n." + ID)
-          #]
-          }
-      }
+    State handle_loadaccepted{
+    	onMsg( load_accepted : slot(SlotID) ) {
+        [#
+            val ID = payloadArg(0)
+            CommUtils.outblue("client | Richiesta di carico accettata, product container associato allo Slot n." + ID)
+        #]
+        }
+    }
       
-      State handle_loadrefused{
-          onMsg( load_refused : reason(Motivation) ) {
-          [#
-              val res = payloadArg(0)
-              CommUtils.outblue("Richiesta di carico rifiutata, motivo: " + res)
-          #]
-          }
-      }
+    State handle_loadrefused{
+    	onMsg( load_refused : reason(Motivation) ) {
+        [#
+            val res = payloadArg(0)
+            CommUtils.outblue("client | Richiesta di carico rifiutata, motivo: " + res)
+        #]
+        }
+    }
 }
 
 QActor cargoservice context ctxcargoservice withobj helper using "main.java.domain.CargoServiceHelper.getSingleton()"{
@@ -72,67 +75,81 @@ QActor cargoservice context ctxcargoservice withobj helper using "main.java.doma
 		var PID = -1	
 		#]
 		
-		State s0 initial {
-		}
-      Transition t0 
+	State s0 initial {
+	}
+    Transition t0 
           whenRequest load_request -> handle_loadRequest
 
-      State handle_loadRequest{
-          onMsg( load_request : load(PID) ) {
-          [#
-              PID = payloadArg(0).toInt()
-              CommUtils.outgreen("Ricevuta richiesta di carico per PID:" + PID)
-          #]
-          request productservice -m getProduct : product($PID)
-          }
-      }
-      Transition t1
+	State handle_loadRequest{
+		onMsg( load_request : load(PID) ) {
+	    [#
+	        PID = payloadArg(0).toInt()
+	        CommUtils.outgreen("cargoservice | Ricevuta richiesta di carico per PID:" + PID)
+	    #]
+	    request productservice -m getProduct : product($PID)
+	    }
+	}
+	Transition t1
       	whenReply getProductAnswer -> handle_productcontainer
-
-    State handle_productcontainer {
+      	
+	State handle_productcontainer {
     	onMsg( getProductAnswer : product(JSonString) ) {
 	        [#
 	            val jsonStr = payloadArg(0)
 	            
 	            if(jsonStr == "unknown") {
-	            	CommUtils.outred("PID_NOT_REGISTERED")
+	            	CommUtils.outred("cargoservice | PID_NOT_REGISTERED")
 	            	val Motivation = "PID_NOT_REGISTERED"
             	 	#]
 	                replyTo load_request with load_refused : reason($Motivation)
+	                autodispatch refused : refused($Motivation)
 	                [#
 	            } else {
 	            	val obj = org.json.JSONObject(jsonStr)
 	                val weight = obj.getInt("weight")
 		
-		            CommUtils.outgreen("Trovato prodotto con peso:" + weight)
+		            CommUtils.outgreen("cargoservice | Trovato prodotto con peso:" + weight)
 		
 		            val RESULT = helper.handleLoadRequest(PID, weight)
-		            if(RESULT > 0){
-		            	CommUtils.outgreen("Product container associato allo Slot n." + RESULT)
+		            if(RESULT >= 0){
+		            	CommUtils.outgreen("cargoservice | Product container associato allo Slot n." + RESULT)
 		            	#]
 		                replyTo load_request with load_accepted : slot($RESULT)
+		                autodispatch accepted : accepted($RESULT)
 		                [#
 		            } else {
 		            	if(RESULT == -1) {
-		            		CommUtils.outred("MAX_LOAD_EXCEEDED")
+		            		CommUtils.outred("cargoservice | MAX_LOAD_EXCEEDED")
 		            		val Motivation = "MAX_LOAD_EXCEEDED"
 		            	 	#]
 			                replyTo load_request with load_refused : reason($Motivation)
+			                autodispatch refused : refused($Motivation)
 			                [#
 		            	} else {
 		            		if(RESULT == -2) {
-		            			CommUtils.outred("NO_FREE_SLOTS")
+		            			CommUtils.outred("cargoservice | NO_FREE_SLOTS")
 		            			val Motivation = "NO_FREE_SLOTS"
 			            	 	#]
 				                replyTo load_request with load_refused : reason($Motivation)
+				                autodispatch refused : refused($Motivation)
 				                [#
 			            	}
 		            	}
 		            }	
 	            }
 	        #]
+	         
     	}
 	}
+	Transition t2
+	    whenMsg accepted -> handle_load_accepted
+	    whenMsg refused -> s0
+	
+	State handle_load_accepted{
+          [#
+              CommUtils.outgreen("cargoservice | Richiesta di carico accettata: in attesa che il product container arrivi all'IOPort'")
+          #]
+      }
 }
 
 QActor cargorobot context ctxcargoservice {

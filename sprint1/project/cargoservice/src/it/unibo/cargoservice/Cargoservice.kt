@@ -47,8 +47,8 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 						if( checkMsgContent( Term.createTerm("load(PID)"), Term.createTerm("load(PID)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
-								              PID = payloadArg(0).toInt()
-								              CommUtils.outgreen("Ricevuta richiesta di carico per PID:" + PID)
+									        PID = payloadArg(0).toInt()
+									        CommUtils.outgreen("cargoservice | Ricevuta richiesta di carico per PID:" + PID)
 								request("getProduct", "product($PID)" ,"productservice" )  
 						}
 						//genTimer( actor, state )
@@ -66,38 +66,54 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 									            val jsonStr = payloadArg(0)
 									            
 									            if(jsonStr == "unknown") {
-									            	CommUtils.outred("PID_NOT_REGISTERED")
+									            	CommUtils.outred("cargoservice | PID_NOT_REGISTERED")
 									            	val Motivation = "PID_NOT_REGISTERED"
 								answer("load_request", "load_refused", "reason($Motivation)"   )  
+								forward("refused", "refused($Motivation)" ,name ) 
 								
 									            } else {
 									            	val obj = org.json.JSONObject(jsonStr)
 									                val weight = obj.getInt("weight")
 										
-										            CommUtils.outgreen("Trovato prodotto con peso:" + weight)
+										            CommUtils.outgreen("cargoservice | Trovato prodotto con peso:" + weight)
 										
 										            val RESULT = helper.handleLoadRequest(PID, weight)
-										            if(RESULT > 0){
-										            	CommUtils.outgreen("Product container associato allo Slot n." + RESULT)
+										            if(RESULT >= 0){
+										            	CommUtils.outgreen("cargoservice | Product container associato allo Slot n." + RESULT)
 								answer("load_request", "load_accepted", "slot($RESULT)"   )  
+								forward("accepted", "accepted($RESULT)" ,name ) 
 								
 										            } else {
 										            	if(RESULT == -1) {
-										            		CommUtils.outred("MAX_LOAD_EXCEEDED")
+										            		CommUtils.outred("cargoservice | MAX_LOAD_EXCEEDED")
 										            		val Motivation = "MAX_LOAD_EXCEEDED"
 								answer("load_request", "load_refused", "reason($Motivation)"   )  
+								forward("refused", "refused($Motivation)" ,name ) 
 								
 										            	} else {
 										            		if(RESULT == -2) {
-										            			CommUtils.outred("NO_FREE_SLOTS")
+										            			CommUtils.outred("cargoservice | NO_FREE_SLOTS")
 										            			val Motivation = "NO_FREE_SLOTS"
 								answer("load_request", "load_refused", "reason($Motivation)"   )  
+								forward("refused", "refused($Motivation)" ,name ) 
 								
 											            	}
 										            	}
 										            }	
 									            }
 						}
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t25",targetState="handle_load_accepted",cond=whenDispatch("accepted"))
+					transition(edgeName="t26",targetState="s0",cond=whenDispatch("refused"))
+				}	 
+				state("handle_load_accepted") { //this:State
+					action { //it:State
+						
+						              CommUtils.outgreen("cargoservice | Richiesta di carico accettata: in attesa che il product container arrivi all'IOPort'")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

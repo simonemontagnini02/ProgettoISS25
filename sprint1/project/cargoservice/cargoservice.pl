@@ -8,6 +8,8 @@ reply( load_accepted, slot(SlotID) ).  %%for load_request
 reply( load_refused, reason(Motivation) ).  %%for load_request
 request( getProduct, product(PID) ).
 reply( getProductAnswer, product(JSonString) ).  %%for getProduct
+dispatch( accepted, accepted(ARG) ).
+dispatch( refused, refused(ARG) ).
 %====================================================================================
 context(ctxproductservice, "127.0.0.1",  "TCP", "8111").
 context(ctxcargoservice, "localhost",  "TCP", "8110").
