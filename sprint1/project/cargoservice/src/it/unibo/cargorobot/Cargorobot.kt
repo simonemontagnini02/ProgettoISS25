@@ -37,6 +37,25 @@ class Cargorobot ( name: String, scope: CoroutineScope, isconfined: Boolean=fals
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
+					 transition(edgeName="t223",targetState="go_ioport",cond=whenDispatch("transport"))
+				}	 
+				state("go_ioport") { //this:State
+					action { //it:State
+						if( checkMsgContent( Term.createTerm("transport(SlotID)"), Term.createTerm("transport(SlotID)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								
+								            	val SlotId = payloadArg(0).toInt()
+								              	CommUtils.outyellow("cargorobot | ricevuta richiesta di carico allo Slot n."+ SlotId)
+								delay(3000) 
+								
+											CommUtils.outyellow("cargorobot | trasporto completato, il robot e' tornato alla HOME")
+								forward("robot_home", "robot_home(ok)" ,"cargoservice" ) 
+						}
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
 				}	 
 			}
 		}

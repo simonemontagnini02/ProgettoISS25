@@ -1,4 +1,5 @@
 System cargoservice
+mqttBroker "localhost" : 1883 eventTopic "sonar"
 
 //Richiesta di registrazione del prodotto
 Request createProduct : product(String)
@@ -13,15 +14,34 @@ Reply   load_refused  : reason(Motivation) for load_request
 Request getProduct : product( PID )
 Reply   getProductAnswer : product( JSonString ) for getProduct
 
-//Autodispatch
-Dispatch accepted : accepted(ARG)
-Dispatch refused : refused(ARG)
+//Sonar
+Event sonardata : distance(D)
+
+//Interrupt
+Event alarm : alarm(X)
+Dispatch alarm : alarm(X)
+
+//AUTODISPATCH
+//cargoservice
+Dispatch accepted : accepted(X)
+Dispatch refused : refused(X)
+Dispatch container_ioport : container_ioport(X)
+//sonarcontroller
+Dispatch sonar_failure : sonar_failure(X)
+Dispatch sonar_normal : sonar_normal(X)
+
+//Comunicazione con cargorobot
+Dispatch transport : transport( SlotID )
+Dispatch robot_home : robot_home(X)
 
 //PRODUCTSERVICE
 Context ctxproductservice ip [ host="127.0.0.1" port=8111]
 
 //CARGOSERVICE
 Context ctxcargoservice ip [ host="localhost" port=8110]
+
+//SONAR
+Context ctxiodevices ip [ host= "localhost" port= 8128 ]
 
 QActor productservice context ctxproductservice {
     State s0 initial {
@@ -42,7 +62,7 @@ QActor clientmock context ctxcargoservice {
     	onMsg( createdProduct : productid(ID) ) {
         [#
             val PIDC = payloadArg(0).toInt()
-            CommUtils.outblue("client | Prodotto registrato con PID: " + PIDC)
+            CommUtils.outblue("clientmock | prodotto registrato con PID: " + PIDC)
         #]
         request cargoservice -m load_request : load($PIDC)
         }
@@ -55,7 +75,7 @@ QActor clientmock context ctxcargoservice {
     	onMsg( load_accepted : slot(SlotID) ) {
         [#
             val ID = payloadArg(0)
-            CommUtils.outblue("client | Richiesta di carico accettata, product container associato allo Slot n." + ID)
+            CommUtils.outblue("clientmock | richiesta di carico accettata, product container associato allo Slot n." + ID)
         #]
         }
     }
@@ -64,7 +84,7 @@ QActor clientmock context ctxcargoservice {
     	onMsg( load_refused : reason(Motivation) ) {
         [#
             val res = payloadArg(0)
-            CommUtils.outblue("client | Richiesta di carico rifiutata, motivo: " + res)
+            CommUtils.outblue("clientmock | richiesta di carico rifiutata, motivo: " + res)
         #]
         }
     }
@@ -72,25 +92,33 @@ QActor clientmock context ctxcargoservice {
 
 QActor cargoservice context ctxcargoservice withobj helper using "main.java.domain.CargoServiceHelper.getSingleton()"{
 		[#
-		var PID = -1	
+		val DFREE = 50
+		var PID = -1
+		var SlotId = -1
+		var counterIO = 0
 		#]
 		
 	State s0 initial {
+		[#
+	        CommUtils.outgreen("cargoservice | in attesa di ricevere richieste di carico")
+	    #]
 	}
     Transition t0 
           whenRequest load_request -> handle_loadRequest
+          whenInterruptEvent  alarm -> handlealarm
 
 	State handle_loadRequest{
 		onMsg( load_request : load(PID) ) {
 	    [#
 	        PID = payloadArg(0).toInt()
-	        CommUtils.outgreen("cargoservice | Ricevuta richiesta di carico per PID:" + PID)
+	        CommUtils.outgreen("cargoservice | ricevuta richiesta di carico per PID:" + PID)
 	    #]
 	    request productservice -m getProduct : product($PID)
 	    }
 	}
 	Transition t1
       	whenReply getProductAnswer -> handle_productcontainer
+      	whenInterruptEvent  alarm -> handlealarm
       	
 	State handle_productcontainer {
     	onMsg( getProductAnswer : product(JSonString) ) {
@@ -108,14 +136,15 @@ QActor cargoservice context ctxcargoservice withobj helper using "main.java.doma
 	            	val obj = org.json.JSONObject(jsonStr)
 	                val weight = obj.getInt("weight")
 		
-		            CommUtils.outgreen("cargoservice | Trovato prodotto con peso:" + weight)
+		            CommUtils.outgreen("cargoservice | trovato prodotto con peso:" + weight)
 		
 		            val RESULT = helper.handleLoadRequest(PID, weight)
 		            if(RESULT >= 0){
-		            	CommUtils.outgreen("cargoservice | Product container associato allo Slot n." + RESULT)
+		            	SlotId = RESULT
+		            	CommUtils.outgreen("cargoservice | product container associato allo Slot n." + RESULT)
 		            	#]
 		                replyTo load_request with load_accepted : slot($RESULT)
-		                autodispatch accepted : accepted($RESULT)
+		                autodispatch accepted : accepted(ok)
 		                [#
 		            } else {
 		            	if(RESULT == -1) {
@@ -144,20 +173,182 @@ QActor cargoservice context ctxcargoservice withobj helper using "main.java.doma
 	Transition t2
 	    whenMsg accepted -> handle_load_accepted
 	    whenMsg refused -> s0
+	    whenInterruptEvent  alarm -> handlealarm
 	
 	State handle_load_accepted{
-          [#
-              CommUtils.outgreen("cargoservice | Richiesta di carico accettata: in attesa che il product container arrivi all'IOPort'")
-          #]
-      }
+		[#
+            CommUtils.outgreen("cargoservice | richiesta di carico accettata: in attesa che il product container arrivi all'IOPort")
+        #]
+    }
+    Transition t3
+	    whenEvent sonardata -> handle_ioport
+	    whenInterruptEvent  alarm -> handlealarm
+	
+	State handle_ioport {
+    	onMsg( sonardata : distance(D) ) {
+            [#
+                val D = payloadArg(0).toInt()
+                CommUtils.outgreen("cargoservice | distanza: "+ D)
+                if(D < DFREE/2){
+                    counterIO++
+                    if(counterIO >= 3) {
+                    	CommUtils.outgreen("cargoservice | rilevata presenza del product container all'IOPort")
+                        #]
+		                autodispatch container_ioport : container_ioport(ok)
+		                [#
+                    }
+                } else {
+                    counterIO = 0
+                }
+            #]
+        }   
+	}
+	Transition t4
+	    whenEvent sonardata -> handle_ioport
+	    whenMsg container_ioport -> handle_container
+	    whenInterruptEvent  alarm -> handlealarm
+	    
+	State handle_container {
+		[#
+		CommUtils.outgreen("cargoservice | invio richiesta a cargorobot di trasportare il product container PID: "+ PID +" allo Slot n."+ SlotId)
+		#]
+		forward cargorobot -m transport : transport($SlotId)
+	}
+	Transition t5
+	    whenMsg robot_home -> s0
+	    whenInterruptEvent  alarm -> handlealarm
+	    
+	
+	
+	State handlealarm{
+	    if[# currentMsg.msgContent() == "alarm(ok)" #] {
+	    	println("cargoservice | servizio ripristinato") color green
+	    	returnFromInterrupt
+	    } else {
+	    	println("cargoservice | servizio interrotto") color red
+	    }
+	}
+	Transition t6
+	    whenMsg  alarm -> handlealarm
+}
+
+
+
+
+
+
+QActor sonarcontroller context ctxcargoservice {
+	[#
+    var counter = 0
+    val DFREE = 50
+    #]
+    
+	State s0 initial {
+    }
+    Transition t0
+	    whenEvent sonardata -> normal
+    
+    State normal {
+		onMsg( sonardata : distance(D) ) {
+            [#
+                val D = payloadArg(0).toInt()
+                if(D > DFREE){
+                    counter++
+                    if(counter >= 3) {
+                    	CommUtils.outred("sonarcontroller | Sonar Failure")
+                        #]
+                        emitlocal alarm : alarm(failure)
+		                autodispatch sonar_failure : sonar_failure(ok)
+		                [#
+                    }
+                } else {
+                    counter = 0
+                }
+            #]
+        }
+    }
+    Transition t1
+	    whenEvent sonardata -> normal
+	    whenMsg sonar_failure -> failure
+	
+	State failure {
+		onMsg( sonardata : distance(D) ) {
+            [#
+                val D = payloadArg(0).toInt()
+                if(D <= DFREE){
+                	CommUtils.outred("sonarcontroller | Sonar Ok")
+                	counter = 0
+                    #]
+                    forward cargoservice -m alarm : alarm(ok)
+	                autodispatch sonar_normal : sonar_normal(ok)
+	                [#
+                }
+            #]
+        }
+	}
+	Transition t2
+	    whenEvent sonardata -> failure
+	    whenMsg sonar_normal -> normal
 }
 
 QActor cargorobot context ctxcargoservice {
-  State s0 initial{
-    }
+	State s0 initial{
+  	}
+  	Transition t2
+  		whenMsg transport -> go_ioport
+  
+  	State go_ioport {
+  		onMsg( transport : transport(SlotID) ) {
+            [#
+            	val SlotId = payloadArg(0).toInt()
+              	CommUtils.outyellow("cargorobot | ricevuta richiesta di carico allo Slot n."+ SlotId)
+            #]
+            delay 3000
+            [#
+			CommUtils.outyellow("cargorobot | trasporto completato, il robot e' tornato alla HOME")
+			#]
+			forward cargoservice -m robot_home : robot_home(ok)
+        }
+  	}
 }
 
 QActor webguimock context ctxcargoservice {
   State s0 initial{
+  }
+}
+
+
+
+
+QActor sonardevice context ctxcargoservice {
+	[#
+	var Distance = 100	
+	#]
+	State s0 initial{
+		delay 1000
+		println("$name| publish distanza: $Distance") color blue
+		publish "sonar" -m sonardata : distance($Distance)
+		delay 1000
+		println("$name| publish distanza: $Distance") color blue
+		publish "sonar" -m sonardata : distance($Distance)
+		delay 1000
+		println("$name| publish distanza: $Distance") color blue
+		publish "sonar" -m sonardata : distance($Distance)
+		delay 3000
+		[# Distance = 10 #]
+		println("$name| publish distanza: $Distance") color blue
+		publish "sonar" -m sonardata : distance($Distance)
+		[# Distance = 90 #]
+		println("$name| publish distanza: $Distance") color blue
+		publish "sonar" -m sonardata : distance($Distance)
+		[# 
+		Distance = 20
+		while (true) {
+			#]
+			delay 1000
+			publish "sonar" -m sonardata : distance($Distance)
+			[#
+		}
+		#]
     }
 }

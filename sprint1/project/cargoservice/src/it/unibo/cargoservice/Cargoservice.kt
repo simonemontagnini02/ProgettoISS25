@@ -31,16 +31,22 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 		//IF actor.withobj !== null val actor.withobj.name» = actor.withobj.method»ENDIF
 		val helper = main.java.domain.CargoServiceHelper.getSingleton()
 		
-				var PID = -1	
+				val DFREE = 50
+				var PID = -1
+				var SlotId = -1
+				var counterIO = 0
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
+						
+							        CommUtils.outgreen("cargoservice | in attesa di ricevere richieste di carico")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
 					 transition(edgeName="t03",targetState="handle_loadRequest",cond=whenRequest("load_request"))
+					interrupthandle(edgeName="t04",targetState="handlealarm",cond=whenEvent("alarm"),interruptedStateTransitions)
 				}	 
 				state("handle_loadRequest") { //this:State
 					action { //it:State
@@ -48,7 +54,7 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
 									        PID = payloadArg(0).toInt()
-									        CommUtils.outgreen("cargoservice | Ricevuta richiesta di carico per PID:" + PID)
+									        CommUtils.outgreen("cargoservice | ricevuta richiesta di carico per PID:" + PID)
 								request("getProduct", "product($PID)" ,"productservice" )  
 						}
 						//genTimer( actor, state )
@@ -56,7 +62,8 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t14",targetState="handle_productcontainer",cond=whenReply("getProductAnswer"))
+					 transition(edgeName="t15",targetState="handle_productcontainer",cond=whenReply("getProductAnswer"))
+					interrupthandle(edgeName="t16",targetState="handlealarm",cond=whenEvent("alarm"),interruptedStateTransitions)
 				}	 
 				state("handle_productcontainer") { //this:State
 					action { //it:State
@@ -75,13 +82,14 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 									            	val obj = org.json.JSONObject(jsonStr)
 									                val weight = obj.getInt("weight")
 										
-										            CommUtils.outgreen("cargoservice | Trovato prodotto con peso:" + weight)
+										            CommUtils.outgreen("cargoservice | trovato prodotto con peso:" + weight)
 										
 										            val RESULT = helper.handleLoadRequest(PID, weight)
 										            if(RESULT >= 0){
-										            	CommUtils.outgreen("cargoservice | Product container associato allo Slot n." + RESULT)
+										            	SlotId = RESULT
+										            	CommUtils.outgreen("cargoservice | product container associato allo Slot n." + RESULT)
 								answer("load_request", "load_accepted", "slot($RESULT)"   )  
-								forward("accepted", "accepted($RESULT)" ,name ) 
+								forward("accepted", "accepted(ok)" ,name ) 
 								
 										            } else {
 										            	if(RESULT == -1) {
@@ -107,18 +115,77 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t25",targetState="handle_load_accepted",cond=whenDispatch("accepted"))
-					transition(edgeName="t26",targetState="s0",cond=whenDispatch("refused"))
+					 transition(edgeName="t27",targetState="handle_load_accepted",cond=whenDispatch("accepted"))
+					transition(edgeName="t28",targetState="s0",cond=whenDispatch("refused"))
+					interrupthandle(edgeName="t29",targetState="handlealarm",cond=whenEvent("alarm"),interruptedStateTransitions)
 				}	 
 				state("handle_load_accepted") { //this:State
 					action { //it:State
 						
-						              CommUtils.outgreen("cargoservice | Richiesta di carico accettata: in attesa che il product container arrivi all'IOPort'")
+						            CommUtils.outgreen("cargoservice | richiesta di carico accettata: in attesa che il product container arrivi all'IOPort")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
+					 transition(edgeName="t310",targetState="handle_ioport",cond=whenEvent("sonardata"))
+					interrupthandle(edgeName="t311",targetState="handlealarm",cond=whenEvent("alarm"),interruptedStateTransitions)
+				}	 
+				state("handle_ioport") { //this:State
+					action { //it:State
+						if( checkMsgContent( Term.createTerm("distance(D)"), Term.createTerm("distance(D)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								
+								                val D = payloadArg(0).toInt()
+								                CommUtils.outgreen("cargoservice | distanza: "+ D)
+								                if(D < DFREE/2){
+								                    counterIO++
+								                    if(counterIO >= 3) {
+								                    	CommUtils.outgreen("cargoservice | rilevata presenza del product container all'IOPort")
+								forward("container_ioport", "container_ioport(ok)" ,name ) 
+								
+								                    }
+								                } else {
+								                    counterIO = 0
+								                }
+						}
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t412",targetState="handle_ioport",cond=whenEvent("sonardata"))
+					transition(edgeName="t413",targetState="handle_container",cond=whenDispatch("container_ioport"))
+					interrupthandle(edgeName="t414",targetState="handlealarm",cond=whenEvent("alarm"),interruptedStateTransitions)
+				}	 
+				state("handle_container") { //this:State
+					action { //it:State
+						
+								CommUtils.outgreen("cargoservice | invio richiesta a cargorobot di trasportare il product container PID: "+ PID +" allo Slot n."+ SlotId)
+						forward("transport", "transport($SlotId)" ,"cargorobot" ) 
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t515",targetState="s0",cond=whenDispatch("robot_home"))
+					interrupthandle(edgeName="t516",targetState="handlealarm",cond=whenEvent("alarm"),interruptedStateTransitions)
+				}	 
+				state("handlealarm") { //this:State
+					action { //it:State
+						if(  currentMsg.msgContent() == "alarm(ok)"  
+						 ){CommUtils.outgreen("cargoservice | servizio ripristinato")
+						returnFromInterrupt(interruptedStateTransitions)
+						}
+						else
+						 {CommUtils.outred("cargoservice | servizio interrotto")
+						 }
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t617",targetState="handlealarm",cond=whenDispatch("alarm"))
 				}	 
 			}
 		}

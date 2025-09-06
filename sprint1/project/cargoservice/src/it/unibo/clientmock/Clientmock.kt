@@ -48,7 +48,7 @@ class Clientmock ( name: String, scope: CoroutineScope, isconfined: Boolean=fals
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
 								            val PIDC = payloadArg(0).toInt()
-								            CommUtils.outblue("client | Prodotto registrato con PID: " + PIDC)
+								            CommUtils.outblue("clientmock | prodotto registrato con PID: " + PIDC)
 								request("load_request", "load($PIDC)" ,"cargoservice" )  
 						}
 						//genTimer( actor, state )
@@ -65,7 +65,7 @@ class Clientmock ( name: String, scope: CoroutineScope, isconfined: Boolean=fals
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
 								            val ID = payloadArg(0)
-								            CommUtils.outblue("client | Richiesta di carico accettata, product container associato allo Slot n." + ID)
+								            CommUtils.outblue("clientmock | richiesta di carico accettata, product container associato allo Slot n." + ID)
 						}
 						//genTimer( actor, state )
 					}
@@ -79,7 +79,7 @@ class Clientmock ( name: String, scope: CoroutineScope, isconfined: Boolean=fals
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
 								            val res = payloadArg(0)
-								            CommUtils.outblue("client | Richiesta di carico rifiutata, motivo: " + res)
+								            CommUtils.outblue("clientmock | richiesta di carico rifiutata, motivo: " + res)
 						}
 						//genTimer( actor, state )
 					}
