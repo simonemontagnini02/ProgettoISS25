@@ -26,330 +26,437 @@
     </div>
 
     <h2>Requisiti degli attori</h2>
-
+    <div>
     <h3>cargoservice</h3>
     <br />
-    <table>
-        <tr>
-            <th>
-                ID
-            </th>
-            <th>
-                Descrizione
-            </th>
-            <th>
-                Tipo
-            </th>
-            <th>
-                Vincoli
-            </th>
+    
+        <table>
+            <tr>
+                <th>
+                    ID
+                </th>
+                <th>
+                    Descrizione
+                </th>
+                <th>
+                    Tipo
+                </th>
+                <th>
+                    Vincoli
+                </th>
 
-        </tr>
+            </tr>
 
-        <tr>
-            <td>
-                CS1
-            </td>
-            <td>
-                L'attore deve verificare che il productId del product container sia presente nel database
-            </td>
-            <td>
-                Funzionale
-            </td>
-            <td>
-                productId > 0 e già registrato nel database
-            </td>
+            <tr>
+                <td>
+                    CS1
+                </td>
+                <td>
+                    L'attore deve verificare che il productId del product container sia presente nel database
+                </td>
+                <td>
+                    Funzionale
+                </td>
+                <td>
+                    productId > 0 e già registrato nel database
+                </td>
 
-        </tr>
+            </tr>
 
-        <tr>
-            <td>
-                CS2
-            </td>
+            <tr>
+                <td>
+                    CS2
+                </td>
 
-            <td>
-                L'attore mantiene il peso totale (Hold.totalWeight) dei product container attualmente presenti nella
-                Hold
-            </td>
+                <td>
+                    L'attore mantiene il peso totale (Hold.totalWeight) dei product container attualmente presenti nella
+                    Hold
+                </td>
 
-            <td>
-                Funzionale
-            </td>
+                <td>
+                    Funzionale
+                </td>
 
-            <td>
+                <td>
 
-            </td>
+                </td>
 
-        </tr>
+            </tr>
 
-        <tr>
-            <td>
-                CS3
-            </td>
-            <td>
-                L'attore deve verificare che il peso totale della Hold non superi il suo peso massimo
-            </td>
-            <td>
-                Funzionale
-            </td>
-            <td>
-                Product.weight + Hold.totalWeight &le; Hold.maxLoad (maxLoad con valore arbitrario)
-            </td>
-        </tr>
+            <tr>
+                <td>
+                    CS3
+                </td>
+                <td>
+                    L'attore deve verificare che il peso totale della Hold non superi il suo peso massimo
+                </td>
+                <td>
+                    Funzionale
+                </td>
+                <td>
+                    Product.weight + Hold.totalWeight &le; Hold.maxLoad (maxLoad con valore arbitrario)
+                </td>
+            </tr>
 
-        <tr>
-            <td>
-                CS4
-            </td>
+            <tr>
+                <td>
+                    CS4
+                </td>
 
-            <td>
-                L'attore gestisce lo stato di occupazione degli Slot
-            </td>
+                <td>
+                    L'attore gestisce lo stato di occupazione degli Slot
+                </td>
 
-            <td>
-                Funzionale
-            </td>
+                <td>
+                    Funzionale
+                </td>
 
-            <td>
-                Ciascuno Slot può essere "occupato" o "libero"
-            </td>
+                <td>
+                    Ciascuno Slot può essere "occupato" o "libero"
+                </td>
 
-        </tr>
+            </tr>
 
-        <tr>
-            <td>
-                CS5
-            </td>
-            <td>
-                L'attore deve verificare la disponibilità di Slot liberi nella Hold
-            </td>
-            <td>
-                Funzionale
-            </td>
-            <td>
-                La Hold dispone di 4 Slot inizialmente liberi
-            </td>
-        </tr>
+            <tr>
+                <td>
+                    CS5
+                </td>
+                <td>
+                    L'attore deve verificare la disponibilità di Slot liberi nella Hold
+                </td>
+                <td>
+                    Funzionale
+                </td>
+                <td>
+                    La Hold dispone di 4 Slot inizialmente liberi
+                </td>
+            </tr>
 
-        <tr>
-            <td>
-                CS6
-            </td>
+            <tr>
+                <td>
+                    CS6
+                </td>
 
-            <td>
-                Per ciascun Slot occupato, l'attore mantiene all'interno del database il productId del product container
-                presente
-            </td>
+                <td>
+                    Per ciascun Slot occupato, l'attore mantiene all'interno del database il productId del product
+                    container
+                    presente
+                </td>
 
-            <td>
-                Funzionale
-            </td>
+                <td>
+                    Funzionale
+                </td>
 
-            <td>
-            </td>
+                <td>
+                </td>
 
-        </tr>
+            </tr>
 
-        <tr>
-            <td>
-                CS7
-            </td>
-            <td>
-                L'attore deve accettare le richieste di carico valide inviando un messaggio load_accepted
-            </td>
-            <td>
-                Funzionale
-            </td>
-            <td>
-                Vincoli CS1, CS3 e CS5 validi
-            </td>
-        </tr>
+            <tr>
+                <td>
+                    CS7
+                </td>
+                <td>
+                    L'attore deve accettare le richieste di carico valide inviando un messaggio load_accepted
+                </td>
+                <td>
+                    Funzionale
+                </td>
+                <td>
+                    Vincoli CS1, CS3 e CS5 validi
+                </td>
+            </tr>
 
-        <tr>
-            <td>
-                CS8
-            </td>
-            <td>
-                L'attore deve rifiutare le richieste di carico non valide inviando un messaggio load_refused
-            </td>
-            <td>
-                Funzionale
-            </td>
-            <td>
-                Vincolo CS1/CS3/CS5 non valido
-            </td>
-        </tr>
+            <tr>
+                <td>
+                    CS8
+                </td>
+                <td>
+                    L'attore deve rifiutare le richieste di carico non valide inviando un messaggio load_refused
+                </td>
+                <td>
+                    Funzionale
+                </td>
+                <td>
+                    Vincolo CS1/CS3/CS5 non valido
+                </td>
+            </tr>
 
-        <tr>
-            <td>
-                CS9
-            </td>
-            <td>
-                L'attore deve comunicare l'identificativo dello Slot assegnato al product container (slotId) alla webgui
-            </td>
-            <td>
-                Funzionale
-            </td>
-            <td>
-                Vincolo CS7 valido
-            </td>
-        </tr>
+            <tr>
+                <td>
+                    CS9
+                </td>
+                <td>
+                    L'attore deve comunicare l'identificativo dello Slot assegnato al product container (slotId) alla
+                    webgui
+                </td>
+                <td>
+                    Funzionale
+                </td>
+                <td>
+                    Vincolo CS7 valido
+                </td>
+            </tr>
 
-        <tr>
-            <td>
-                CS10
-            </td>
-            <td>
-               L'attore rimane in attesa che l'attore sonar gli comunichi la presenza del product container all'IOPort
-            </td>
-            <td>
-                Funzionale
-            </td>
-            <td>
-                Vincolo CS7 valido
-            </td>
-        </tr>
+            <tr>
+                <td>
+                    CS10
+                </td>
+                <td>
+                    L'attore rimane in attesa che l'attore sonar gli comunichi la presenza del product container
+                    all'IOPort
+                </td>
+                <td>
+                    Funzionale
+                </td>
+                <td>
+                    Vincolo CS7 valido
+                </td>
+            </tr>
 
-        <tr>
-            <td>
-                CS11
-            </td>
-            <td>
-                L'attore deve interagire con l'attore cargorobot per garantire il corretto posizionamento del product container
-                nello Slot
-                assegnato
-            </td>
-            <td>
-                Funzionale
-            </td>
-            <td>
+            <tr>
+                <td>
+                    CS11
+                </td>
+                <td>
+                    L'attore deve interagire con l'attore cargorobot per garantire il corretto posizionamento del
+                    product
+                    container
+                    nello Slot
+                    assegnato
+                </td>
+                <td>
+                    Funzionale
+                </td>
+                <td>
 
-            </td>
-        </tr>
+                </td>
+            </tr>
 
-        <tr>
-            <td>
-                CS12
-            </td>
-            <td>
-                L'attore deve bloccare l'elaborazione di nuove richieste fino al completamento della precedente
-            </td>
-            <td>
-                Funzionale
-            </td>
-            <td>
-                Vincolo CS7 valido
-            </td>
-        </tr>
+            <tr>
+                <td>
+                    CS12
+                </td>
+                <td>
+                    L'attore deve bloccare l'elaborazione di nuove richieste fino al completamento della precedente
+                </td>
+                <td>
+                    Funzionale
+                </td>
+                <td>
+                    Vincolo CS7 valido
+                </td>
+            </tr>
 
-    </table>
+        </table>
+    </div>
 
-    <h1>Modello del dominio</h1>
+    <h2>Analisi del Problema</h2>
 
-    <h2>cargoservice</h2>
+    <div>
 
-    <p>
+        <h3>Classi Helper</h3>
+        Per l'implementazione di questo attore si rendono necessarie una serie di classi Java helper, introdotte con
+        l’obiettivo di rispettare il <strong>Single Responsibility Principle</strong>. Ciascuna classe è infatti
+        progettata
+        per occuparsi di
+        un compito specifico e ben definito, riducendo la complessità dell’attore e favorendo una maggiore
+        manutenibilità ed
+        estendibilità del sistema.
+
+        </br></br>
+
+        La classe <strong>Hold</strong> fornisce informazioni sull'occupazione della stiva, permettendo così di:
+        <ul>
+            <li> Gestire lo stato fisico della stiva: la classe sarà responsabile della rappresentazione della stiva. In
+                particolare lo stato fisico sarà rappresentato dalle seguenti variabili:
+                <ul>
+                    <li><strong>lenght</strong>: variabile positiva di tipo intero che rappresenta la lunghezza della
+                        Hold
+                    </li>
+                    <li><strong>width</strong>: variabile positiva di tipo intero che rappresenta la larghezza della
+                        Hold
+                    </li>
+                    <li><strong>totalWeight</strong>: variabile positiva di tipo intero rappresentante il peso totale
+                        della
+                        Hold</li>
+                    <li><strong>maxLoad</strong>: variabile positiva di tipo intero rappresentante il peso massimo della
+                        Hold</li>
+                </ul>
+            </li>
+            <li> Tracciare gli Slot: dovrà memorizzare gli stati dei 4 Slot, fornendo un metodo per identificare quelli
+                liberi </li>
+            <li> Associare prodotti agli slot: per ogni Slot occupato, dovrà conservare il productId associato al
+                product
+                container posizionato al suo interno </li>
+        </ul>
+        Per la realizzazione di questo componente si è deciso di adottare un <strong>design pattern Singleton</strong>,
+        in
+        modo da garantire
+        che la classe abbia una sola istanza come un unico punto d'accesso globale ad essa.
+        È stato scelto di utilizzare un <strong>POJO</strong> anziché un attore, poiché le richieste di carico vengono
+        gestite in maniera
+        sequenziale; di conseguenza anche le modifiche allo stato della Hold avvengono nello stesso ordine, senza la
+        necessità di introdurre concorrenza.
+        </br></br>
+        La classe <strong>Slot</strong> avrà il compito di rappresentare i 4 Slot della Hold e conterrà le seguenti
+        variabili:
+        <ul>
+            <li><strong>slotId</strong>: variabile positiva di tipo intero che rappresenta l'identificativo univoco
+                associato allo Slot</li>
+            <li><strong>productId</strong>: variabile di tipo intero, inizialmente pari a -1, conterrà il PID del
+                product
+                container
+                situato all'interno dello Slot</li>
+        </ul>
+        </br>
+        Per rendere la logica applicativa indipendente dai dispositivi usati per la persistenza, viene realizzata la
+        classe
+        astratta <strong>AdapterStorage</strong>. La classe <strong>AdapterStorageMongo</strong> realizza un adattatore
+        che
+        consente di utilizzare MongoDB
+        come sistema di persistenza dei dati per gli Slot. In particolare, essa stabilisce una connessione verso
+        un database chiamato cargodb e lavora su una collezione di documenti denominata slots. La classe
+        <strong>AdapterStorageVolatile</strong>, invece, viene utilizzata per memorizzare gli Slot in una struttura di
+        dati
+        runtime, fornendo un’interfaccia di adattamento verso lo storage sottostante (StorageVolatile).
+        </br></br>
+        <img src="./img/Modello_Dominio_Hold.png">
+        </br>
+        È prevista inoltre la realizzazione di una seconda classe helper, denominata
+        <strong>CargoServiceHelper</strong>.
+        Al suo interno saranno implementate tutte le funzionalità necessarie a gestire le richieste di carico:
+        <ul>
+            <li> int handleLoadrequest(int productId, int weight): gestisce la richiesta di carico relativa ad un certo
+                productId </li>
+            <li> boolean checkWeight(): ritorna true nel caso in cui Product.weight + Hold.totalWeight &le;
+                Hold.maxLoad,
+                altrimenti false </li>
+            <li> int checkFreeSlots(): ritorna lo slotId relativo al primo Slot libero, altrimenti -1 in assenza di Slot
+                liberi </li>
+        </ul>
+        </br></br>
+        <img src="./img/Modello_Dominio_CargoService.png">
+
+
+        <h3>cargoservice</h3>
+
+
         L'attore cargoservice si occupa della gestione del core-business del servizio, realizzando le seguenti
         funzionalità:
-    <ul>
-        <li>Esecuzione di richieste di carico di product container: messaggio <span
-                style="background-color: lightblue;">Request
-                load_request:load(PID)</span>.
-            </br>Questa richiesta prevede due tipologie di risposte a seconda del suo
-            esito:
-            <ul>
-                <li><span style="background-color: lightblue;">Reply load_accepted : slot(SlotID)</span>: richiesta
-                    accettata con indicazione dell'id dello Slot associato al product container</li>
-                <li><span style="background-color: lightblue;">Reply load_refused : reason(Motivation)</span>: richiesta
-                    rifiutata con motivazione del rifiuto</li>
-            </ul>
-        </li>
-        <li>Rilevazione della presenza del product container sull'IOPort tramite utilizzo di un sonar</li>
-        <li>Posizionamento da parte del cargorobot del product container nello Slot a lui assegnato</li>
-        <li>Visualizzazione dello stato interno della Hold tramite l'utilizzo di una web-gui dinamicamente
-            aggiornata</li>
-        <li>Interruzione di tutte le attività e accensione del led nel caso il sonar misuri una distanza <strong>D
-                &gt;
-                DFREE</strong> per un periodo di tempo pari ad almeno tre secondi. Il servizio riprenderà le sue
-            attività non
-            appena il sonar misurerà una distanza <strong>D &le; DFREE</strong></li>
-    </ul>
+        <ul>
+            <li>Esecuzione di richieste di carico di product container: messaggio <span class="messaggi">Request
+                    load_request : load(PID)</span>.
+                </br>Questa richiesta prevede due tipologie di risposte a seconda del suo
+                esito:
+                <ul>
+                    <li><span class="messaggi">Reply load_accepted : slot(SlotID)</span>: richiesta
+                        accettata con indicazione dell'id dello Slot associato al product container</li>
+                    <li><span class="messaggi">Reply load_refused : reason(Motivation)</span>: richiesta
+                        rifiutata con motivazione del rifiuto</li>
+                </ul>
+            </li>
+            <li>Rilevazione della presenza del product container sull'IOPort tramite utilizzo di un sonar</li>
+            <li>Posizionamento da parte del cargorobot del product container nello Slot a lui assegnato</li>
+            <li>Visualizzazione dello stato interno della Hold tramite l'utilizzo di una web-gui dinamicamente
+                aggiornata</li>
+            <li>Interruzione di tutte le attività e accensione del led nel caso il sonar misuri una distanza <strong>D
+                    &gt;
+                    DFREE</strong> per un periodo di tempo pari ad almeno tre secondi. Il servizio riprenderà le sue
+                attività non
+                appena il sonar misurerà una distanza <strong>D &le; DFREE</strong></li>
+        </ul>
 
-    Nello stato iniziale "s0", l'attore cargoservice stampa a video un messaggio per indicare di essere in attesa della ricezione di nuove richieste di caarico.
-    
-    </p>
+        Nello stato iniziale s0, l'attore cargoservice rimane in attesa della ricezione di nuove richieste di carico.
+        Successivamente, all'arrivo della <span class="messaggi">Request load_request : load(PID)</span>, l'attore si
+        sposterà nello stato <strong>handle_loadRequest</strong>
+        dove interagirà con l'attore <strong>productservice</strong> inviando una <span class="messaggi">Request
+            getProduct
+            : product(PID)</span>
+        specificando il PID del prodotto da caricare.
+        Alla <span class="messaggi">Reply getProductAnswer : product(JSonString)</span> l'attore passera nello stato
+        <strong>handle_productcontainer</strong> dove
+        verificherà la risposta fornita da <strong>productservice</strong>. Nel caso JSonString sia uguale ad "unknown"
+        significherà che il prodotto non è registrato, quindi
+        verrà inviata una <span class="messaggi">Reply load_refused : reason(Motivation)</span> contenente la seguente
+        ragione del rifiuto: "PID_NOT_REGISTERED".
+        In caso contrario l'attore estrae la variabile <strong>weight</strong> del prodotto e invoca il metodo
+        <strong>handleLoadRequest(PID, weight)</strong> della classe
+        helper <strong>CargoServiceHelper</strong> che avrà il compito di valutare la richiesta di carico, restituendo i
+        seguenti possibili risultati:
 
-    <h2>Classi Helper</h2>
-    Per l'implementazione di questo attore si rendono necessarie una serie di classi Java helper, introdotte con
-    l’obiettivo di rispettare il <strong>Single Responsibility Principle</strong>. Ciascuna classe è infatti progettata
-    per occuparsi di
-    un compito specifico e ben definito, riducendo la complessità dell’attore e favorendo una maggiore manutenibilità ed
-    estendibilità del sistema.
+        <ul>
+            <li>Valore &ge; 0, ovvero lo SlotId associato al product container. Successivamente verrà inviato una <span
+                    class="messaggi">Reply load_accepted : slot(SlotID)</span> </li>
+            <li>Valore = -1, nel caso in cui totalWeight+weight &gt; maxLoad. Successivamente verrà inviato una <span
+                    class="messaggi">Reply load_refused : reason(Motivation) con Motivation = "MAX_LOAD_EXCEEDED"</span>
+            </li>
+            <li>Valore = -2, nel caso in cui non ci siano Slot disponibili. Successivamente verrà inviato una <span
+                    class="messaggi">Reply load_refused : reason(Motivation) con Motivation = "NO_FREE_SLOTS"</span>
+            </li>
+        </ul>
 
-    </br></br>
+        In caso di richiesta rifiutata, l'attore tramite un messaggio di <span class="messaggi">autodispatch refused :
+            refused(X)</span> torna nello stato s0 in attesa di
+        nuove richieste.
 
-    La classe <strong>Hold</strong> fornisce informazioni sull'occupazione della stiva, permettendo così di:
-    <ul>
-        <li> Gestire lo stato fisico della stiva: la classe sarà responsabile della rappresentazione della stiva. In
-            particolare lo stato fisico sarà rappresentato dalle seguenti variabili:
-            <ul>
-                <li><strong>lenght</strong>: variabile positiva di tipo intero che rappresenta la lunghezza della Hold
-                </li>
-                <li><strong>width</strong>: variabile positiva di tipo intero che rappresenta la larghezza della Hold
-                </li>
-                <li><strong>totalWeight</strong>: variabile positiva di tipo intero rappresentante il peso totale della
-                    Hold</li>
-                <li><strong>maxLoad</strong>: variabile positiva di tipo intero rappresentante il peso massimo della
-                    Hold</li>
-            </ul>
-        </li>
-        <li> Tracciare gli Slot: dovrà memorizzare gli stati dei 4 Slot, fornendo un metodo per identificare quelli
-            liberi </li>
-        <li> Associare prodotti agli slot: per ogni Slot occupato, dovrà conservare il productId associato al product
-            container posizionato al suo interno </li>
-    </ul>
-    Per la realizzazione di questo componente si è deciso di adottare un <strong>design pattern Singleton</strong>, in
-    modo da garantire
-    che la classe abbia una sola istanza come un unico punto d'accesso globale ad essa.
-    È stato scelto di utilizzare un <strong>POJO</strong> anziché un attore, poiché le richieste di carico vengono
-    gestite in maniera
-    sequenziale; di conseguenza anche le modifiche allo stato della Hold avvengono nello stesso ordine, senza la
-    necessità di introdurre concorrenza.
-    </br></br>
-    La classe <strong>Slot</strong> avrà il compito di rappresentare i 4 Slot della Hold e conterrà le seguenti
-    variabili:
-    <ul>
-        <li><strong>slotId</strong>: variabile positiva di tipo intero che rappresenta l'identificativo univoco
-            associato allo Slot</li>
-        <li><strong>productId</strong>: variabile di tipo intero, inizialmente pari a -1, conterrà il PID del product
-            container
-            situato all'interno dello Slot</li>
-    </ul>
-    </br>
-    Per rendere la logica applicativa indipendente dai dispositivi usati per la persistenza, viene realizzata la classe
-    astratta <strong>AdapterStorage</strong>. La classe <strong>AdapterStorageMongo</strong> realizza un adattatore che consente di utilizzare MongoDB
-    come sistema di persistenza dei dati per gli Slot. In particolare, essa stabilisce una connessione verso
-    un database chiamato cargodb e lavora su una collezione di documenti denominata slots. La classe
-    <strong>AdapterStorageVolatile</strong>, invece, viene utilizzata per memorizzare gli Slot in una struttura di dati
-    runtime, fornendo un’interfaccia di adattamento verso lo storage sottostante (StorageVolatile).
-    </br></br>
-    <img src="./img/Modello_Dominio_Hold.png">
-    </br>
-    È prevista inoltre la realizzazione di una seconda classe helper, denominata <strong>CargoServiceHelper</strong>.
-    Al suo interno saranno implementate tutte le funzionalità necessarie a gestire le richieste di carico:
-    <ul>
-        <li> int handleLoadrequest(int productId, int weight): gestisce la richiesta di carico relativa ad un certo productId </li>
-        <li> boolean checkWeight(): ritorna true nel caso in cui Product.weight + Hold.totalWeight &le; Hold.maxLoad,
-            altrimenti false </li>
-        <li> int checkFreeSlots(): ritorna lo slotId relativo al primo Slot libero, altrimenti -1 in assenza di Slot
-            liberi </li>
-    </ul>
-    </br></br>
-    <img src="./img/Modello_Dominio_CargoService.png">
+        </br>
+
+        In caso di richiesta accettata, l'attore tramite un messaggio di <span class="messaggi">autodispatch accepted :
+            accepted(X)</span> transita nello stato <strong>handle_load_accepted</strong>, in attesa che il product
+        container venga
+        posizionato sull'IOPort.
+
+        </br>
+
+        All'interno di questo stato, l'arrivo del product container all'IOPort viene segnalato da <span
+            class="messaggi">Event sonardata : distance(D)</span>.
+        A seguito dell'arrivo di questo evento, l'attore transita nello stato <strong>handle_ioport</strong> dove vi
+        rimane
+        finchè non viene rilevata una distanza
+        D &lt; DFREE/2 per almeno 3 secondi. Al termine di questo periodo tramite un messaggio di <span
+            class="messaggi">autodispatch container_ioport : container_ioport(X)</span> l'attore transita nello stato
+        <strong>handle_container</strong>
+        dove invierà un <span class="messaggi">Dispatch transport : transport(SlotID)</span> al
+        <strong>cargorobot</strong>
+        indicando l'Id dello
+        Slot in cui inserire il product container.
+
+        </br>
+
+        Infine, alla ricezione del <span class="messaggi">Dispatch robot_home : robot_home(X)</span>, l'attore tonerà
+        allo
+        stato s0 nell'attesa di nuove
+        richieste di carico.
+
+
+
+        <h3>sonarcontroller</h3>
+
+
+        Questo attore viene introdotto con lo scopo di rilevare e gestire le <i>sonar failure</i>. In particolare, dopo
+        aver ricevuto il messaggio
+        <span class="messaggi">Event sonardata : distance(D)</span> l'attore transita nello stato
+        <strong>normal</strong>, dove controlla che la distanza
+        rilevata dal sonar non superi DFREE per piu di 3 secondi. In caso contrario emetterà un <span
+            class="messaggi">Event alarm : alarm(failure)</span>,
+        in modo da segnalare la <i>sonar failure</i> all'attore <strong>cargoservice</strong>, e tramite un messaggio di
+        <span class="messaggi">autodispatch sonar_failure : sonar_failure(X)</span> transiterà nello stato
+        <strong>failure</strong>.
+        In questo stato, appena viene rilevata una distanza D &le; DFREE, <strong>sonarcontroller</strong> invierà
+        all'attore <strong>cargoservice</strong> un messaggio di <span class="messaggi">Dispatch alarm : alarm(X)</span>
+        per segnalare la fine della <i>sonar failure</i>, e transiterà tramite un
+        <span class="messaggi">autodispatch sonar_normal : sonar_normal(X)</span> nuovamente nello stato
+        <strong>normal</strong>, ritornando a rilevare
+        eventuali <i>sonar failure</i>.
+
+    </div>
 
     <h2>Testing</h2>
 
-    <table>
+    <div>
+
+        <table>
             <tr>
                 <th>
                     ID
@@ -390,97 +497,129 @@
             </td>
             <td>
             </td>
-        </tr>
+            </tr>
 
-        <tr>
-            <td>
-                T06
-            </td>
-            <td>
-                <strong>Fallimento del sonar</strong>
-            </td>
-            <td>
-                Integration Test
-            </td>
-            <td>
-                Nel caso la distanza misurata dal sonar sia maggiore di DFREE per più di tre secondi, l'attore sonar
-                dovrà interrompere il sistema, segnalando l'anomalia all'attore cargoservice, e comunicando
-                all'attore led di accendere il LED.
-            </td>
-            <td>
-                D &gt; DFREE
-            </td>
-            <td>
-                Interruzione dell'attività e accensione del LED da parte dell'attore led
-            </td>
-        </tr>
+            <tr>
+                <td>
+                    T06
+                </td>
+                <td>
+                    <strong>Fallimento del sonar</strong>
+                </td>
+                <td>
+                    Integration Test
+                </td>
+                <td>
+                    Nel caso la distanza misurata dal sonar sia maggiore di DFREE per più di tre secondi, l'attore sonar
+                    dovrà interrompere il sistema, segnalando l'anomalia all'attore cargoservice, e comunicando
+                    all'attore led di accendere il LED.
+                </td>
+                <td>
+                    D &gt; DFREE
+                </td>
+                <td>
+                    Interruzione dell'attività e accensione del LED da parte dell'attore led
+                </td>
+            </tr>
 
-        <tr>
-            <td>
-                T07
-            </td>
-            <td>
-                <strong>Ripristino del sistema</strong>
-            </td>
-            <td>
-                Integration Test
-            </td>
-            <td>
-                Nel caso la distanza misurata dal sonar sia minore o uguale di DFREE, l'attore sonar dovrà
-                comunicare all'attore cargoservice di ripristinare il sistema
-            </td>
-            <td>
-                D &le; DFREE </td>
-            <td>
-                Ripristino dell'attività
-            </td>
-        </tr>
+            <tr>
+                <td>
+                    T07
+                </td>
+                <td>
+                    <strong>Ripristino del sistema</strong>
+                </td>
+                <td>
+                    Integration Test
+                </td>
+                <td>
+                    Nel caso la distanza misurata dal sonar sia minore o uguale di DFREE, l'attore sonar dovrà
+                    comunicare all'attore cargoservice di ripristinare il sistema
+                </td>
+                <td>
+                    D &le; DFREE </td>
+                <td>
+                    Ripristino dell'attività
+                </td>
+            </tr>
 
-        <tr>
-            <td>
-                T08
-            </td>
-            <td>
-                <strong>Corretto funzionamento sonar</strong>
-            </td>
-            <td>
-                Integration Test
-            </td>
-            <td>
-                L'attore sonar dovrà segnalare all'attore cargoservice l'arrivo di un container sull'IOPort in modo
-                da poter avviare la procedura di carico
-            </td>
-            <td>
-                Product container sull'IOPort
-            </td>
-            <td>
-                Messaggio inviato all'attore cargoservice
-            </td>
-        </tr>
+            <tr>
+                <td>
+                    T08
+                </td>
+                <td>
+                    <strong>Corretto funzionamento sonar</strong>
+                </td>
+                <td>
+                    Integration Test
+                </td>
+                <td>
+                    L'attore sonar dovrà segnalare all'attore cargoservice l'arrivo di un container sull'IOPort in modo
+                    da poter avviare la procedura di carico
+                </td>
+                <td>
+                    Product container sull'IOPort
+                </td>
+                <td>
+                    Messaggio inviato all'attore cargoservice
+                </td>
+            </tr>
 
-        <tr>
-            <td>
-                T09
-            </td>
-            <td>
-                <strong>Comunicazione dello Slot di scarico del container</strong>
-            </td>
-            <td>
-                Integration Test
-            </td>
-            <td>
-                L'attore cargoservice dovrà comunicare all'attore cargorobot l'identificativo dello Slot in cui il
-                product container presente sull'IOPort dovrà essere scaricato.
-            </td>
-            <td>
-                Product container sull'IOPort
-            </td>
-            <td>
-                Identificativo dello Slot
-            </td>
-        </tr>
+            <tr>
+                <td>
+                    T09
+                </td>
+                <td>
+                    <strong>Comunicazione dello Slot di scarico del container</strong>
+                </td>
+                <td>
+                    Integration Test
+                </td>
+                <td>
+                    L'attore cargoservice dovrà comunicare all'attore cargorobot l'identificativo dello Slot in cui il
+                    product container presente sull'IOPort dovrà essere scaricato.
+                </td>
+                <td>
+                    Product container sull'IOPort
+                </td>
+                <td>
+                    Identificativo dello Slot
+                </td>
+            </tr>
 
-    </table>
+        </table>
+    </div>
+
+    <h2>Attori Mock</h2>
+    <div>
+
+        Alla fine della fase di testing è emersa la necessità di introdurre una serie di attori con lo scopo di simulare il funzionamento di parti del sistema non 
+        ancora implementate. 
+
+    <h3>clientmock</h3>
+
+    
+        Questo attore è stato inserito per simulare un client applicativo; il suo scopo è quello di inviare una richiesta di creazione di un prodotto e una 
+        successiva richiesta di carico del product container appena registrato. La prima richiesta viene inviata tramite una <span class="messaggi">Request createProduct : product(String)</span>
+        all'attore <strong>productservice</strong> con <strong><i>String = "{'\"productId\":31,\"name\":\"p31\",\"weight\":311'}"</i></strong> che contiene le 
+        specifiche di un prodotto. Successivamente all'arrivo della <span class="messaggi">Reply createdProduct : productid(ID)</span> relativa alla prima richiesta, l'attore
+        invia una <span class="messaggi">Request load_request : load(PID)</span> all'attore <strong>cargoservice</strong> specificando il PID del product container. Infine si mette
+        in attesa di una risposta, stampando successivamente l'esito della richiesta di carico.
+    
+
+    <h3></h3>
+
+
+    </div>
+
+    <h2>Sistema logico di riferimento</h2>
+
+    <div>
+
+        <img src="./img/Sprint1Arch.png">
+
+    </div>
+
 
 </body>
 

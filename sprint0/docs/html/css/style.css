@@ -87,6 +87,7 @@ div {
 
 /* Liste puntate */
 ul {
+    margin-top: 6px;
     margin-bottom: 6px;
     padding-left: 25px;
 }
@@ -98,7 +99,6 @@ ol {
 
 li{
     margin-bottom: 4px;
-    color: #34495e;
 }
 
 .cerchio{
@@ -138,6 +138,13 @@ th, td {
         overflow-x: auto;
         white-space: nowrap;
     }
+}
+
+
+span.messaggi{
+
+    background-color: lightblue;
+
 }
 
 
