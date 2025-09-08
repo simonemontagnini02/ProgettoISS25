@@ -320,7 +320,7 @@ QActor webguimock context ctxcargoservice {
 
 
 
-QActor sonardevice context ctxcargoservice {
+QActor sonarmock context ctxcargoservice {
 	[#
 	var Distance = 100	
 	#]

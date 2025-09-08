@@ -33,7 +33,7 @@ with Diagram('cargoserviceArch', show=False, outformat='png', graph_attr=graphat
           sonarcontroller=Custom('sonarcontroller','./qakicons/symActorWithobjSmall.png')
           cargorobot=Custom('cargorobot','./qakicons/symActorWithobjSmall.png')
           webguimock=Custom('webguimock','./qakicons/symActorWithobjSmall.png')
-          sonardevice=Custom('sonardevice','./qakicons/symActorWithobjSmall.png')
+          sonarmock=Custom('sonarmock','./qakicons/symActorWithobjSmall.png')
      sys >> Edge( label='sonardata', **evattr, decorate='true', fontcolor='darkgreen') >> cargoservice
      sys >> Edge( label='sonardata', **evattr, decorate='true', fontcolor='darkgreen') >> sonarcontroller
      clientmock >> Edge(color='magenta', style='solid', decorate='true', label='<createProduct<font color="darkgreen"> createdProduct</font> &nbsp; >',  fontcolor='magenta') >> productservice
