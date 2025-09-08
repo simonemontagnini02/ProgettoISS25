@@ -142,6 +142,7 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 								                    counterIO++
 								                    if(counterIO >= 3) {
 								                    	CommUtils.outgreen("cargoservice | rilevata presenza del product container all'IOPort")
+								                    	counterIO = 0
 								forward("container_ioport", "container_ioport(ok)" ,name ) 
 								
 								                    }

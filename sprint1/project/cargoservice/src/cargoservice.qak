@@ -193,6 +193,7 @@ QActor cargoservice context ctxcargoservice withobj helper using "main.java.doma
                     counterIO++
                     if(counterIO >= 3) {
                     	CommUtils.outgreen("cargoservice | rilevata presenza del product container all'IOPort")
+                    	counterIO = 0
                         #]
 		                autodispatch container_ioport : container_ioport(ok)
 		                [#
