@@ -27,9 +27,9 @@
 
     <h2>Requisiti degli attori</h2>
     <div>
-    <h3>cargoservice</h3>
-    <br />
-    
+        <h3>cargoservice</h3>
+        <br />
+
         <table>
             <tr>
                 <th>
@@ -423,11 +423,21 @@
         Slot in cui inserire il product container.
 
         </br>
+        </br>
 
         Infine, alla ricezione del <span class="messaggi">Dispatch robot_home : robot_home(X)</span>, l'attore tonerà
         allo
         stato s0 nell'attesa di nuove
         richieste di carico.
+
+        </br>
+        </br>
+
+        In tutti gli stati, l'attore alla ricezione di un interrupt <span class="messaggi">Event alarm : alarm(X)</span>
+        sospenderà tutte le sue
+        funzioni e si metterà in attesa di ricevere un messaggio <span class="messaggi">Dispatch alarm :
+            alarm(ok)</span>. Una volta ricevuto questo
+        messaggio riprenderà le sue attività attraverso un <strong>returnFromInterrupt</strong>.
 
 
 
@@ -510,7 +520,7 @@
                     Integration Test
                 </td>
                 <td>
-                    Nel caso la distanza misurata dal sonar sia maggiore di DFREE per più di tre secondi, l'attore sonar
+                    Nel caso la distanza misurata dal sonar sia maggiore di DFREE per più di tre secondi, l'attore sonarcontroller
                     dovrà interrompere il sistema, segnalando l'anomalia all'attore cargoservice, e comunicando
                     all'attore led di accendere il LED.
                 </td>
@@ -518,7 +528,7 @@
                     D &gt; DFREE
                 </td>
                 <td>
-                    Interruzione dell'attività e accensione del LED da parte dell'attore led
+                    Event alarm : alarm(failure)
                 </td>
             </tr>
 
@@ -533,13 +543,13 @@
                     Integration Test
                 </td>
                 <td>
-                    Nel caso la distanza misurata dal sonar sia minore o uguale di DFREE, l'attore sonar dovrà
+                    Nel caso la distanza misurata dal sonar sia minore o uguale di DFREE, l'attore sonarcontroller dovrà
                     comunicare all'attore cargoservice di ripristinare il sistema
                 </td>
                 <td>
                     D &le; DFREE </td>
                 <td>
-                    Ripristino dell'attività
+                    Dispatch alarm : alarm(ok)
                 </td>
             </tr>
 
@@ -561,7 +571,7 @@
                     Product container sull'IOPort
                 </td>
                 <td>
-                    Messaggio inviato all'attore cargoservice
+                    Event sonardata : distance(D)
                 </td>
             </tr>
 
@@ -583,7 +593,7 @@
                     Product container sull'IOPort
                 </td>
                 <td>
-                    Identificativo dello Slot
+                    Dispatch transport : transport(SlotID)
                 </td>
             </tr>
 
@@ -593,21 +603,47 @@
     <h2>Attori Mock</h2>
     <div>
 
-        Alla fine della fase di testing è emersa la necessità di introdurre una serie di attori con lo scopo di simulare il funzionamento di parti del sistema non 
-        ancora implementate. 
+        Alla fine della fase di testing è emersa la necessità di introdurre una serie di attori con lo scopo di simulare
+        il funzionamento di parti del sistema non
+        ancora implementate.
 
-    <h3>clientmock</h3>
+        <h3>clientmock</h3>
 
-    
-        Questo attore è stato inserito per simulare un client applicativo; il suo scopo è quello di inviare una richiesta di creazione di un prodotto e una 
-        successiva richiesta di carico del product container appena registrato. La prima richiesta viene inviata tramite una <span class="messaggi">Request createProduct : product(String)</span>
-        all'attore <strong>productservice</strong> con <strong><i>String = "{'\"productId\":31,\"name\":\"p31\",\"weight\":311'}"</i></strong> che contiene le 
-        specifiche di un prodotto. Successivamente all'arrivo della <span class="messaggi">Reply createdProduct : productid(ID)</span> relativa alla prima richiesta, l'attore
-        invia una <span class="messaggi">Request load_request : load(PID)</span> all'attore <strong>cargoservice</strong> specificando il PID del product container. Infine si mette
+
+        Questo attore è stato inserito per simulare un client applicativo; il suo scopo è quello di inviare una
+        richiesta di creazione di un prodotto e una
+        successiva richiesta di carico del product container appena registrato. La prima richiesta viene inviata tramite
+        una <span class="messaggi">Request createProduct : product(String)</span>
+        all'attore <strong>productservice</strong> con <strong><i>String =
+                "{'\"productId\":31,\"name\":\"p31\",\"weight\":311'}"</i></strong> che contiene le
+        specifiche di un prodotto. Successivamente all'arrivo della <span class="messaggi">Reply createdProduct :
+            productid(ID)</span> relativa alla prima richiesta, l'attore
+        invia una <span class="messaggi">Request load_request : load(PID)</span> all'attore
+        <strong>cargoservice</strong> specificando il PID del product container. Infine si mette
         in attesa di una risposta, stampando successivamente l'esito della richiesta di carico.
-    
 
-    <h3></h3>
+
+        <h3>sonarmock</h3>
+
+        Questo attore simula delle misurazioni realizzate dal sonar, effettuando ogni secondo una publish della distanza
+        rilevata tramite il messaggio
+        <span class="messaggi">Event sonardata : distance(D)</span> sul topic <strong><i>sonar</i></strong>.
+        Inzialmente viene simulata una <strong><i>sonar failure</i></strong> tramite l'invio di una distanza D &gt;
+        DFREE per 3
+        volte. Successivamente viene inviata una distanza D &le; DRFEE con lo scopo di uscire dalla <strong><i>sonar
+                failure</i></strong>.
+        Dopo aver inviato una distanza D &gt; DFREE una sola volta, viene simulato l'arrivo del product container
+        all'IOPort inviando distanze
+        D &lt; DRFEE/2.
+
+        <h3>cargorobot</h3>
+
+        Questo attore riproduce il comportamento del robot, ricevendo il messaggio <span class="messaggi">Dispatch
+            transport : transport(SlotID)</span>,
+        simulando il trasporto del product container e inviando a <strong>cargoservice</strong> il messaggio <span
+            class="messaggi">Dispatch robot_home : robot_home(X)</span>
+        con lo scopo di comunicare di essere ritornato alla HOME.
+
 
 
     </div>
@@ -617,6 +653,50 @@
     <div>
 
         <img src="./img/Sprint1Arch.png">
+
+    </div>
+
+    <h2>Istruzioni per l'esecuzione</h2>
+
+    <div>
+
+        Per poter avviare il sistema è necessario seguire i seguenti passi:
+
+        <ul>
+            <li>
+                avviare l'immagine docker <strong>iss2025new.yaml</strong> contenente al suo interno diversi servizi
+                software utili al supporto dell'esecuzione del
+                sistema.
+            </li>
+
+            <li>
+                avviare l'immagine docker <strong>cargoserviceqak.yaml</strong> contenente la logica che realizza il
+                servizio <strong>productservice</strong>
+            </li>
+
+            <li>
+                avviare il servizio <strong>cargoservice</strong> eseguendo il comando <i>gradlew run</i>
+            </li>
+
+        </ul>
+
+    </div>
+
+
+    <h2>Piano di lavoro</h2>
+
+    <div>
+
+        Dopo aver completato l'attore legato al core-business del sistema <strong>cargoservice</strong>, nello Sprint2 procediamo con l'implementazione di 
+        <strong>cargorobot</strong> e <strong>webgui_mock</strong> in modo tale da completare il contesto <strong>ctxcargoservice</strong>.
+
+    </br>
+    </br>
+
+    In particolare, <strong>cargorobot</strong> si occuperà di estendere <Strong>basicrobot</Strong> implementando le funzionalità legate al trasporto dei product
+    container. <strong>webgui_mock</strong>, invece, permetterà di implementare la funzionalità di visualizzazione dello stato della Hold tramite un'interfaccia
+    accessibile all'utente.
+
 
     </div>
 
