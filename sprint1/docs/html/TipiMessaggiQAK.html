@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messaggi QAK</title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+    <h1>Messaggi QAK</h1>
+
+    Dopo aver fatto una premessa relativa al metemodello <a href="../../../sprint0/docs/html/PremessaQak.html">QAK</a>, riteniamo utile introdurre i vari tipi di 
+    messaggi previsti dal linguaggio:
+
+    
+    <ul>
+        <li>
+            <strong>dispatch</strong>: un messaggio inviato a un preciso destinatario senza attesa di una risposta (in modo detto anche fire-and-forget)
+        </li>
+
+        <li>
+           <strong>request</strong>: un messaggio inviato a un preciso destinatario aspettandosi da parte di questi una reply logicamente correlata alla richiesta
+        </li>
+
+        <li>
+            <strong>event</strong>: un messaggio inviato a chiunque sia in grado di elaborarlo
+        </li>
+    </ul>
+
+   Il linguaggio QAK fornisce la seguente transizione per gestire gli Interrupt: <strong>whenInterrupt</strong>, che permette la transzione da uno stato A a uno stato 
+   B, con ritorno allo stato A, quando nello stato B viene eseguita l'istruzione QAK <strong>returnFromInterrupt</strong>.
+
+
+
+</body>
+</html>
