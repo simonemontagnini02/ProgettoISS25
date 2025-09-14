@@ -40,7 +40,7 @@ class Sonarcontroller ( name: String, scope: CoroutineScope, isconfined: Boolean
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t018",targetState="normal",cond=whenEvent("sonardata"))
+					 transition(edgeName="t020",targetState="normal",cond=whenEvent("sonardata"))
 				}	 
 				state("normal") { //this:State
 					action { //it:State
@@ -65,8 +65,8 @@ class Sonarcontroller ( name: String, scope: CoroutineScope, isconfined: Boolean
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t119",targetState="normal",cond=whenEvent("sonardata"))
-					transition(edgeName="t120",targetState="failure",cond=whenDispatch("sonar_failure"))
+					 transition(edgeName="t121",targetState="normal",cond=whenEvent("sonardata"))
+					transition(edgeName="t122",targetState="failure",cond=whenDispatch("sonar_failure"))
 				}	 
 				state("failure") { //this:State
 					action { //it:State
@@ -77,7 +77,7 @@ class Sonarcontroller ( name: String, scope: CoroutineScope, isconfined: Boolean
 								                if(D <= DFREE){
 								                	CommUtils.outred("sonarcontroller | Sonar Ok")
 								                	counter = 0
-								forward("alarm", "alarm(ok)" ,"cargoservice" ) 
+								emitlocal("alarm", "alarm(ok)" ) 
 								forward("sonar_normal", "sonar_normal(ok)" ,name ) 
 								
 								                }
@@ -87,8 +87,8 @@ class Sonarcontroller ( name: String, scope: CoroutineScope, isconfined: Boolean
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t221",targetState="failure",cond=whenEvent("sonardata"))
-					transition(edgeName="t222",targetState="normal",cond=whenDispatch("sonar_normal"))
+					 transition(edgeName="t223",targetState="failure",cond=whenEvent("sonardata"))
+					transition(edgeName="t224",targetState="normal",cond=whenDispatch("sonar_normal"))
 				}	 
 			}
 		}

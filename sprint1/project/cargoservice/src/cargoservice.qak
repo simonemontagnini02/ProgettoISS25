@@ -10,6 +10,11 @@ Request load_request : load(PID)
 Reply   load_accepted : slot(SlotID) for load_request
 Reply   load_refused  : reason(Motivation) for load_request
 
+//Richieste di validazione
+Request validate_request : validate(PID, Weight)
+Reply validate_accepted : slot(SlotID) for validate_request
+Reply validate_refused : motivation(X) for validate_request
+
 //Richiesta del prodotto
 Request getProduct : product( PID )
 Reply   getProductAnswer : product( JSonString ) for getProduct
@@ -19,11 +24,9 @@ Event sonardata : distance(D)
 
 //Interrupt
 Event alarm : alarm(X)
-Dispatch alarm : alarm(X)
 
 //AUTODISPATCH
 //cargoservice
-Dispatch accepted : accepted(X)
 Dispatch refused : refused(X)
 Dispatch container_ioport : container_ioport(X)
 //sonarcontroller
@@ -31,8 +34,8 @@ Dispatch sonar_failure : sonar_failure(X)
 Dispatch sonar_normal : sonar_normal(X)
 
 //Comunicazione con cargorobot
-Dispatch transport : transport( SlotID )
-Dispatch robot_home : robot_home(X)
+Request transport : transport( SlotID )
+Reply robot_home : robot_home(X) for transport
 
 //PRODUCTSERVICE
 Context ctxproductservice ip [ host="127.0.0.1" port=8111]
@@ -90,7 +93,7 @@ QActor clientmock context ctxcargoservice {
     }
 }
 
-QActor cargoservice context ctxcargoservice withobj helper using "main.java.domain.CargoServiceHelper.getSingleton()"{
+QActor cargoservice context ctxcargoservice {
 		[#
 		val DFREE = 50
 		var PID = -1
@@ -134,51 +137,55 @@ QActor cargoservice context ctxcargoservice withobj helper using "main.java.doma
 	                [#
 	            } else {
 	            	val obj = org.json.JSONObject(jsonStr)
-	                val weight = obj.getInt("weight")
+	                val Weight = obj.getInt("weight")
 		
-		            CommUtils.outgreen("cargoservice | trovato prodotto con peso:" + weight)
-		
-		            val RESULT = helper.handleLoadRequest(PID, weight)
-		            if(RESULT >= 0){
-		            	SlotId = RESULT
-		            	CommUtils.outgreen("cargoservice | product container associato allo Slot n." + RESULT)
-		            	#]
-		                replyTo load_request with load_accepted : slot($RESULT)
-		                autodispatch accepted : accepted(ok)
-		                [#
-		            } else {
-		            	if(RESULT == -1) {
-		            		CommUtils.outred("cargoservice | MAX_LOAD_EXCEEDED")
-		            		val Motivation = "MAX_LOAD_EXCEEDED"
-		            	 	#]
-			                replyTo load_request with load_refused : reason($Motivation)
-			                autodispatch refused : refused($Motivation)
-			                [#
-		            	} else {
-		            		if(RESULT == -2) {
-		            			CommUtils.outred("cargoservice | NO_FREE_SLOTS")
-		            			val Motivation = "NO_FREE_SLOTS"
-			            	 	#]
-				                replyTo load_request with load_refused : reason($Motivation)
-				                autodispatch refused : refused($Motivation)
-				                [#
-			            	}
-		            	}
-		            }	
+		            CommUtils.outgreen("cargoservice | trovato prodotto con peso:" + Weight)
+		            #]
+		            request requestvalidator -m validate_request : validate($PID, $Weight)
+	            	[#
 	            }
 	        #]
-	         
     	}
 	}
 	Transition t2
-	    whenMsg accepted -> handle_load_accepted
+	    whenReply validate_accepted -> handle_load_accepted
+	    whenReply validate_refused -> handle_load_refused
 	    whenMsg refused -> s0
 	    whenInterruptEvent  alarm -> handlealarm
 	
+	State handle_load_refused{
+		onMsg( validate_refused : motivation(X) ) {
+			[#
+				val RESULT = payloadArg(0).toInt()
+				if(RESULT == -1) {
+	        		CommUtils.outred("cargoservice | MAX_LOAD_EXCEEDED")
+	        		val Motivation = "MAX_LOAD_EXCEEDED"
+	        	 	#]
+	                replyTo load_request with load_refused : reason($Motivation)
+	                [#
+	        	} else {
+	        		if(RESULT == -2) {
+	        			CommUtils.outred("cargoservice | NO_FREE_SLOTS")
+	        			val Motivation = "NO_FREE_SLOTS"
+	            	 	#]
+		                replyTo load_request with load_refused : reason($Motivation)
+		                [#
+	            	}
+	        	}
+			#]	
+		}
+	}
 	State handle_load_accepted{
+		onMsg( validate_accepted : slot(SlotID) ) {
 		[#
-            CommUtils.outgreen("cargoservice | richiesta di carico accettata: in attesa che il product container arrivi all'IOPort")
+			SlotId = payloadArg(0).toInt()
+		    CommUtils.outgreen("cargoservice | product container associato allo Slot n." + SlotId)
         #]
+            replyTo load_request with load_accepted : slot($SlotId)
+        [#
+            CommUtils.outgreen("cargoservice | richiesta di carico accettata: in attesa che il product container arrivi all'IOPort")
+        #]	
+		}
     }
     Transition t3
 	    whenEvent sonardata -> handle_ioport
@@ -213,10 +220,10 @@ QActor cargoservice context ctxcargoservice withobj helper using "main.java.doma
 		[#
 		CommUtils.outgreen("cargoservice | invio richiesta a cargorobot di trasportare il product container PID: "+ PID +" allo Slot n."+ SlotId)
 		#]
-		forward cargorobot -m transport : transport($SlotId)
+		request cargorobot -m transport : transport($SlotId)
 	}
 	Transition t5
-	    whenMsg robot_home -> s0
+	    whenReply robot_home -> s0
 	    whenInterruptEvent  alarm -> handlealarm
 	    
 	
@@ -230,13 +237,61 @@ QActor cargoservice context ctxcargoservice withobj helper using "main.java.doma
 	    }
 	}
 	Transition t6
-	    whenMsg  alarm -> handlealarm
+	    whenEvent  alarm -> handlealarm
 }
 
 
-
-
-
+QActor requestvalidator context ctxcargoservice withobj hold using "main.java.domain.Hold.getInstance()"{
+	
+	import "main.java.domain.*"
+	
+	State s0 initial {
+	}
+	Transition t0
+	whenRequest validate_request -> handle_validate
+	
+	State handle_validate {
+		onMsg( validate_request : validate(PID, Weight) ) {
+			
+			[#			
+		 val PID = payloadArg(0).toInt()
+		 val  weight = payloadArg(1).toInt()
+		 
+		 if( hold.getTotalWeight() + weight > hold.getMaxLoad() ) {
+		 	CommUtils.outcyan("requestvalidator | peso massimo interno alla stiva superato")
+		 	val RESULT = -1
+		 #]
+		 	replyTo validate_request with validate_refused : motivation($RESULT)
+		 [#
+		 } else {
+		 	var SlotID = -1
+        	
+        	for (slot in hold.getSlots()) {
+			    if (slot.productId == -1) {
+			        SlotID = slot.slotId
+			        break  // esce subito dal ciclo
+			    }
+			}
+        	
+        	if ( SlotID == -1 ) {
+        		CommUtils.outcyan("requestvalidator | slot non disponibile")
+        		val RESULT = -2
+		 	#]
+		 		replyTo validate_request with validate_refused : motivation($RESULT)
+		 	[#
+		 	} else {
+		 		CommUtils.outcyan("requestvalidator | controlli superati, richiesta accettata per il product container PID: "+ PID)
+		 		hold.addContainer(SlotID, PID, weight)
+		 		#]
+		 		replyTo validate_request with validate_accepted : slot($SlotID)
+		 		[#	
+		 	}
+		 }
+		 #]	
+		}
+	}
+	Goto s0
+}
 
 QActor sonarcontroller context ctxcargoservice {
 	[#
@@ -280,7 +335,7 @@ QActor sonarcontroller context ctxcargoservice {
                 	CommUtils.outred("sonarcontroller | Sonar Ok")
                 	counter = 0
                     #]
-                    forward cargoservice -m alarm : alarm(ok)
+                    emitlocal alarm : alarm(ok)
 	                autodispatch sonar_normal : sonar_normal(ok)
 	                [#
                 }
@@ -296,7 +351,7 @@ QActor cargorobot context ctxcargoservice {
 	State s0 initial{
   	}
   	Transition t2
-  		whenMsg transport -> go_ioport
+  		whenRequest transport -> go_ioport
   
   	State go_ioport {
   		onMsg( transport : transport(SlotID) ) {
@@ -308,7 +363,7 @@ QActor cargorobot context ctxcargoservice {
             [#
 			CommUtils.outyellow("cargorobot | trasporto completato, il robot e' tornato alla HOME")
 			#]
-			forward cargoservice -m robot_home : robot_home(ok)
+			replyTo transport with robot_home : robot_home(ok)
         }
   	}
 }

@@ -314,7 +314,7 @@
                 <strong>requestvalidator</strong>.
                 I messaggi impiegati per la realizzazione della comunicazione sono:
                 <ul>
-                    <li><span class="messaggi">Request validate_request : request(PID, weight)</span>: la scelta di
+                    <li><span class="messaggi">Request validate_request : validate(PID, weight)</span>: la scelta di
                         utilizzare una request è dettata dalla necessità di avere una risposta relativa all'esito della
                         richiesta. I parametri PID e weight sono necessari in quanto permettono all'attore di validare
                         la
@@ -639,7 +639,7 @@
         verrà inviata una <span class="messaggi">Reply load_refused : reason(Motivation)</span> contenente la seguente
         ragione del rifiuto: "PID_NOT_REGISTERED".
         In caso contrario, l'attore estrae la variabile <strong>weight</strong> del prodotto e invierà una <span
-            class="messaggi">Request validate_request : request(PID, weight)</span>
+            class="messaggi">Request validate_request : validate(PID, weight)</span>
         all'attore <strong>requestvalidator</strong> che avrà il compito di valutare la richiesta di carico, rispondendo
         nei seguenti possibili modi:
 
@@ -729,7 +729,7 @@
         <h3>requestvalidator</h3>
 
         Nello stato s0 l'attore rimane in attesa di ricevere una <span class="messaggi">Request validate_request :
-            request(PID, weight)</span>. Una volta ricevuto, transita nello stato <strong>handle_validate</strong> nel
+            validate(PID, weight)</span>. Una volta ricevuto, transita nello stato <strong>handle_validate</strong> nel
         quale esegue questi controlli:
 
         <ul>
@@ -794,10 +794,10 @@
 
         <h3>cargorobot</h3>
 
-        Questo attore riproduce il comportamento del robot, ricevendo il messaggio <span class="messaggi">Dispatch
+        Questo attore riproduce il comportamento del robot, ricevendo il messaggio <span class="messaggi">Request
             transport : transport(SlotID)</span>,
         simulando il trasporto del product container e inviando a <strong>cargoservice</strong> il messaggio <span
-            class="messaggi">Dispatch robot_home : robot_home(X)</span>
+            class="messaggi">Reply robot_home : robot_home(X)</span>
         con lo scopo di comunicare di essere ritornato alla HOME.
 
 

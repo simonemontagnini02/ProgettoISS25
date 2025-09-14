@@ -37,7 +37,7 @@ class Cargorobot ( name: String, scope: CoroutineScope, isconfined: Boolean=fals
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t223",targetState="go_ioport",cond=whenDispatch("transport"))
+					 transition(edgeName="t225",targetState="go_ioport",cond=whenRequest("transport"))
 				}	 
 				state("go_ioport") { //this:State
 					action { //it:State
@@ -49,7 +49,7 @@ class Cargorobot ( name: String, scope: CoroutineScope, isconfined: Boolean=fals
 								delay(3000) 
 								
 											CommUtils.outyellow("cargorobot | trasporto completato, il robot e' tornato alla HOME")
-								forward("robot_home", "robot_home(ok)" ,"cargoservice" ) 
+								answer("transport", "robot_home", "robot_home(ok)"   )  
 						}
 						//genTimer( actor, state )
 					}
