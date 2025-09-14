@@ -38,6 +38,7 @@ class Cargorobot ( name: String, scope: CoroutineScope, isconfined: Boolean=fals
 					sysaction { //it:State
 					}	 	 
 					 transition(edgeName="t225",targetState="go_ioport",cond=whenRequest("transport"))
+					interrupthandle(edgeName="t226",targetState="handlealarm",cond=whenEvent("alarm"),interruptedStateTransitions)
 				}	 
 				state("go_ioport") { //this:State
 					action { //it:State
@@ -56,6 +57,23 @@ class Cargorobot ( name: String, scope: CoroutineScope, isconfined: Boolean=fals
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
+					 transition( edgeName="goto",targetState="s0", cond=doswitch() )
+				}	 
+				state("handlealarm") { //this:State
+					action { //it:State
+						if(  currentMsg.msgContent() == "alarm(ok)"  
+						 ){CommUtils.outyellow("cargorobot | servizio ripristinato")
+						returnFromInterrupt(interruptedStateTransitions)
+						}
+						else
+						 {CommUtils.outyellow("cargorobot | servizio interrotto")
+						 }
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t627",targetState="handlealarm",cond=whenEvent("alarm"))
 				}	 
 			}
 		}

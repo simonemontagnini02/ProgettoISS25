@@ -36,7 +36,5 @@ context(ctxiodevices, "localhost",  "TCP", "8128").
  static(sonarcontroller).
   qactor( cargorobot, ctxcargoservice, "it.unibo.cargorobot.Cargorobot").
  static(cargorobot).
-  qactor( webguimock, ctxcargoservice, "it.unibo.webguimock.Webguimock").
- static(webguimock).
   qactor( sonarmock, ctxcargoservice, "it.unibo.sonarmock.Sonarmock").
  static(sonarmock).

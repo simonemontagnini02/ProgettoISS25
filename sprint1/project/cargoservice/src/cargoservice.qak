@@ -352,6 +352,7 @@ QActor cargorobot context ctxcargoservice {
   	}
   	Transition t2
   		whenRequest transport -> go_ioport
+  		whenInterruptEvent  alarm -> handlealarm
   
   	State go_ioport {
   		onMsg( transport : transport(SlotID) ) {
@@ -366,15 +367,20 @@ QActor cargorobot context ctxcargoservice {
 			replyTo transport with robot_home : robot_home(ok)
         }
   	}
+  	Goto s0
+  	
+  	
+  	State handlealarm{
+	    if[# currentMsg.msgContent() == "alarm(ok)" #] {
+	    	println("cargorobot | servizio ripristinato") color yellow
+	    	returnFromInterrupt
+	    } else {
+	    	println("cargorobot | servizio interrotto") color yellow
+	    }
+	}
+	Transition t6
+	    whenEvent  alarm -> handlealarm
 }
-
-QActor webguimock context ctxcargoservice {
-  State s0 initial{
-  }
-}
-
-
-
 
 QActor sonarmock context ctxcargoservice {
 	[#
