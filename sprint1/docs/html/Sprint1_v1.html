@@ -126,23 +126,62 @@
                     </li>
                 </ul>
             </li>
-            <li><strong>Rilevazione della presenza del product container sull'IOPort</strong>: per questa responsabilità sono state individuate possibili soluzioni alternative:
+            <li><strong>Rilevazione della presenza del product container sull'IOPort</strong>: per questa responsabilità
+                sono state individuate possibili soluzioni alternative:
                 <ul>
                     <li>
-                        
+
+                        Il sonar si occupa di comunicare a cargoservice l'arrivo di un container sull'IOPort.
+                        In questo modo viene rispettato il <strong>Single Responsibility Principle</strong>, riducendo
+                        le responsabilità
+                        di cargoservice. Inoltre, cargoservice attende un unico messaggio dal sonar, evitando l'invio
+                        continuo di messaggi contenenti la distanza rilevata dal sensore e riducendo così l'impatto
+                        della comunicazione.
+
+                    </li>
+
+                    <li>
+
+                        Il sonar si occupa di comunicare la distanza rilevata dal sensore a cargoservice, il quale si
+                        occuperà di rilevare la presenza del container sull'IOPort sfruttando queste informazioni. In
+                        questo modo il sonar svolge meno attività, ma, in quanto vi è la necessità di inviare molti
+                        messaggi, la comunicazione risulta molto più fitta, peggiorando le performance del sistema.
+                        Inoltre,
+                        siccome cargoservice dovrà processare molti messaggi, la sua reattività sarà minore.
+
                     </li>
                 </ul>
-                
-                
-                
-                
-                
-                l'attore si mette in
-                attesa di rilevare la presenza del product container sull'IOPort per almeno 3 secondi attraverso degli
-                <span class="messaggi">Event sonardata : distance(D)</span>. La scelta di utilizzare un evento, invece
-                di
-                un dispatch, deriva dal fatto che questa informazione dovrà
-                essere disponibile a più di un attore, cioè cargoservice e sonarcontroller.
+
+                L'approccio scelto è il primo in quanto più efficiente.
+                </br>
+                Di conseguenza, la comunicazione con cargoservice può avvenire in 3 modi: 
+                <ul>
+                    <li>
+                        <strong>Attraverso un evento</strong>: questo approccio è necessario nel caso in cui
+                        l'informazione
+                        dell'arrivo del container sull'IOPort risulti utile a tutti gli attori del contesto
+                    </li>
+
+                    <li>
+                        <strong>Attraverso un dispatch</strong>: questo approccio invece risulta migliore se
+                        l'informazione
+                        è necessaria ad un solo attore
+                    </li>
+                    <li>
+                        <strong>Attraverso un’interazione basata sul modello Observer</strong>: questo approccio è
+                        preferibile quando
+                        l’informazione interessa solo una parte degli attori del contesto. In questo modo, chi è
+                        interessato
+                        si registra e l’informazione viene inviata esclusivamente a coloro che hanno effettuato la
+                        registrazione.
+                    </li>
+                </ul>
+
+
+                La comunicazione con cargoservice avverrà quindi tramite
+                un <span class="messaggi"> Dispatch containerAtIOPort : containerAtIOPort(X)</span>,
+                in quanto il messaggio non prevede risposta ed ha un unico destinatario.
+
             </li>
             <li><strong>Posizionamento</strong> da parte del cargorobot <strong>del product container nello Slot a lui
                     assegnato</strong>: la comunicazione avverrà tramite una <span class="messaggi">Request transport :
