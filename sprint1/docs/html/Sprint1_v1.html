@@ -25,232 +25,6 @@
         dell'occupazione della Hold.
     </div>
 
-    <h2>Requisiti degli attori</h2>
-    <div>
-        <h3>cargoservice</h3>
-        <br />
-
-        <table>
-            <tr>
-                <th>
-                    ID
-                </th>
-                <th>
-                    Descrizione
-                </th>
-                <th>
-                    Tipo
-                </th>
-                <th>
-                    Vincoli
-                </th>
-
-            </tr>
-
-            <tr>
-                <td>
-                    CS1
-                </td>
-                <td>
-                    L'attore deve verificare che il productId del product container sia presente nel database
-                </td>
-                <td>
-                    Funzionale
-                </td>
-                <td>
-                    productId > 0 e già registrato nel database
-                </td>
-
-            </tr>
-
-            <tr>
-                <td>
-                    CS2
-                </td>
-
-                <td>
-                    L'attore mantiene il peso totale (Hold.totalWeight) dei product container attualmente presenti nella
-                    Hold
-                </td>
-
-                <td>
-                    Funzionale
-                </td>
-
-                <td>
-
-                </td>
-
-            </tr>
-
-            <tr>
-                <td>
-                    CS3
-                </td>
-                <td>
-                    L'attore deve verificare che il peso totale della Hold non superi il suo peso massimo
-                </td>
-                <td>
-                    Funzionale
-                </td>
-                <td>
-                    Product.weight + Hold.totalWeight &le; Hold.maxLoad (maxLoad con valore arbitrario)
-                </td>
-            </tr>
-
-            <tr>
-                <td>
-                    CS4
-                </td>
-
-                <td>
-                    L'attore gestisce lo stato di occupazione degli Slot
-                </td>
-
-                <td>
-                    Funzionale
-                </td>
-
-                <td>
-                    Ciascuno Slot può essere "occupato" o "libero"
-                </td>
-
-            </tr>
-
-            <tr>
-                <td>
-                    CS5
-                </td>
-                <td>
-                    L'attore deve verificare la disponibilità di Slot liberi nella Hold
-                </td>
-                <td>
-                    Funzionale
-                </td>
-                <td>
-                    La Hold dispone di 4 Slot inizialmente liberi
-                </td>
-            </tr>
-
-            <tr>
-                <td>
-                    CS6
-                </td>
-
-                <td>
-                    Per ciascun Slot occupato, l'attore mantiene all'interno del database il productId del product
-                    container
-                    presente
-                </td>
-
-                <td>
-                    Funzionale
-                </td>
-
-                <td>
-                </td>
-
-            </tr>
-
-            <tr>
-                <td>
-                    CS7
-                </td>
-                <td>
-                    L'attore deve accettare le richieste di carico valide inviando un messaggio load_accepted
-                </td>
-                <td>
-                    Funzionale
-                </td>
-                <td>
-                    Vincoli CS1, CS3 e CS5 validi
-                </td>
-            </tr>
-
-            <tr>
-                <td>
-                    CS8
-                </td>
-                <td>
-                    L'attore deve rifiutare le richieste di carico non valide inviando un messaggio load_refused
-                </td>
-                <td>
-                    Funzionale
-                </td>
-                <td>
-                    Vincolo CS1/CS3/CS5 non valido
-                </td>
-            </tr>
-
-            <tr>
-                <td>
-                    CS9
-                </td>
-                <td>
-                    L'attore deve comunicare l'identificativo dello Slot assegnato al product container (slotId) alla
-                    webgui
-                </td>
-                <td>
-                    Funzionale
-                </td>
-                <td>
-                    Vincolo CS7 valido
-                </td>
-            </tr>
-
-            <tr>
-                <td>
-                    CS10
-                </td>
-                <td>
-                    L'attore rimane in attesa che l'attore sonar gli comunichi la presenza del product container
-                    all'IOPort
-                </td>
-                <td>
-                    Funzionale
-                </td>
-                <td>
-                    Vincolo CS7 valido
-                </td>
-            </tr>
-
-            <tr>
-                <td>
-                    CS11
-                </td>
-                <td>
-                    L'attore deve interagire con l'attore cargorobot per garantire il corretto posizionamento del
-                    product
-                    container
-                    nello Slot
-                    assegnato
-                </td>
-                <td>
-                    Funzionale
-                </td>
-                <td>
-
-                </td>
-            </tr>
-
-            <tr>
-                <td>
-                    CS12
-                </td>
-                <td>
-                    L'attore deve bloccare l'elaborazione di nuove richieste fino al completamento della precedente
-                </td>
-                <td>
-                    Funzionale
-                </td>
-                <td>
-                    Vincolo CS7 valido
-                </td>
-            </tr>
-
-        </table>
-    </div>
-
     <h2>Analisi del Problema</h2>
 
     <div>
@@ -263,7 +37,8 @@
 
         <h3>cargoservice</h3>
 
-        La scelta di rappresentare <strong>cargoservice</strong> come un <strong>Actor</strong> risulta opportuna.
+        Analizzando i requisiti del committente, emerge la necessità di rappresentare il core-business del sistema come
+        un attore.
         Poiché il servizio può ricevere più richieste di carico contemporaneamente, ma deve gestirle una alla volta, il
         modello ad attore è adeguato: le richieste aggiuntive, infatti, vengono accodate e gestite in modo sequenziale,
         senza rischio di perdita. Inoltre, grazie a questa soluzione, l'attore può rimanere sempre reattivo a eventuali
@@ -310,8 +85,28 @@
                 Product relativa al PID comunicato. Nel caso in cui il PID non dovesse risultare registrato, il payload
                 della risposta sarà uguale a "unknown".
             </li>
-            <li><strong>Validazione delle richieste di carico</strong>: questa funzionalità verrà delegata ad un attore
-                <strong>requestvalidator</strong>.
+            <li><strong>Validazione delle richieste di carico</strong>: per questa responsabilità sono state individuate
+                possibili soluzioni alternative:
+                <ul>
+                    <li><strong>Implementazione all'interno di cargoservice</strong>: in questo modo cargoservice
+                        sarebbe incaricato della gestione delle richieste di carico e della loro validazione. Questo
+                        permetterebbe di avere tutta la logica relativa all'interno di un unico attore, tuttavia
+                        l'attore sarebbe sovraccaricato di troppe responsabilità</li>
+                    <li><strong>Utilizzo di un POJO</strong>: l'utilizzo di classi helper java permette di separare le
+                        responsabilità ed implementare una comunicazione basata su procedure call, che quindi
+                        non necessità scambio di messaggi. Seguendo questa opzione avremmo una comunicazione più
+                        efficiente, tuttavia l'attore dovrebbe cedere il controllo al POJO, perdendo così reattività in
+                        quanto potrebbe gestire eventuali sonar failure solamente dopo aver ripreso il controllo</li>
+                    <li><strong>Realizzazione di un attore separato</strong>: questa opzione prevede la realizzazione di
+                        un attore incaricato della validazione delle richieste di carico dei product
+                        container. Sebbene l'utilizzo di un attore preveda una comunicazione basata su messaggi,
+                        così sarebbe possibile realizzare una comunicazione asincrona. Lo scambio di messaggi, avvenendo
+                        in locale, risulta inoltre abbastanza efficiente. In questo modo sarebbe anche possibile gestire
+                        in modo più responsivo le eventuali sonar failure che potrebbero avvenire durante la fase di
+                        validazione della richiesta</li>
+                </ul>
+                Delle tre opzioni elencate, abbiamo scelto di seguire l'implementazione di un attore separato, di nome
+                <strong>requestvalidator</strong>, i cui dettagli vengono specificati nel paragrafo sottostante.
                 I messaggi impiegati per la realizzazione della comunicazione sono:
                 <ul>
                     <li><span class="messaggi">Request validate_request : validate(PID, weight)</span>: la scelta di
@@ -331,7 +126,18 @@
                     </li>
                 </ul>
             </li>
-            <li><strong>Rilevazione della presenza del product container sull'IOPort</strong>: l'attore si mette in
+            <li><strong>Rilevazione della presenza del product container sull'IOPort</strong>: per questa responsabilità sono state individuate possibili soluzioni alternative:
+                <ul>
+                    <li>
+                        
+                    </li>
+                </ul>
+                
+                
+                
+                
+                
+                l'attore si mette in
                 attesa di rilevare la presenza del product container sull'IOPort per almeno 3 secondi attraverso degli
                 <span class="messaggi">Event sonardata : distance(D)</span>. La scelta di utilizzare un evento, invece
                 di
@@ -748,7 +554,7 @@
         </ul>
 
         Nel caso in cui la richiesta venga accettata, l'attore invierà una <span class="messaggi">Reply
-        validate_accepted : slot(SlotID)</span>, avente come payload lo SlotId associato al product container.
+            validate_accepted : slot(SlotID)</span>, avente come payload lo SlotId associato al product container.
 
         Una volta inviata la risposta, l'attore ritorna allo stato inziale in attesa di altre richieste di validazione.
 
