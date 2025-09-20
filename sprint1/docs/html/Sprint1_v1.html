@@ -131,7 +131,8 @@
                 <ul>
                     <li>
 
-                        Il sonar si occupa di comunicare a cargoservice l'arrivo di un container sull'IOPort.
+                        <strong>Il sonar si occupa di comunicare a cargoservice l'arrivo di un container
+                            sull'IOPort.</strong>
                         In questo modo viene rispettato il <strong>Single Responsibility Principle</strong>, riducendo
                         le responsabilità
                         di cargoservice. Inoltre, cargoservice attende un unico messaggio dal sonar, evitando l'invio
@@ -142,7 +143,8 @@
 
                     <li>
 
-                        Il sonar si occupa di comunicare la distanza rilevata dal sensore a cargoservice, il quale si
+                        <strong>Il sonar si occupa di comunicare la distanza rilevata dal sensore a
+                            cargoservice</strong>, il quale si
                         occuperà di rilevare la presenza del container sull'IOPort sfruttando queste informazioni. In
                         questo modo il sonar svolge meno attività, ma, in quanto vi è la necessità di inviare molti
                         messaggi, la comunicazione risulta molto più fitta, peggiorando le performance del sistema.
@@ -154,7 +156,7 @@
 
                 L'approccio scelto è il primo in quanto più efficiente.
                 </br>
-                Di conseguenza, la comunicazione con cargoservice può avvenire in 3 modi: 
+                Di conseguenza, la comunicazione con cargoservice può avvenire in 3 modi:
                 <ul>
                     <li>
                         <strong>Attraverso un evento</strong>: questo approccio è necessario nel caso in cui
@@ -183,13 +185,37 @@
                 in quanto il messaggio non prevede risposta ed ha un unico destinatario.
 
             </li>
-            <li><strong>Posizionamento</strong> da parte del cargorobot <strong>del product container nello Slot a lui
-                    assegnato</strong>: la comunicazione avverrà tramite una <span class="messaggi">Request transport :
-                    transport(SlotID)</span>, avente come payload lo slotId dello Slot all'interno del quale posizionare
-                il product container. In questo modo saremo in grado di ottenere una risposta dal robot una volta che
-                sarà tornato in posizione Home. È prevista una <span class="messaggi">Reply robot_home :
-                    robot_home(X)</span> per fare in modo che cargoservice possa uscire dall'attesa, così da essere in
-                grado di servire altre richieste di carico.</li>
+
+            <li><strong>Posizionamento del product container nello Slot assegnato</strong> da parte del
+                cargorobot: questa funzionalità può essere modellata secondo due approcci differenti: <ul>
+                    <li><strong>Cargorobot come entità indipendente</strong>: in questo scenario il cargorobot agisce
+                        autonomamente, prelevando il product container non appena viene rilevato all’IOPort. Per
+                        abilitare tale comportamento, il sonar deve segnalare direttamente l’arrivo del container al
+                        cargorobot, che a sua volta deve conoscere lo stato della Hold per individuare lo Slot corretto
+                        in cui collocarlo. Dopo aver completato la fase di scarico, il cargorobot deve comunicare a
+                        cargoservice
+                        il proprio ritorno alla posizione Home.
+                    </li>
+                    <li><strong>Cargorobot come entità dipendente</strong>: in questo caso il cargorobot non prende
+                        decisioni in autonomia, ma riceve istruzioni da cargoservice. L’arrivo del product container
+                        all’IOPort viene notificato solo a cargoservice, che provvede a comunicare al cargorobot lo
+                        SlotId a lui assegnato. In questo modo il cargorobot non necessita di accedere alla Hold, poiché
+                        cargoservice si interfaccia con requestvalidator per ottenere le informazioni necessarie. Una
+                        volta tornato alla Home, il cargorobot deve informarne cargoservice.
+                    </li>
+                </ul>
+            </li>
+
+
+
+
+            La comunicazione avverrà tramite una <span class="messaggi">Request transport :
+                transport(SlotID)</span>, avente come payload lo slotId dello Slot all'interno del quale posizionare
+            il product container. In questo modo saremo in grado di ottenere una risposta dal robot una volta che
+            sarà tornato in posizione Home. È prevista una <span class="messaggi">Reply robot_home :
+                robot_home(X)</span> per fare in modo che cargoservice possa uscire dall'attesa, così da essere in
+            grado di servire altre richieste di carico.
+            </li>
             <li><strong>Comunicazione dello stato aggiornato alla GUI</strong>: per comunicare con la GUI è previsto un
                 <span class="messaggi">Dispatch updategui : updategui(PID, SlotID, weight)</span> in quanto è
                 un'interazione che non prevede risposta.
