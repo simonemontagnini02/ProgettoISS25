@@ -92,6 +92,12 @@ ul {
     padding-left: 25px;
 }
 
+ul.morespace > li{
+
+  margin-bottom: 15px;
+
+}
+
 ol {
     margin-bottom: 6px;
     padding-left: 25px;

@@ -52,7 +52,7 @@
 
         L'attore cargoservice si occupa della gestione del core-business del servizio, realizzando le seguenti
         funzionalità:
-        <ul>
+        <ul class="morespace">
             <li><strong>Ricezione di richieste di carico</strong> di product container: messaggio <span
                     class="messaggi">Request
                     load_request : load(PID)</span>. Tramite questo messaggio l'ente esterno è in grado di comunicare
@@ -191,36 +191,80 @@
                     <li><strong>Cargorobot come entità indipendente</strong>: in questo scenario il cargorobot agisce
                         autonomamente, prelevando il product container non appena viene rilevato all’IOPort. Per
                         abilitare tale comportamento, il sonar deve segnalare direttamente l’arrivo del container al
-                        cargorobot, che a sua volta deve conoscere lo stato della Hold per individuare lo Slot corretto
+                        cargorobot, che a sua volta dovrà ottenere lo SlotID corretto
                         in cui collocarlo. Dopo aver completato la fase di scarico, il cargorobot deve comunicare a
                         cargoservice
                         il proprio ritorno alla posizione Home.
                     </li>
-                    <li><strong>Cargorobot come entità dipendente</strong>: in questo caso il cargorobot non prende
+                    <li><strong>cargorobot come entità dipendente</strong>: in questo caso il cargorobot non prende
                         decisioni in autonomia, ma riceve istruzioni da cargoservice. L’arrivo del product container
                         all’IOPort viene notificato solo a cargoservice, che provvede a comunicare al cargorobot lo
-                        SlotId a lui assegnato. In questo modo il cargorobot non necessita di accedere alla Hold, poiché
-                        cargoservice si interfaccia con requestvalidator per ottenere le informazioni necessarie. Una
-                        volta tornato alla Home, il cargorobot deve informarne cargoservice.
+                        SlotId a lui assegnato. In questo modo il cargorobot non deve occuparsi di reperire lo SlotId,
+                        poiché è cargoservice a interfacciarsi con requestvalidator per ottenere le informazioni
+                        necessarie e a comunicargliele direttamente. Una
+                        volta tornato alla Home, il cargorobot deve informare cargoservice.
                     </li>
                 </ul>
-            </li>
 
 
+                L'alternativa scelta è stata quella di modellare cargorobot come un'entità dipendente, di conseguenza
+                non si
+                muove autonomamente, ma attende direttive da cargoservice. Le comunicazione può essere realizzata nei
+                seguenti modi:
 
+                <ul>
+                    <li>
+                        <strong>Attraverso un dispatch</strong>: in questo caso sono necessari due messaggi. Il primo
+                        serve
+                        a cargoservice per comunicare al cargorobot lo SlotId assegnato al container, mentre il secondo
+                        viene inviato dal
+                        cargorobot a cargoservice per notificare il proprio ritorno alla posizione Home
+                    </li>
 
-            La comunicazione avverrà tramite una <span class="messaggi">Request transport :
-                transport(SlotID)</span>, avente come payload lo slotId dello Slot all'interno del quale posizionare
-            il product container. In questo modo saremo in grado di ottenere una risposta dal robot una volta che
-            sarà tornato in posizione Home. È prevista una <span class="messaggi">Reply robot_home :
-                robot_home(X)</span> per fare in modo che cargoservice possa uscire dall'attesa, così da essere in
-            grado di servire altre richieste di carico.
+                    <li>
+                        <strong>Attraverso una request</strong>: in questo caso invece verrà inviata una request da
+                        cargoservice a cargorobot contenente lo SlotID assegnato al container e sarà prevista una reply
+                        da
+                        parte di cargorobot quando sarà tornato alla Home
+                    </li>
+
+                </ul>
+
+                Tra le 2 opzioni è stata scelta la seconda, poiché il modello <strong>request/reply</strong> garantisce
+                un legame diretto
+                tra la richiesta e la relativa risposta, mentre i dispatch risultano messaggi indipendenti e non
+                correlati
+                tra loro.
+
+                </br>
+
+                La comunicazione avverrà quindi tramite una <span class="messaggi">Request transport :
+                    transport(SlotID)</span>, avente come payload lo slotId dello Slot all'interno del quale posizionare
+                il product container. In questo modo saremo in grado di ottenere una risposta dal robot una volta che
+                sarà tornato in posizione Home. È prevista una <span class="messaggi">Reply robot_home :
+                    robot_home(X)</span> per fare in modo che cargoservice possa uscire dall'attesa, così da essere in
+                grado di servire altre richieste di carico.
             </li>
             <li><strong>Comunicazione dello stato aggiornato alla GUI</strong>: per comunicare con la GUI è previsto un
                 <span class="messaggi">Dispatch updategui : updategui(PID, SlotID, weight)</span> in quanto è
-                un'interazione che non prevede risposta.
+                un'interazione asincrona "fire-and-forget". Di conseguenza, l’uso di un messaggio di request
+                risulterebbe inopportuno, poiché richiede una risposta, così come un evento, che verrebbe notificato a
+                tutti, mentre in questo caso l'informazione interessa solo alla GUI.
             </li>
-            <li><strong>Interruzione di tutte le attività</strong>: abbiamo deciso di delegare il controllo della sonar
+            <li><strong>Interruzione di tutte le attività</strong>: Per questa responsabilità sono state individuate diverse alternative:
+
+                <ul>
+                    <li>
+                        <strong>Il sonar comunica le sonar failure a cargoservice</strong>:
+                    </li>
+
+                    <li>
+                        <strong>cargoservice rileva le situazioni di sonar failure</strong>:
+                    </li>
+
+                </ul>
+                
+                abbiamo deciso di delegare il controllo della sonar
                 failure ad un attore secondario detto <strong>sonarcontroller</strong>. Quest'ultimo emetterà un <span
                     class="messaggi">Event alarm : alarm(Failure)</span> in caso di sonar failure. La scelta di un
                 evento è dettata dalla necessità di comunicare contemporaneamente a più di un attore, ovvero
