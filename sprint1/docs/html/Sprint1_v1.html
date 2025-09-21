@@ -251,25 +251,44 @@
                 risulterebbe inopportuno, poiché richiede una risposta, così come un evento, che verrebbe notificato a
                 tutti, mentre in questo caso l'informazione interessa solo alla GUI.
             </li>
-            <li><strong>Interruzione di tutte le attività</strong>: Per questa responsabilità sono state individuate diverse alternative:
+            <li><strong>Interruzione di tutte le attività</strong>: Per questa responsabilità sono state individuate
+                diverse alternative:
 
                 <ul>
                     <li>
-                        <strong>Il sonar comunica le sonar failure a cargoservice</strong>:
+                        <strong>Il sonar segnala le sonar failure</strong>: quando rileva per almeno tre secondi
+                            una distanza superiore a DFREE, il sonar comunica direttamente l’interruzione delle
+                            attività. Questo approccio consente di distribuire meglio le responsabilità,
+                            sollevando cargoservice dal compito di monitorare continuamente le distanze. Inoltre, si
+                            riduce il numero di messaggi, poiché il sonar gestisce internamente la rilevazione e invia
+                            solo le notifiche di fallimento.
                     </li>
 
                     <li>
-                        <strong>cargoservice rileva le situazioni di sonar failure</strong>:
+                        <strong>cargoservice rileva le situazioni di sonar failure</strong>: in questo scenario il sonar
+                        si limita a trasmettere tutte le misurazioni effettuate, mentre cargoservice si occupa di
+                        individuare eventuali condizioni di failure. In questo modo la logica di rilevamento viene
+                        centralizzata in cargoservice, a fronte però di un overhead nelle comunicazioni, poiché il sonar
+                        deve inviare ogni singola misurazione.
                     </li>
 
                 </ul>
-                
-                abbiamo deciso di delegare il controllo della sonar
-                failure ad un attore secondario detto <strong>sonarcontroller</strong>. Quest'ultimo emetterà un <span
-                    class="messaggi">Event alarm : alarm(Failure)</span> in caso di sonar failure. La scelta di un
-                evento è dettata dalla necessità di comunicare contemporaneamente a più di un attore, ovvero
-                cargoservice e cargorobot.
-                Il ripristino delle attività avverrà con l'invio, da parte di sonarcontroller, di un messaggio <span
+
+                Abbiamo scelto il primo approccio, in modo da avere un numero minore di comunicazioni e una migliore
+                ripartizione delle responsabilità all'interno del servizio.
+                Scegliamo di realizzare la comunicazione tramite un Event, in quanto le sonar failure sono informazioni
+                utili a diversi attori, ossia cargoservice e cargorobot. In questo modo possiamo comunicare
+                direttamente, ad entrambi gli attori, l'interruzione del servizio. Inoltre, questa soluzione si presta
+                bene anche
+                a possibili estensioni future: qualora venissero introdotti ulteriori attori interessati alle sonar
+                failure, basterà che rilevino l’evento senza modificare la logica del sonar. Con una Dispatch potremmo
+                realizzare
+                un comportamento simile, sarebbe però necessario inviare un messaggio esplicito a ciascun attore
+                destinatario. La Request
+                risulta inopportuna, in quanto il sonar alla segnalazione di una failure non aspetta una risposta.
+                L'attore emetterà quindi un <span class="messaggi">Event alarm : alarm(Failure)</span> in caso di sonar
+                failure.
+                Il ripristino delle attività avverrà con l'invio, da parte di sonar, di un messaggio <span
                     class="messaggi">Event alarm : alarm(ok)</span>.
             </li>
         </ul>
