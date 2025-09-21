@@ -14,9 +14,6 @@ reply( getProductAnswer, product(JSonString) ).  %%for getProduct
 dispatch( containerAtIOPort, containerAtIOPort(X) ).
 event( alarm, alarm(X) ).
 dispatch( refused, refused(X) ).
-dispatch( container_ioport, container_ioport(X) ).
-dispatch( sonar_failure, sonar_failure(X) ).
-dispatch( sonar_normal, sonar_normal(X) ).
 request( transport, transport(SlotID) ).
 reply( robot_home, robot_home(X) ).  %%for transport
 %====================================================================================

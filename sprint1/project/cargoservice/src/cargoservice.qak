@@ -25,10 +25,6 @@ Event alarm : alarm(X)
 //AUTODISPATCH
 //cargoservice
 Dispatch refused : refused(X)
-Dispatch container_ioport : container_ioport(X)
-//sonarcontroller
-Dispatch sonar_failure : sonar_failure(X)
-Dispatch sonar_normal : sonar_normal(X)
 
 //Comunicazione con cargorobot
 Request transport : transport( SlotID )
