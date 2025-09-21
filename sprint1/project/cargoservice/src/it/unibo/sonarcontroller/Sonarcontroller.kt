@@ -40,7 +40,7 @@ class Sonarcontroller ( name: String, scope: CoroutineScope, isconfined: Boolean
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t020",targetState="normal",cond=whenEvent("sonardata"))
+					 transition(edgeName="t020",targetState="normal",cond=whenDispatch("sonardata"))
 				}	 
 				state("normal") { //this:State
 					action { //it:State
@@ -65,7 +65,7 @@ class Sonarcontroller ( name: String, scope: CoroutineScope, isconfined: Boolean
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t121",targetState="normal",cond=whenEvent("sonardata"))
+					 transition(edgeName="t121",targetState="normal",cond=whenDispatch("sonardata"))
 					transition(edgeName="t122",targetState="failure",cond=whenDispatch("sonar_failure"))
 				}	 
 				state("failure") { //this:State
@@ -87,7 +87,7 @@ class Sonarcontroller ( name: String, scope: CoroutineScope, isconfined: Boolean
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t223",targetState="failure",cond=whenEvent("sonardata"))
+					 transition(edgeName="t223",targetState="failure",cond=whenDispatch("sonardata"))
 					transition(edgeName="t224",targetState="normal",cond=whenDispatch("sonar_normal"))
 				}	 
 			}

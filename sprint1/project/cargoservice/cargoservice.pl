@@ -1,7 +1,6 @@
 %====================================================================================
 % cargoservice description   
 %====================================================================================
-mqttBroker("localhost", "1883", "sonar").
 request( createProduct, product(String) ).
 reply( createdProduct, productid(ID) ).  %%for createProduct
 request( load_request, load(PID) ).
@@ -12,7 +11,7 @@ reply( validate_accepted, slot(SlotID) ).  %%for validate_request
 reply( validate_refused, motivation(X) ).  %%for validate_request
 request( getProduct, product(PID) ).
 reply( getProductAnswer, product(JSonString) ).  %%for getProduct
-event( sonardata, distance(D) ).
+dispatch( containerAtIOPort, containerAtIOPort(X) ).
 event( alarm, alarm(X) ).
 dispatch( refused, refused(X) ).
 dispatch( container_ioport, container_ioport(X) ).
@@ -32,8 +31,6 @@ context(ctxiodevices, "localhost",  "TCP", "8128").
  static(cargoservice).
   qactor( requestvalidator, ctxcargoservice, "it.unibo.requestvalidator.Requestvalidator").
  static(requestvalidator).
-  qactor( sonarcontroller, ctxcargoservice, "it.unibo.sonarcontroller.Sonarcontroller").
- static(sonarcontroller).
   qactor( cargorobot, ctxcargoservice, "it.unibo.cargorobot.Cargorobot").
  static(cargorobot).
   qactor( sonarmock, ctxcargoservice, "it.unibo.sonarmock.Sonarmock").

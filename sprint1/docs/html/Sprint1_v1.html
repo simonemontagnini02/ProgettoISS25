@@ -188,7 +188,7 @@
 
             <li><strong>Posizionamento del product container nello Slot assegnato</strong> da parte del
                 cargorobot: questa funzionalità può essere modellata secondo due approcci differenti: <ul>
-                    <li><strong>Cargorobot come entità indipendente</strong>: in questo scenario il cargorobot agisce
+                    <li><strong>cargorobot come entità indipendente</strong>: in questo scenario il cargorobot agisce
                         autonomamente, prelevando il product container non appena viene rilevato all’IOPort. Per
                         abilitare tale comportamento, il sonar deve segnalare direttamente l’arrivo del container al
                         cargorobot, che a sua volta dovrà ottenere lo SlotID corretto
@@ -251,7 +251,7 @@
                 risulterebbe inopportuno, poiché richiede una risposta, così come un evento, che verrebbe notificato a
                 tutti, mentre in questo caso l'informazione interessa solo alla GUI.
             </li>
-            <li><strong>Interruzione di tutte le attività</strong>: Per questa responsabilità sono state individuate
+            <li><strong>Interruzione di tutte le attività</strong>: per questa responsabilità sono state individuate
                 diverse alternative:
 
                 <ul>
@@ -265,7 +265,7 @@
                     </li>
 
                     <li>
-                        <strong>cargoservice rileva le situazioni di sonar failure</strong>: in questo scenario il sonar
+                        <strong>L'attore cargoservice rileva le situazioni di sonar failure</strong>: in questo scenario il sonar
                         si limita a trasmettere tutte le misurazioni effettuate, mentre cargoservice si occupa di
                         individuare eventuali condizioni di failure. In questo modo la logica di rilevamento viene
                         centralizzata in cargoservice, a fronte però di un overhead nelle comunicazioni, poiché il sonar

@@ -29,40 +29,21 @@ class Sonarmock ( name: String, scope: CoroutineScope, isconfined: Boolean=false
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		//IF actor.withobj !== null val actor.withobj.name» = actor.withobj.method»ENDIF
-		
-			var Distance = 100	
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						delay(1000) 
-						CommUtils.outblue("$name| publish distanza: $Distance")
-						//val m = MsgUtil.buildEvent(name, "sonardata", "distance($Distance)" ) 
-						publish(MsgUtil.buildEvent(name,"sonardata","distance($Distance)").toString(), "sonar" )   
-						delay(1000) 
-						CommUtils.outblue("$name| publish distanza: $Distance")
-						//val m = MsgUtil.buildEvent(name, "sonardata", "distance($Distance)" ) 
-						publish(MsgUtil.buildEvent(name,"sonardata","distance($Distance)").toString(), "sonar" )   
-						delay(1000) 
-						CommUtils.outblue("$name| publish distanza: $Distance")
-						//val m = MsgUtil.buildEvent(name, "sonardata", "distance($Distance)" ) 
-						publish(MsgUtil.buildEvent(name,"sonardata","distance($Distance)").toString(), "sonar" )   
+						connectToMqttBroker( "tcp://localhost:1883" )
 						delay(3000) 
-						 Distance = 10  
-						CommUtils.outblue("$name| publish distanza: $Distance")
-						//val m = MsgUtil.buildEvent(name, "sonardata", "distance($Distance)" ) 
-						publish(MsgUtil.buildEvent(name,"sonardata","distance($Distance)").toString(), "sonar" )   
-						 Distance = 90  
-						CommUtils.outblue("$name| publish distanza: $Distance")
-						//val m = MsgUtil.buildEvent(name, "sonardata", "distance($Distance)" ) 
-						publish(MsgUtil.buildEvent(name,"sonardata","distance($Distance)").toString(), "sonar" )   
-						 
-								Distance = 20
-								while (true) {
+						CommUtils.outblue("$name| rilevata sonar failure")
+						//val m = MsgUtil.buildEvent(name, "alarm", "alarm(failure)" ) 
+						publish(MsgUtil.buildEvent(name,"alarm","alarm(failure)").toString(), "sonarfailure" )   
+						delay(2000) 
+						CommUtils.outblue("$name| sonar failure terminata")
+						//val m = MsgUtil.buildEvent(name, "alarm", "alarm(ok)" ) 
+						publish(MsgUtil.buildEvent(name,"alarm","alarm(ok)").toString(), "sonarfailure" )   
 						delay(1000) 
-						//val m = MsgUtil.buildEvent(name, "sonardata", "distance($Distance)" ) 
-						publish(MsgUtil.buildEvent(name,"sonardata","distance($Distance)").toString(), "sonar" )   
-						
-								}
+						CommUtils.outblue("$name| rilevato product container all'IOPort")
+						forward("containerAtIOPort", "containerAtIOPort(ok)" ,"cargoservice" ) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

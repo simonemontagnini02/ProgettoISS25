@@ -31,16 +31,14 @@ with Diagram('cargoserviceArch', show=False, outformat='png', graph_attr=graphat
           clientmock=Custom('clientmock','./qakicons/symActorWithobjSmall.png')
           cargoservice=Custom('cargoservice','./qakicons/symActorWithobjSmall.png')
           requestvalidator=Custom('requestvalidator','./qakicons/symActorWithobjSmall.png')
-          sonarcontroller=Custom('sonarcontroller','./qakicons/symActorWithobjSmall.png')
           cargorobot=Custom('cargorobot','./qakicons/symActorWithobjSmall.png')
           sonarmock=Custom('sonarmock','./qakicons/symActorWithobjSmall.png')
-     sys >> Edge( label='sonardata', **evattr, decorate='true', fontcolor='darkgreen') >> cargoservice
      sys >> Edge( label='alarm', **evattr, decorate='true', fontcolor='darkgreen') >> cargoservice
-     sys >> Edge( label='sonardata', **evattr, decorate='true', fontcolor='darkgreen') >> sonarcontroller
      sys >> Edge( label='alarm', **evattr, decorate='true', fontcolor='darkgreen') >> cargorobot
      cargoservice >> Edge(color='magenta', style='solid', decorate='true', label='<validate_request<font color="darkgreen"> validate_accepted validate_refused</font> &nbsp; >',  fontcolor='magenta') >> requestvalidator
      clientmock >> Edge(color='magenta', style='solid', decorate='true', label='<createProduct<font color="darkgreen"> createdProduct</font> &nbsp; >',  fontcolor='magenta') >> productservice
      clientmock >> Edge(color='magenta', style='solid', decorate='true', label='<load_request<font color="darkgreen"> load_accepted load_refused</font> &nbsp; >',  fontcolor='magenta') >> cargoservice
      cargoservice >> Edge(color='magenta', style='solid', decorate='true', label='<getProduct<font color="darkgreen"> getProductAnswer</font> &nbsp; >',  fontcolor='magenta') >> productservice
      cargoservice >> Edge(color='magenta', style='solid', decorate='true', label='<transport<font color="darkgreen"> robot_home</font> &nbsp; >',  fontcolor='magenta') >> cargorobot
+     sonarmock >> Edge(color='blue', style='solid',  decorate='true', label='<containerAtIOPort &nbsp; >',  fontcolor='blue') >> cargoservice
 diag

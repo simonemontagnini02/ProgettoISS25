@@ -32,13 +32,24 @@ class Cargorobot ( name: String, scope: CoroutineScope, isconfined: Boolean=fals
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
+						connectToMqttBroker( "tcp://localhost:1883" )
+						subscribe(  "sonarfailure" ) //mqtt.subscribe(this,topic)
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t225",targetState="go_ioport",cond=whenRequest("transport"))
-					interrupthandle(edgeName="t226",targetState="handlealarm",cond=whenEvent("alarm"),interruptedStateTransitions)
+					 transition( edgeName="goto",targetState="work", cond=doswitch() )
+				}	 
+				state("work") { //this:State
+					action { //it:State
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t117",targetState="go_ioport",cond=whenRequest("transport"))
+					interrupthandle(edgeName="t118",targetState="handlealarm",cond=whenEvent("alarm"),interruptedStateTransitions)
 				}	 
 				state("go_ioport") { //this:State
 					action { //it:State
@@ -57,7 +68,7 @@ class Cargorobot ( name: String, scope: CoroutineScope, isconfined: Boolean=fals
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition( edgeName="goto",targetState="s0", cond=doswitch() )
+					 transition( edgeName="goto",targetState="work", cond=doswitch() )
 				}	 
 				state("handlealarm") { //this:State
 					action { //it:State
@@ -73,7 +84,7 @@ class Cargorobot ( name: String, scope: CoroutineScope, isconfined: Boolean=fals
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t627",targetState="handlealarm",cond=whenEvent("alarm"))
+					 transition(edgeName="t219",targetState="handlealarm",cond=whenEvent("alarm"))
 				}	 
 			}
 		}

@@ -1,5 +1,4 @@
 System cargoservice
-mqttBroker "localhost" : 1883 eventTopic "sonar"
 
 //Richiesta di registrazione del prodotto
 Request createProduct : product(String)
@@ -20,9 +19,7 @@ Request getProduct : product( PID )
 Reply   getProductAnswer : product( JSonString ) for getProduct
 
 //Sonar
-Event sonardata : distance(D)
-
-//Interrupt
+Dispatch containerAtIOPort : containerAtIOPort(X)
 Event alarm : alarm(X)
 
 //AUTODISPATCH
@@ -95,13 +92,17 @@ QActor clientmock context ctxcargoservice {
 
 QActor cargoservice context ctxcargoservice {
 		[#
-		val DFREE = 50
 		var PID = -1
 		var SlotId = -1
-		var counterIO = 0
 		#]
 		
 	State s0 initial {
+	    connectToMqttBroker "tcp://localhost:1883"
+	    subscribe "sonarfailure"
+	}
+	Goto work
+	
+	State work {
 		[#
 	        CommUtils.outgreen("cargoservice | in attesa di ricevere richieste di carico")
 	    #]
@@ -150,7 +151,7 @@ QActor cargoservice context ctxcargoservice {
 	Transition t2
 	    whenReply validate_accepted -> handle_load_accepted
 	    whenReply validate_refused -> handle_load_refused
-	    whenMsg refused -> s0
+	    whenMsg refused -> work
 	    whenInterruptEvent  alarm -> handlealarm
 	
 	State handle_load_refused{
@@ -188,32 +189,7 @@ QActor cargoservice context ctxcargoservice {
 		}
     }
     Transition t3
-	    whenEvent sonardata -> handle_ioport
-	    whenInterruptEvent  alarm -> handlealarm
-	
-	State handle_ioport {
-    	onMsg( sonardata : distance(D) ) {
-            [#
-                val D = payloadArg(0).toInt()
-                CommUtils.outgreen("cargoservice | distanza: "+ D)
-                if(D < DFREE/2){
-                    counterIO++
-                    if(counterIO >= 3) {
-                    	CommUtils.outgreen("cargoservice | rilevata presenza del product container all'IOPort")
-                    	counterIO = 0
-                        #]
-		                autodispatch container_ioport : container_ioport(ok)
-		                [#
-                    }
-                } else {
-                    counterIO = 0
-                }
-            #]
-        }   
-	}
-	Transition t4
-	    whenEvent sonardata -> handle_ioport
-	    whenMsg container_ioport -> handle_container
+	    whenMsg containerAtIOPort -> handle_container
 	    whenInterruptEvent  alarm -> handlealarm
 	    
 	State handle_container {
@@ -222,8 +198,8 @@ QActor cargoservice context ctxcargoservice {
 		#]
 		request cargorobot -m transport : transport($SlotId)
 	}
-	Transition t5
-	    whenReply robot_home -> s0
+	Transition t4
+	    whenReply robot_home -> work
 	    whenInterruptEvent  alarm -> handlealarm
 	    
 	
@@ -236,8 +212,8 @@ QActor cargoservice context ctxcargoservice {
 	    	println("cargoservice | servizio interrotto") color red
 	    }
 	}
-	Transition t6
-	    whenEvent  alarm -> handlealarm
+	Transition t5
+	    whenEvent alarm -> handlealarm
 }
 
 
@@ -293,64 +269,18 @@ QActor requestvalidator context ctxcargoservice withobj hold using "main.java.do
 	Goto s0
 }
 
-QActor sonarcontroller context ctxcargoservice {
-	[#
-    var counter = 0
-    val DFREE = 50
-    #]
-    
-	State s0 initial {
-    }
-    Transition t0
-	    whenEvent sonardata -> normal
-    
-    State normal {
-		onMsg( sonardata : distance(D) ) {
-            [#
-                val D = payloadArg(0).toInt()
-                if(D > DFREE){
-                    counter++
-                    if(counter >= 3) {
-                    	CommUtils.outred("sonarcontroller | Sonar Failure")
-                        #]
-                        emitlocal alarm : alarm(failure)
-		                autodispatch sonar_failure : sonar_failure(ok)
-		                [#
-                    }
-                } else {
-                    counter = 0
-                }
-            #]
-        }
-    }
-    Transition t1
-	    whenEvent sonardata -> normal
-	    whenMsg sonar_failure -> failure
-	
-	State failure {
-		onMsg( sonardata : distance(D) ) {
-            [#
-                val D = payloadArg(0).toInt()
-                if(D <= DFREE){
-                	CommUtils.outred("sonarcontroller | Sonar Ok")
-                	counter = 0
-                    #]
-                    emitlocal alarm : alarm(ok)
-	                autodispatch sonar_normal : sonar_normal(ok)
-	                [#
-                }
-            #]
-        }
-	}
-	Transition t2
-	    whenEvent sonardata -> failure
-	    whenMsg sonar_normal -> normal
-}
 
 QActor cargorobot context ctxcargoservice {
-	State s0 initial{
+	State s0 initial {
+		connectToMqttBroker "tcp://localhost:1883"
+		subscribe "sonarfailure"
   	}
-  	Transition t2
+  	Goto work
+  	
+  	State work {
+  		
+  	}
+  	Transition t1
   		whenRequest transport -> go_ioport
   		whenInterruptEvent  alarm -> handlealarm
   
@@ -367,7 +297,7 @@ QActor cargorobot context ctxcargoservice {
 			replyTo transport with robot_home : robot_home(ok)
         }
   	}
-  	Goto s0
+  	Goto work
   	
   	
   	State handlealarm{
@@ -378,39 +308,21 @@ QActor cargorobot context ctxcargoservice {
 	    	println("cargorobot | servizio interrotto") color yellow
 	    }
 	}
-	Transition t6
+	Transition t2
 	    whenEvent  alarm -> handlealarm
 }
 
 QActor sonarmock context ctxcargoservice {
-	[#
-	var Distance = 100	
-	#]
 	State s0 initial{
-		delay 1000
-		println("$name| publish distanza: $Distance") color blue
-		publish "sonar" -m sonardata : distance($Distance)
-		delay 1000
-		println("$name| publish distanza: $Distance") color blue
-		publish "sonar" -m sonardata : distance($Distance)
-		delay 1000
-		println("$name| publish distanza: $Distance") color blue
-		publish "sonar" -m sonardata : distance($Distance)
+		connectToMqttBroker "tcp://localhost:1883"
 		delay 3000
-		[# Distance = 10 #]
-		println("$name| publish distanza: $Distance") color blue
-		publish "sonar" -m sonardata : distance($Distance)
-		[# Distance = 90 #]
-		println("$name| publish distanza: $Distance") color blue
-		publish "sonar" -m sonardata : distance($Distance)
-		[# 
-		Distance = 20
-		while (true) {
-			#]
-			delay 1000
-			publish "sonar" -m sonardata : distance($Distance)
-			[#
-		}
-		#]
+		println("$name| rilevata sonar failure") color blue
+		publish "sonarfailure" -m alarm : alarm(failure)
+		delay 2000
+		println("$name| sonar failure terminata") color blue
+		publish "sonarfailure" -m alarm : alarm(ok)
+		delay 1000
+		println("$name| rilevato product container all'IOPort") color blue
+		forward cargoservice -m containerAtIOPort : containerAtIOPort(ok)
     }
 }
