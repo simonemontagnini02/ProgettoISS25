@@ -35,6 +35,7 @@ with Diagram('cargoserviceArch', show=False, outformat='png', graph_attr=graphat
           sonarmock=Custom('sonarmock','./qakicons/symActorWithobjSmall.png')
      sys >> Edge( label='alarm', **evattr, decorate='true', fontcolor='darkgreen') >> cargoservice
      sys >> Edge( label='alarm', **evattr, decorate='true', fontcolor='darkgreen') >> cargorobot
+     sonarmock >> Edge( label='alarm', **eventedgeattr, decorate='true', fontcolor='red') >> sys
      cargoservice >> Edge(color='magenta', style='solid', decorate='true', label='<validate_request<font color="darkgreen"> validate_accepted validate_refused</font> &nbsp; >',  fontcolor='magenta') >> requestvalidator
      clientmock >> Edge(color='magenta', style='solid', decorate='true', label='<createProduct<font color="darkgreen"> createdProduct</font> &nbsp; >',  fontcolor='magenta') >> productservice
      clientmock >> Edge(color='magenta', style='solid', decorate='true', label='<load_request<font color="darkgreen"> load_accepted load_refused</font> &nbsp; >',  fontcolor='magenta') >> cargoservice

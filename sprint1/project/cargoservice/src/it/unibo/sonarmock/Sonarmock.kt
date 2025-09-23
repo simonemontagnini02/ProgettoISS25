@@ -32,15 +32,12 @@ class Sonarmock ( name: String, scope: CoroutineScope, isconfined: Boolean=false
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						connectToMqttBroker( "tcp://localhost:1883" )
 						delay(3000) 
 						CommUtils.outblue("$name| rilevata sonar failure")
-						//val m = MsgUtil.buildEvent(name, "alarm", "alarm(failure)" ) 
-						publish(MsgUtil.buildEvent(name,"alarm","alarm(failure)").toString(), "sonarfailure" )   
+						emit("alarm", "alarm(failure)" ) 
 						delay(2000) 
 						CommUtils.outblue("$name| sonar failure terminata")
-						//val m = MsgUtil.buildEvent(name, "alarm", "alarm(ok)" ) 
-						publish(MsgUtil.buildEvent(name,"alarm","alarm(ok)").toString(), "sonarfailure" )   
+						emit("alarm", "alarm(ok)" ) 
 						delay(1000) 
 						CommUtils.outblue("$name| rilevato product container all'IOPort")
 						forward("containerAtIOPort", "containerAtIOPort(ok)" ,"cargoservice" ) 

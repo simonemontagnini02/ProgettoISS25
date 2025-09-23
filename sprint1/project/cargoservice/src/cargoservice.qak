@@ -93,8 +93,6 @@ QActor cargoservice context ctxcargoservice {
 		#]
 		
 	State s0 initial {
-	    connectToMqttBroker "tcp://localhost:1883"
-	    subscribe "sonarfailure"
 	}
 	Goto work
 	
@@ -268,8 +266,6 @@ QActor requestvalidator context ctxcargoservice withobj hold using "main.java.do
 
 QActor cargorobot context ctxcargoservice {
 	State s0 initial {
-		connectToMqttBroker "tcp://localhost:1883"
-		subscribe "sonarfailure"
   	}
   	Goto work
   	
@@ -310,13 +306,12 @@ QActor cargorobot context ctxcargoservice {
 
 QActor sonarmock context ctxcargoservice {
 	State s0 initial{
-		connectToMqttBroker "tcp://localhost:1883"
 		delay 3000
 		println("$name| rilevata sonar failure") color blue
-		publish "sonarfailure" -m alarm : alarm(failure)
+		emit alarm : alarm(failure)
 		delay 2000
 		println("$name| sonar failure terminata") color blue
-		publish "sonarfailure" -m alarm : alarm(ok)
+		emit alarm : alarm(ok)
 		delay 1000
 		println("$name| rilevato product container all'IOPort") color blue
 		forward cargoservice -m containerAtIOPort : containerAtIOPort(ok)

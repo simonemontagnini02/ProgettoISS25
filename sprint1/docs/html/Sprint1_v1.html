@@ -257,15 +257,16 @@
                 <ul>
                     <li>
                         <strong>Il sonar segnala le sonar failure</strong>: quando rileva per almeno tre secondi
-                            una distanza superiore a DFREE, il sonar comunica direttamente l’interruzione delle
-                            attività. Questo approccio consente di distribuire meglio le responsabilità,
-                            sollevando cargoservice dal compito di monitorare continuamente le distanze. Inoltre, si
-                            riduce il numero di messaggi, poiché il sonar gestisce internamente la rilevazione e invia
-                            solo le notifiche di fallimento.
+                        una distanza superiore a DFREE, il sonar comunica direttamente l’interruzione delle
+                        attività. Questo approccio consente di distribuire meglio le responsabilità,
+                        sollevando cargoservice dal compito di monitorare continuamente le distanze. Inoltre, si
+                        riduce il numero di messaggi, poiché il sonar gestisce internamente la rilevazione e invia
+                        solo le notifiche di fallimento.
                     </li>
 
                     <li>
-                        <strong>L'attore cargoservice rileva le situazioni di sonar failure</strong>: in questo scenario il sonar
+                        <strong>L'attore cargoservice rileva le situazioni di sonar failure</strong>: in questo scenario
+                        il sonar
                         si limita a trasmettere tutte le misurazioni effettuate, mentre cargoservice si occupa di
                         individuare eventuali condizioni di failure. In questo modo la logica di rilevamento viene
                         centralizzata in cargoservice, a fronte però di un overhead nelle comunicazioni, poiché il sonar
@@ -293,7 +294,6 @@
             </li>
         </ul>
 
-        </br>
 
         <h3>requestvalidator</h3>
 
@@ -314,37 +314,13 @@
         La comunicazione con cargoservice avviene sfruttando i messaggi indicati precedentemente nella sezione
         <i>"Validazione delle richieste di carico" di <strong>cargoservice</strong></i>.
 
-        </br>
+    </div>
 
-        <h3>sonarcontroller</h3>
+    <h2>Architettura Logica del Sistema</h2>
 
-        Questo attore è stato introdotto con lo scopo di separare da cargoservice la responsabilità legata alla gestione
-        della sonar failure. In particolare, si occupa di monitorare la distanza rilevata dal sonar, segnalando
-        eventuali sonar failure. In questo modo, cargoservice può proseguire l'esecuzione senza interrompersi e senza
-        dover
-        verificare direttamente lo stato del sonar, poiché tali situazioni gli vengono comunicate. L'attore, al termine
-        di una sonar failure, si occupa successivamente di comunicare il ripristino delle attività.
-        </br>
+    <div>
 
-        La comunicazione di sonar failure e di ripristino avviene come descritto nella sezione <i>"Interruzione di tutte
-            le attività" di
-            <strong>cargoservice</strong></i>
-
-        <h3>Classi Helper</h3>
-
-        Per l'implementazione dell'attore <strong>requestvalidator</strong> si rende necessaria una classe Java helper,
-        chiamata <strong>Hold</strong>, introdotta con
-        l'obiettivo di rispettare il <strong>Single Responsibility Principle</strong>. La classe è infatti
-        progettata
-        per occuparsi di
-        un compito specifico e ben definito, riducendo la complessità dell'attore e favorendo una maggiore
-        manutenibilità ed
-        estendibilità del sistema.
-
-        </br>
-        La classe <strong>Hold</strong> fornisce una rappresentazione dello stato della stiva ed è implementata come un
-        POJO, poiché le richieste di carico vengono effettuate sequenzialmente e, di conseguenza, l'aggiornamento della
-        Hold non richiede una sincronizzazione esplicita.
+        <img src="./img/Sprint1Arch.png">
 
     </div>
 
@@ -389,7 +365,7 @@
                 dall'esterno
             </td>
             <td>
-                PID container
+                Request load_request : load(PID)
             </td>
             <td>
             </td>
@@ -406,15 +382,13 @@
                     Integration Test
                 </td>
                 <td>
-                    Nel caso la distanza misurata dal sonar sia maggiore di DFREE per più di tre secondi, l'attore
-                    sonarcontroller
-                    dovrà segnalare tramite un evento l'interruzione del sistema
-                </td>
-                <td>
-                    D &gt; DFREE
+                    Nel caso il sonar rilevi una sonar failure, gli attori cargoservice e cargorobot dovranno
+                    interrompere le loro attività
                 </td>
                 <td>
                     Event alarm : alarm(failure)
+                </td>
+                <td>
                 </td>
             </tr>
 
@@ -429,41 +403,18 @@
                     Integration Test
                 </td>
                 <td>
-                    Nel caso la distanza misurata dal sonar sia minore o uguale di DFREE, l'attore sonarcontroller dovrà
-                    emettere un evento che indica il ripristino del sistema
+                    Nel caso il sonar comunichi il termine della sonar failure, gli attori cargoservice e cargorobot
+                    dovranno ripristinare le loro attività
                 </td>
                 <td>
-                    D &le; DFREE </td>
-                <td>
                     Event alarm : alarm(ok)
+                <td>
                 </td>
             </tr>
 
             <tr>
                 <td>
                     T08
-                </td>
-                <td>
-                    <strong>Corretto funzionamento sonar</strong>
-                </td>
-                <td>
-                    Integration Test
-                </td>
-                <td>
-                    L'attore sonar dovrà segnalare all'attore cargoservice l'arrivo di un container sull'IOPort in modo
-                    da poter avviare la procedura di carico
-                </td>
-                <td>
-                    Product container sull'IOPort
-                </td>
-                <td>
-                    Event sonardata : distance(D)
-                </td>
-            </tr>
-
-            <tr>
-                <td>
-                    T09
                 </td>
                 <td>
                     <strong>Comunicazione dello Slot di scarico del container</strong>
@@ -476,7 +427,7 @@
                     product container presente sull'IOPort dovrà essere scaricato
                 </td>
                 <td>
-                    Product container sull'IOPort
+                    Dispatch containerAtIOPort : containerAtIOPort(X)
                 </td>
                 <td>
                     Request transport : transport(SlotID)
@@ -492,7 +443,20 @@
 
         <h3>Classi Helper</h3>
 
+        Per l'implementazione dell'attore <strong>requestvalidator</strong> si rende necessaria una classe Java helper,
+        chiamata <strong>Hold</strong>, introdotta con
+        l'obiettivo di rispettare il <strong>Single Responsibility Principle</strong>. La classe è infatti
+        progettata
+        per occuparsi di
+        un compito specifico e ben definito, riducendo la complessità dell'attore e favorendo una maggiore
+        manutenibilità ed
+        estendibilità del sistema.
 
+        </br>
+        La classe <strong>Hold</strong> fornisce una rappresentazione dello stato della stiva ed è implementata come un
+        POJO, poiché le richieste di carico vengono effettuate sequenzialmente e, di conseguenza, l'aggiornamento della
+        Hold non richiede una sincronizzazione esplicita.
+        </br></br>
         La classe <strong>Hold</strong> fornisce informazioni sull'occupazione della stiva, permettendo così di:
         <ul>
             <li> <strong>Gestire lo stato fisico della stiva</strong>: la classe sarà responsabile della
@@ -559,7 +523,7 @@
         <h3>cargoservice</h3>
 
         </br>
-        Nello stato iniziale s0, l'attore cargoservice rimane in attesa della ricezione di nuove richieste di carico.
+        Nello stato work, l'attore cargoservice rimane in attesa della ricezione di nuove richieste di carico.
         Successivamente, all'arrivo della <span class="messaggi">Request load_request : load(PID)</span>, l'attore si
         sposterà nello stato <strong>handle_loadRequest</strong>,
         dove interagirà con l'attore <strong>productservice</strong> tramite una <span class="messaggi">Request
@@ -600,7 +564,7 @@
 
         </ul>
 
-        In caso di richiesta rifiutata, l'attore torna nello stato s0 in attesa di
+        In caso di richiesta rifiutata, l'attore torna nello stato work in attesa di
         nuove richieste.
 
         </br></br>
@@ -611,24 +575,19 @@
 
         </br>
 
-        All'interno di questo stato, l'arrivo del product container all'IOPort viene segnalato da <span
-            class="messaggi">Event sonardata : distance(D)</span>.
-        A seguito dell'arrivo di questo evento, l'attore transita nello stato <strong>handle_ioport</strong> dove vi
-        rimane
-        finchè non viene rilevata una distanza
-        D &lt; DFREE/2 per almeno 3 secondi. Al termine di questo periodo tramite un messaggio di <span
-            class="messaggi">autodispatch container_ioport : container_ioport(X)</span> l'attore transita nello stato
-        <strong>handle_container</strong>,
-        dove invierà una <span class="messaggi">Request transport : transport(SlotID)</span> al
-        <strong>cargorobot</strong>
-        indicando l'Id dello
-        Slot in cui inserire il product container.
+        All'interno di questo stato, l'arrivo del product container all'IOPort viene segnalato dal sonar attraverso un
+        <span class="messaggi">Dispatch containerAtIOPort : containerAtIOPort(X)</span>.
+        </br>
+        Alla ricezione di questo
+        messaggio, l'attore transita nello stato <strong>handle_container</strong>, dove invierà una <span
+            class="messaggi">Request transport : transport(SlotID)</span> al
+        <strong>cargorobot</strong> indicando l'Id dello Slot in cui inserire il product container.
 
         </br>
         </br>
 
         Infine, alla ricezione della <span class="messaggi">Reply robot_home : robot_home(X)</span>, l'attore tonerà
-        allo stato s0 nell'attesa di nuove richieste di carico.
+        allo stato work nell'attesa di nuove richieste di carico.
 
         </br>
         </br>
@@ -638,27 +597,6 @@
         funzioni e si metterà in attesa di ricevere un messaggio <span class="messaggi">Event alarm :
             alarm(ok)</span>. Una volta ricevuto questo
         messaggio riprenderà le sue attività attraverso un <strong>returnFromInterrupt</strong>.
-
-
-
-        <h3>sonarcontroller</h3>
-
-
-        Questo attore viene introdotto con lo scopo di rilevare e gestire le <i>sonar failure</i>. In particolare, dopo
-        aver ricevuto il messaggio
-        <span class="messaggi">Event sonardata : distance(D)</span> l'attore transita nello stato
-        <strong>normal</strong>, dove controlla che la distanza
-        rilevata dal sonar non superi DFREE per piu di 3 secondi. In caso contrario emetterà un <span
-            class="messaggi">Event alarm : alarm(failure)</span>,
-        in modo da segnalare la <i>sonar failure</i>, e tramite un messaggio di
-        <span class="messaggi">autodispatch sonar_failure : sonar_failure(X)</span> transiterà nello stato
-        <strong>failure</strong>.
-        In questo stato, appena viene rilevata una distanza D &le; DFREE, <strong>sonarcontroller</strong> emetterà
-        un <span class="messaggi">Event alarm : alarm(ok)</span>
-        per segnalare la fine della <i>sonar failure</i>, e transiterà tramite un
-        <span class="messaggi">autodispatch sonar_normal : sonar_normal(X)</span> nuovamente nello stato
-        <strong>normal</strong>, ritornando a rilevare
-        eventuali <i>sonar failure</i>.
 
         <h3>requestvalidator</h3>
 
@@ -715,16 +653,18 @@
 
         <h3>sonarmock</h3>
 
-        Questo attore simula delle misurazioni realizzate dal sonar, effettuando ogni secondo una publish della distanza
-        rilevata tramite il messaggio
-        <span class="messaggi">Event sonardata : distance(D)</span> sul topic <strong><i>sonar</i></strong>.
-        Inizialmente viene simulata una <strong><i>sonar failure</i></strong> tramite l'invio di una distanza D &gt;
-        DFREE per 3
-        volte. Successivamente viene inviata una distanza D &le; DRFEE con lo scopo di uscire dalla <strong><i>sonar
-                failure</i></strong>.
-        Dopo aver inviato una distanza D &gt; DFREE una sola volta, viene simulato l'arrivo del product container
-        all'IOPort inviando distanze
-        D &lt; DRFEE/2.
+        Questo attore simula il comportamento dell'attore <strong>sonar</strong>, producendo i seguenti messaggi:
+        <ul>
+            <li>Segnalazione della sonar failure: viene inviato un <span class="messaggi">Event alarm :
+                    alarm(Failure)</span> per simulare una situazione di interruzione dei servizi</li>
+            <li>Segnalazione del termine della sonar failure: viene inviato un <span class="messaggi">Event alarm :
+                    alarm(ok)</span> per indicare il ritorno alla normalità dopo una fase di failure</li>
+            <li>Segnalazione presenza del container: viene inviato un <span class="messaggi">Dispatch containerAtIOPort
+                    : containerAtIOPort(X)</span> all'attore <strong>cargoservice</strong>, per notificare che il
+                product container si
+                trova sull’IOPort.
+            </li>
+        </ul>
 
         <h3>cargorobot</h3>
 
@@ -735,14 +675,6 @@
         con lo scopo di comunicare di essere ritornato alla HOME.
 
 
-
-    </div>
-
-    <h2>Sistema logico di riferimento</h2>
-
-    <div>
-
-        <img src="./img/Sprint1Arch.png">
 
     </div>
 
@@ -777,19 +709,20 @@
 
     <div>
 
-        Dopo aver completato l'attore legato al core-business del sistema <strong>cargoservice</strong>, nello Sprint2
-        procediamo con l'implementazione di
-        <strong>cargorobot</strong> e <strong>webgui</strong> in modo tale da completare il contesto
-        <strong>ctxcargoservice</strong>.
+        Dopo aver completato l'attore <strong>cargoservice</strong>, nello Sprint2
+        procediamo con la realizzazione di
+        <strong>cargorobot</strong>, <strong>sonar</strong> e <strong>led</strong>, in modo tale da completare il
+        contesto
+        <strong>ctxiodevices</strong> e terminare l'implementazione del core-business del sistema.
 
         </br>
         </br>
 
         In particolare, <strong>cargorobot</strong> si occuperà di estendere <Strong>basicrobot</Strong> implementando
         le funzionalità legate al trasporto dei product
-        container. L'attore <strong>webgui</strong>, invece, permetterà di implementare la funzionalità di
-        visualizzazione dello stato della Hold tramite un'interfaccia
-        accessibile all'utente.
+        container. L'attore <strong>sonar</strong>, invece, permetterà di implementare le funzionalità di rilevamento
+        della presenza dei product container e di segnalazione delle sonar failure. Infine, l'attore <strong>led</strong> si occuperà 
+        della gestione dello stato del LED.
 
 
     </div>
