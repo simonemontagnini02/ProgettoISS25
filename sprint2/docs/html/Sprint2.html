@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprint2</title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+
+    <h1>Sprint 2</h1>
+    <h2>Sprint 1</h2>
+    <div>Lo Sprint 0 è consultabile alla seguente pagina: <a href="../../../sprint1/docs/html/Sprint1_v1.html">Sprint
+            1</a></div>
+
+    <h2>Goal dello sprint</h2>
+    <div>
+
+        L’obiettivo di questo Sprint è completare il core-business del sistema, implementando
+        <strong>cargorobot</strong>, e realizzare
+        il contesto <strong>ctxiodevices</strong>, che conterrà gli attori presenti nel Raspberry. Al termine di questa
+        fase di sviluppo
+        sarà possibile gestire completamente le richieste di carico e le sonar failure.
+    </div>
+
+    <h2>Analisi del Problema</h2>
+    <div>
+
+        <h3>cargorobot</h3>
+
+        Analizzando il problema emerge la necessità di modellare cargorobot come un attore per diverse motivazioni:
+
+        <ul>
+
+            <li>
+                <strong>Reattività di cargoservice</strong>: la scelta di rappresentare cargorobot come un POJO
+                implicherebbe l’utilizzo di procedure call, con conseguente trasferimento del controllo a questo
+                componente e rendendo così cargoservice insensibile a eventuali situazioni di sonar failure.
+            </li>
+
+            <li>
+
+                <strong>Sensibilità alle sonar failure</strong>: modellare cargorobot come un POJO lo renderebbe
+                insensibile alle situazioni di errore del sonar, in quanto componente passivo.
+
+            </li>
+
+            <li>
+
+                <strong>Interazione con basicrobot</strong>: poiché il componente basicrobot, fornito dal committente, è
+                realizzato come attore, scegliere di implementare cargorobot come un POJO renderebbe la comunicazione
+                con basicrobot intrinsecamente più complessa.
+
+            </li>
+
+        </ul>
+
+        Di conseguenza, per i motivi elencati, un POJO non risulta adatto a rappresentare il comportamento di
+        cargorobot. Si sceglie quindi di implementarlo come attore, poiché la comunicazione con cargoservice avviene
+        tramite scambio asincrono di messaggi, che consente a cargoservice di mantenere il controllo dell’esecuzione.
+        Inoltre, in quanto componente attivo e reattivo, un attore rimane sensibile alle situazioni di sonar failure,
+        che possono essere gestite attraverso l’utilizzo di stati adeguati. Infine, sebbene l’interazione tra attori
+        comporti lo scambio di messaggi, implementare cargorobot come attore risulta vantaggioso, poiché rende
+        l’integrazione con basicrobot più semplice e diretta.
+
+        </br>
+        </br>
+
+        L'attore dovrà realizzare le seguenti funzionalità:
+
+        <ul>
+            <li>
+
+                <strong>Ricezione di richieste di trasporto</strong>: cargorobot attende delle richieste di trasporto di
+                un product container in uno Slot, che verranno inviate da cargoservice. Come specificato nello Sprint 1,
+                per questa funzionalità è stato scelto di utilizzare una <span class="messaggi">Request transport :
+                    transport(SlotID)</span> in quanto è prevista una risposta da parte di
+                cargorobot.
+
+            </li>
+
+            <li>
+
+                <strong>Trasporto del product container</strong>:
+
+            </li>
+
+             <li>
+
+                <strong>Gestione delle sonar failure</strong>:
+
+            </li>
+
+        </ul>
+
+    </div>
+
+
+</body>
+
+</html>
