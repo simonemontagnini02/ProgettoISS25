@@ -83,11 +83,47 @@
 
             <li>
 
-                <strong>Trasporto del product container</strong>:
+                <strong>Trasporto del product container</strong>: una volta ricevuta una richiesta, cargorobot avvia la
+                procedura di carico comunicando col basicorobot. Questa attività sarà divisa nelle seguenti fasi:
+
+                <ul>
+                    <li>
+
+                        <strong>Spostamento del basicrobot verso l’IOPort</strong>: il cargorobot comunica al basicrobot
+                        di raggiungere
+                        l’IOPort per recuperare il container.
+                    </li>
+
+                    <li>
+
+                        <strong>Comunicazione dello Slot in cui posizionare il product container appena
+                            prelevato</strong>: cargorobot comunica al basicrobot le coordinate della <strong>Unload
+                            Position</strong> (area di scarico) associata allo Slot
+
+                    </li>
+
+                    <li>
+
+                        <strong>Ritorno alla HOME</strong>: cargorobot comunica a basicrobot le coordinate della HOME,
+                        in modo da terminare l'operazione di carico, facendo tornare il robot nella posizione iniziale
+
+                    </li>
+
+
+                </ul>
 
             </li>
 
-             <li>
+            <li>
+
+                <strong>Invio della risposta a cargoservice</strong>: una volta che il basicrobot ritona nella HOME,
+                cargorobot risponderà alla request di cargoservice con una<span class="messaggi">Reply robot_home :
+                    robot_home(X)</span>, indicando a cargoservice la terminazione della procedura di carico e
+                permettendogli in questo modo di gestire nuove richieste di carico
+
+            </li>
+
+            <li>
 
                 <strong>Gestione delle sonar failure</strong>:
 
