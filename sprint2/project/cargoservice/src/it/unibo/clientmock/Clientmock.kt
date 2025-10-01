@@ -34,6 +34,7 @@ class Clientmock ( name: String, scope: CoroutineScope, isconfined: Boolean=fals
 					action { //it:State
 						
 						    	val PROD = "{'\"productId\":31,\"name\":\"p31\",\"weight\":311'}"
+						CommUtils.outblue("clientmock | invio richiesta a productservice per prodotto p31")
 						request("createProduct", "product($PROD)" ,"productservice" )  
 						//genTimer( actor, state )
 					}

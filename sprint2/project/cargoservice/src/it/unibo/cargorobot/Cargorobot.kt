@@ -83,6 +83,8 @@ class Cargorobot ( name: String, scope: CoroutineScope, isconfined: Boolean=fals
 						
 									X = slotX[SlotId]
 						 			Y = slotY[SlotId]
+						CommUtils.outyellow("cargorobot | carico del product container dall'IOPort")
+						delay(4000) 
 						CommUtils.outyellow("cargorobot | invio richiesta di spostamento del robot alla posizione X=$X Y=$Y")
 						request("move", "move($X,$Y)" ,"moveexec" )  
 						//genTimer( actor, state )
@@ -98,6 +100,8 @@ class Cargorobot ( name: String, scope: CoroutineScope, isconfined: Boolean=fals
 						
 									X=0
 						 			Y=0
+						CommUtils.outyellow("cargorobot | scarico del product container all'Unload Position dello Slot n.$SlotId")
+						delay(4000) 
 						CommUtils.outyellow("cargorobot | invio richiesta di spostamento del robot alla posizione X=$X Y=$Y")
 						request("move", "move($X,$Y)" ,"moveexec" )  
 						//genTimer( actor, state )
@@ -110,7 +114,7 @@ class Cargorobot ( name: String, scope: CoroutineScope, isconfined: Boolean=fals
 				}	 
 				state("robotAtHome") { //this:State
 					action { //it:State
-						CommUtils.outyellow("cargorobot | robot tornato alla HOME")
+						CommUtils.outyellow("cargorobot | operazione completata, robot tornato alla HOME")
 						answer("transport", "robot_home", "robot_home(ok)"   )  
 						//genTimer( actor, state )
 					}

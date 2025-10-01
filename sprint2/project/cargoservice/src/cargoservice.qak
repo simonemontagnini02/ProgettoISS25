@@ -46,9 +46,6 @@ Reply moverobotfailed:  moverobotfailed(PLANDONE, PLANTODO) for moverobot
 //CARGOSERVICE
 Context ctxcargoservice ip [ host="localhost" port=8110]
 
-//SONAR
-Context ctxiodevices ip [ host= "localhost" port=8128]
-
 //BASICROBOT
 Context ctxbasicrobot  ip [ host= "127.0.0.1" port=8020]
 
@@ -63,6 +60,7 @@ QActor clientmock context ctxcargoservice {
     	[#
     	val PROD = "{'\"productId\":31,\"name\":\"p31\",\"weight\":311'}"
     	#]
+    	println("clientmock | invio richiesta a productservice per prodotto p31") color blue
 		request productservice -m createProduct : product($PROD)
     }
     Transition t1
@@ -321,6 +319,8 @@ QActor cargorobot context ctxcargoservice {
 			X = slotX[SlotId]
  			Y = slotY[SlotId]
  		#]
+ 		println("cargorobot | carico del product container dall'IOPort") color yellow
+ 		delay 4000
  		println("cargorobot | invio richiesta di spostamento del robot alla posizione X=$X Y=$Y") color yellow
  		request moveexec -m move : move($X, $Y) 
  	}
@@ -333,6 +333,8 @@ QActor cargorobot context ctxcargoservice {
 			X=0
  			Y=0
  		#]
+ 		println("cargorobot | scarico del product container all'Unload Position dello Slot n.$SlotId") color yellow
+ 		delay 4000
  		println("cargorobot | invio richiesta di spostamento del robot alla posizione X=$X Y=$Y") color yellow
  		request moveexec -m move : move($X, $Y) 
  	}
@@ -341,7 +343,7 @@ QActor cargorobot context ctxcargoservice {
  		whenReply movefailed -> go_home
  	
  	State robotAtHome {
- 		println("cargorobot | robot tornato alla HOME") color yellow
+ 		println("cargorobot | operazione completata, robot tornato alla HOME") color yellow
  		replyTo transport with robot_home : robot_home(ok)
  	}
   	Goto work

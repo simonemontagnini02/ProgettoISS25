@@ -50,7 +50,7 @@ public class Hold implements IHold {
     }
     
     private int createSlot(Slot slot, int productId) {
-    	CommUtils.outblue( "Hold | creatingSlot:"+ slot.toString() );
+    	CommUtils.outcyan( "Hold | creatingSlot:"+ slot.toString() );
     	logger.info( "Hold | creatingSlot:"+ slot.toString() );
     	int slotId = slot.getSlotId();
     	int slotAnswer;
