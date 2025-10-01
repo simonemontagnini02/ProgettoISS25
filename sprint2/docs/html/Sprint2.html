@@ -95,20 +95,19 @@
                         failure.
                         Infine, un ultimo problema sarebbe dato dalle inevitabili ripetizoni di codice: infatti, per
                         ogni
-                        richiesta di carico, cargorobot transita attraverso tre stati principali, e sarebbe necessario
-                        replicare
+                        richiesta di carico, dal momento che cargorobot transita attraverso tre stati principali,
+                        sarebbe necessario replicare
                         la logica di gestione delle sonar failure all'interno di ciascuno di essi, riducendo di molto
                         la manutenibilità.
                     </li>
                     <li>
-                        <strong>Gestione esterna a cargorobot</strong>: in questo caso introdurremmo un attore dedicato,
+                        <strong>Gestione esterna a cargorobot</strong>: in questo caso introduremmo un attore dedicato,
                         ovvero
                         <strong>moveexec</strong>, che si occupa sia della comunicazione delle richieste di movimento al
                         basicrobot,
-                        sia della gestione degli allarmi durante l’esecuzione. La logica di gestione degli errori
-                        risulterebbe perciò centralizzata e senza ripetizioni all'interno del codice, portando ad una
-                        chiara
-                        separazione tra la logica di movimento e la comunicazione con basicrobot.
+                        sia della gestione delle sonar failur durante l’esecuzione. La logica di gestione degli allarmi
+                        risulterebbe, perciò, centralizzata e senza ripetizioni all'interno del codice, portando ad una
+                        chiara separazione tra la logica di movimento e la comunicazione con basicrobot.
                     </li>
                 </ul>
                 Abbiamo scelto il secondo approccio, introducendo l’attore <strong>moveexec</strong>.
@@ -118,10 +117,10 @@
                 a fronte però di una maggiore complessità architetturale.
                 <br>
                 Il compito, quindi, dell'attore cargorobot è quello di ottenere le coordinate relative alla Unload
-                Position associata allo Slot in cui dovrà essere scaricato il product container e di comunicare
-                attraverso una
-                <span class="messaggi">Request move : move(X,Y)</span> le
-                seguenti mosse a moveexec:
+                Position associata allo Slot in cui dovrà essere scaricato il product container e quello di
+                comunicare attraverso una
+                <span class="messaggi">Request move : move(X,Y)</span>, siccome cargorobot si aspetta una risposta
+                riguardante l'esito dell'azione, le seguenti mosse a moveexec:
                 <ul>
                     <li>
                         <strong>Spostamento del basicrobot verso l’IOPort</strong>: per recuperare il container,
@@ -130,7 +129,8 @@
                     </li>
 
                     <li>
-                        <strong>Comunicazione dello Slot in cui posizionare il product container appena
+                        <strong>Spostamento del basicrobot verso l'area di scarico dello Slot in cui posizionare il
+                            product container appena
                             prelevato</strong>: cargorobot comunica a moveexec le coordinate della <strong>Unload
                             Position</strong> (area di scarico) associata allo Slot
                     </li>
@@ -348,7 +348,8 @@
             <li>
                 <strong>Gestisce le situazioni di sonar failure</strong>:
                 se durante il movimento viene generato un
-                <span class="messaggi">Event alarm : alarm(failure)</span>, moveexec interrompe lo spostamento in corso e
+                <span class="messaggi">Event alarm : alarm(failure)</span>, moveexec interrompe lo spostamento in corso
+                e
                 transita nello stato
                 handlealarm, dove sospende temporaneamente l’esecuzione.
                 Quando l’attore riceve un
