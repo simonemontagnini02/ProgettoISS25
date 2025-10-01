@@ -83,49 +83,45 @@
             </li>
 
             <li>
-                <h1>NOTA IMPORTANTE: VALUTARE TUTTE LE INTERAZIONI DI CARGOROBOT CON BASICROBOT, CAPIRE SE LASCIARE BASICROBOT OPPURE INSERIRE MOVEEXEC</h1>
-                <strong>Trasporto del product container</strong>: una volta ricevuta una richiesta, cargorobot avvia la
-                procedura di carico comunicando col basicorobot. Questa attività sarà divisa nelle seguenti fasi:
-
+                <strong>Trasporto del product container</strong>:
+                per la gestione di questa responsabilità sono state individuate due possibili soluzioni alternative:
                 <ul>
-                    <li><strong>Ingaggiamento con il robot</strong>: cargobot tramite un <span class="messaggi">Request
-                            engage : engage(OWNER, STEPTIME)</span> ingaggia l'attore basicrobot</li>
                     <li>
-
-                        <strong>Spostamento del basicrobot verso l’IOPort</strong>: il cargorobot comunica al basicrobot
-                        di raggiungere
-                        l’IOPort per recuperare il container.
+                        <strong>Gestione interna a cargorobot</strong>: in questo modo ridurremmo il numero di attori
+                        coinvolti,
+                        semplificando notevolmente l'architettura. Tuttavia, con questo modello cargorobot risulterebbe
+                        più complesso, in quanto dovrebbe
+                        occuparsi sia della comunicazione con basicrobot che della gestione delle situazioni di sonar
+                        failure.
+                        Infine, un ultimo problema sarebbe dato dalle inevitabili ripetizoni di codice: infatti, per
+                        ogni
+                        richiesta di carico, cargorobot transita attraverso tre stati principali, e sarebbe necessario
+                        replicare
+                        la logica di gestione delle sonar failure all'interno di ciascuno di essi, riducendo di molto
+                        la manutenibilità.
                     </li>
-
                     <li>
-
-                        <strong>Comunicazione dello Slot in cui posizionare il product container appena
-                            prelevato</strong>: cargorobot comunica al basicrobot le coordinate della <strong>Unload
-                            Position</strong> (area di scarico) associata allo Slot
-
+                        <strong>Gestione esterna a cargorobot</strong>: in questo caso introdurremmo un attore dedicato,
+                        ovvero
+                        <strong>moveexec</strong>, che si occupa sia della comunicazione delle richieste di movimento al
+                        basicrobot,
+                        sia della gestione degli allarmi durante l’esecuzione. La logica di gestione degli errori
+                        risulterebbe perciò centralizzata e senza ripetizioni all'interno del codice, portando ad una
+                        chiara
+                        separazione tra la logica di movimento e la comunicazione con basicrobot.
                     </li>
-
-                    <li>
-
-                        <strong>Ritorno alla HOME</strong>: cargorobot comunica a basicrobot le coordinate della HOME,
-                        in modo da terminare l'operazione di carico, facendo tornare il robot nella posizione iniziale
-
-                    </li>
-
-
                 </ul>
-
-                La comunicazione tra l'attore cargorobot e basicrobot avviene tramite una <span class="messaggi">Request
-                    moverobot : moverobot(TARGETX, TARGETY)</span>, resa disponibile dal componente fornito dal
-                committente. I parametri <i>TARGETX</i> e <i>TARGETY</i>
-                rappresentano le coordinate della cella nella quale si vuole che il robot si sposti.
-
+                Abbiamo scelto il secondo approccio, introducendo l’attore <strong>moveexec</strong>.
+                Questo ci consente di mantenere cargorobot focalizzato sulla gestione del processo di carico,
+                realizzando la logica di movimento e la gestione delle situazioni di errore all'interno di un componente
+                dedicato. In questo modo è possibile offrire maggiore chiarezza, manutenibilità e possibilità di riuso,
+                a fronte però di una maggiore complessità architetturale.
             </li>
 
             <li>
-
-                <strong>Invio della risposta a cargoservice</strong>: una volta che il basicrobot ritona nella HOME,
-                cargorobot risponderà alla request di cargoservice con una <span class="messaggi">Reply robot_home :
+                <strong>Invio della risposta a cargoservice</strong>: una volta che il basicrobot ritona nella HOME, è
+                compito di moveexec di comunicarlo a cargorobot,
+                il quale risponderà alla request di cargoservice con una <span class="messaggi">Reply robot_home :
                     robot_home(X)</span>, indicando a cargoservice la terminazione della procedura di carico e
                 permettendogli in questo modo di gestire nuove richieste di carico
 
@@ -134,35 +130,40 @@
         </ul>
 
         <h3>moveexec</h3>
-        <p>
-            Per la gestione delle situazioni di sonar failure sono state individuate due possibili soluzioni
-            alternative:
-        </p>
+        Una volta ricevuta una richiesta di carico, cargorobot comunica a moveexec tutte le mosse che deve
+        effettuare il robot, il quale avrà il compito di inoltrarle a basicrobot. Questa attività sarà divisa
+        nelle seguenti fasi:
+
         <ul>
             <li>
-                <strong>Gestione interna a cargorobot</strong>: in questo modo ridurremmo il numero di attori coinvolti,
-                semplificando notevolmente l'architettura. Tuttavia, con questo modello cargorobot risulterebbe
-                più complesso, in quanto dovrebbe
-                occuparsi sia della comunicazione con basicrobot che della gestione delle situazioni di sonar failure.
-                Infine, un ultimo problema sarebbe dato dalle inevitabili ripetizoni di codice: infatti, per ogni
-                richiesta di carico, cargorobot transita attraverso tre stati principali, e sarebbe necessario replicare
-                la logica di gestione delle sonar failure all'interno di ciascuno di essi, andando così a ridurre molto
-                la manutenibilità.
+                <strong>Ingaggiamento con il robot</strong>: moveexec tramite un <span class="messaggi">Request
+                    engage : engage(OWNER, STEPTIME)</span> ingaggia l'attore basicrobot
             </li>
             <li>
-                <strong>Gestione esterna a cargorobot</strong>: in questo caso introdurremmo un attore dedicato, ovvero
-                <strong>moveexec</strong>, che si occupa sia della comunicazione delle richieste di movimento al
-                basicrobot,
-                sia della gestione degli allarmi durante l’esecuzione. La logica di gestione degli errori
-                risulterebbe perciò centralizzata e senza ripetizioni all'interno del codice, portando ad una chiara
-                separazione tra la logica di movimento e la comunicazione con basicrobot.
+
+                <strong>Spostamento del basicrobot verso l’IOPort</strong>: moveexec comunica al basicrobot
+                di raggiungere
+                l’IOPort per recuperare il container.
             </li>
+
+            <li>
+                <strong>Comunicazione dello Slot in cui posizionare il product container appena
+                    prelevato</strong>: moveexec comunica al basicrobot le coordinate della <strong>Unload
+                    Position</strong> (area di scarico) associata allo Slot
+
+            </li>
+
+            <li>
+                <strong>Ritorno alla HOME</strong>: moveexec comunica a basicrobot le coordinate della HOME,
+                in modo da terminare l'operazione di carico, facendo tornare il robot nella posizione iniziale
+            </li>
+
         </ul>
-        Abbiamo scelto il secondo approccio, introducendo l’attore moveexec.
-        Questo ci consente di mantenere cargorobot focalizzato sulla gestione del processo di carico,
-        realizzando la logica di movimento e la gestione delle situazioni di errore all'interno di un componente
-        dedicato. In questo modo è possibile offrire maggiore chiarezza, manutenibilità e possibilità di riuso, a patto
-        di una maggiore complessità architetturale.
+
+        La comunicazione tra l'attore moveexec e basicrobot avviene tramite una <span class="messaggi">Request
+            moverobot : moverobot(TARGETX, TARGETY)</span>, resa disponibile dal componente fornito dal
+        committente. I parametri <i>TARGETX</i> e <i>TARGETY</i>
+        rappresentano le coordinate della cella nella quale si vuole che il robot si sposti.
 
 
 
@@ -196,7 +197,8 @@
         </br>
         L'attore dovrà realizzare le seguenti funzionalità:
         <ul>
-            <li><strong>Rilevazione della presenza del product container all'IOPort</strong>:
+            <li>
+                <strong>Rilevazione della presenza del product container all'IOPort</strong>:
                 il componente effettua una misurazione ogni secondo e, quando rileva una distanza
                 D &lt; DFREE / 2 per almeno 3 volte consecutive, invia all'attore cargoservice un
                 messaggio indicando la presenza del product container all'IOPort.
@@ -226,15 +228,17 @@
                 un <span class="messaggi"> Dispatch containerAtIOPort : containerAtIOPort(X)</span>,
                 in quanto il messaggio non prevede risposta ed ha un unico destinatario.
             </li>
-            <li><strong>Rilevazione delle sonar failure</strong>: il componente effettua una misurazione ogni secondo e,
+            <li>
+                <strong>Rilevazione delle sonar failure</strong>: il componente effettua una misurazione ogni secondo e,
                 quando rileva una distanza D &gt; DFREE per almeno 3 volte consecutive, procede all'accensione del LED e
                 invia un
                 <span class="messaggi">Event alarm : alarm(failure)</span>, indicando una situazione di errore.
                 La scelta di utilizzare un evento per la comunicazione è motivata dal fatto che l'informazione che
-                dobbiamo comunicare deve essere ricevuta da più attori (cargoservice, cargorobot...) e di conseguenza la
+                dobbiamo comunicare deve essere ricevuta da più attori (cargoservice, basicrobot) e di conseguenza la
                 scelta di utilizzare un dispatch non risulterebbe efficiente.
             </li>
-            <li><strong>Rilevazione del termine delle sonar failure</strong>: in seguito a una sonar failure, il
+            <li>
+                <strong>Rilevazione del termine delle sonar failure</strong>: in seguito a una sonar failure, il
                 componente effettua una misurazione ogni secondo e, quando rileva una distanza D &le; DFREE, procede
                 allo spegnimento del LED e invia un
                 <span class="messaggi">Event alarm : alarm(ok)</span>, indicando a tutti gli attori di ripristinare le
@@ -248,7 +252,45 @@
         <h2>Progettazione</h2>
 
         <h3>cargorobot</h3>
-
+        Dopo avere inizializzato due array, contenenti rispettivamente le coordinate X e Y di tutti gli slot all'interno
+        della Hold, cargorobot nello stato work si mette in attesa della ricezione di una <span class="messaggi">Request
+            transport : transport(SlotID)</span> da parte di cargoservice.
+        La gestione della richiesta si articola in tre fasi principali:
+        <ul>
+            <li>
+                <strong>Fase 1 - raggiungimento dell'IOPort (stato go_ioport)</strong>:cargorobot salva lo SlotID
+                associato al product container e invia a moveexec una <span class="messaggi">Request move :
+                    move(X,Y)</span> per raggiungere la posizione dell'IOPort.
+            </li>
+            <li>
+                <strong>Fase 2 - raggiungimento dello Slot (stato go_slot)</strong>: una volta prelevato il product
+                container, cargorobot comunica a moveexec la posizione dello Slot assegnato, sempre tramite una <span
+                    class="messaggi">Request move : move(X,Y)</span>, dove X e Y sono le coordinate dello Slot
+                precedentemente comunicate da cargoservice
+            </li>
+            <li>
+                <strong>Fase 3 - ritorno alla Home (stato go_home)</strong>: completato lo scarico, cargorobot ordina a
+                moveexec di far tornare basicrobot alla posizione di Home, concludendo così il ciclo di carico. Al
+                termine entra nello stato
+                robotAtHome e notifica a cargoservice la possibilità di gestire una nuova richiesta di carico tramite
+                una <span class="messaggi">Reply robot_home : robot_home(X)</span>. Infine, cargorobot tornerà nello
+                stato work, pronto a ricevere una nuova richiesta di carico da parte di cargoservice.
+            </li>
+        </ul>
+        All'interno di ciascuna fase, a seguito di una richiesta di movimento, sono possibili due diverse risposte:
+        <ul>
+            <li>
+                <strong>Movimento eseguito con successo</strong>: moveexec risponderà alla request di cargorobot con una
+                <span class="messaggi">Reply movedone : movedone(X)</span>, che gli permetterà di transitare verso un
+                nuovo stato
+            </li>
+            <li>
+                <strong>Movimento fallito</strong>: in questo caso cargorobot riceverà una <span class="messaggi">Reply
+                    movefailed : movefailed(X)</span>. Questa situazione può verificarsi, ad esempio in presenza di una
+                sonar failure o di una collisione del basicrobot. In risposta, cargorobot non avanza nello stato
+                successivo ma reitera la richiesta di movimento attendendo che moveexec confermi l'avvenuto spostamento
+            </li>
+        </ul>
 
         <h3>moveexec</h3>
         All'interno dello stato s0, moveexec invia una
@@ -274,15 +316,15 @@
                         basicrobot porta a termine lo spostamento e
                         moveexec riceve una
                         <span class="messaggi">Reply moverobotdone : moverobotdone(ok)</span>,
-                        che viene opportunamente comunicata a cargorobot.
+                        che viene opportunamente comunicata a cargorobot
                     </li>
                     <li>
                         <strong>Movimento fallito</strong>:
-                        può verificarsi in presenza di sonar failure o per altri errori di esecuzione.
+                        può verificarsi in presenza di sonar failure o in caso di collisione del basicrobot\.
                         In tal caso moveexec riceve una
-                        <span class="messaggi">Reply moverobotfailed : moverobotfailed(PLANDONE, PLANTODO)</span>
-                        e reinoltra al basicrobot la stessa richiesta di movimento per tentare nuovamente
-                        l’operazione.
+                        <span class="messaggi">Reply moverobotfailed : moverobotfailed(PLANDONE, PLANTODO)</span> e
+                        provvede a segnalarlo a cargorobot. Quest'ultimo richiederà quindi a moveexec di ripetere il
+                        movimento non eseguito correttamente
                     </li>
                 </ul>
             </li>
