@@ -13,6 +13,7 @@ request( getProduct, product(PID) ).
 reply( getProductAnswer, product(JSonString) ).  %%for getProduct
 dispatch( containerAtIOPort, containerAtIOPort(X) ).
 event( alarm, alarm(X) ).
+event( endalarm, endalarm(X) ).
 dispatch( refused, refused(X) ).
 request( transport, transport(SlotID) ).
 reply( robot_home, robot_home(X) ).  %%for transport
@@ -41,5 +42,3 @@ context(ctxproductservice, "127.0.0.1",  "TCP", "8111").
  static(cargorobot).
   qactor( moveexec, ctxcargoservice, "it.unibo.moveexec.Moveexec").
  static(moveexec).
-  qactor( sonarmock, ctxcargoservice, "it.unibo.sonarmock.Sonarmock").
- static(sonarmock).

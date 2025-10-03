@@ -163,7 +163,7 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 				}	 
 				state("handlealarm") { //this:State
 					action { //it:State
-						if(  currentMsg.msgContent() == "alarm(ok)"  
+						if(  currentMsg.msgContent() == "endalarm(ok)"  
 						 ){CommUtils.outgreen("cargoservice | servizio ripristinato")
 						returnFromInterrupt(interruptedStateTransitions)
 						}
@@ -175,7 +175,7 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t515",targetState="handlealarm",cond=whenEvent("alarm"))
+					 transition(edgeName="t515",targetState="handlealarm",cond=whenEvent("endalarm"))
 				}	 
 			}
 		}

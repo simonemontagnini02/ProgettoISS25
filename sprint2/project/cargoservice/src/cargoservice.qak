@@ -21,6 +21,7 @@ Reply   getProductAnswer : product( JSonString ) for getProduct
 //Sonar
 Dispatch containerAtIOPort : containerAtIOPort(X)
 Event alarm : alarm(X)
+Event endalarm : endalarm(X)
 
 //AUTODISPATCH
 //cargoservice
@@ -43,7 +44,7 @@ Request moverobot    :  moverobot(TARGETX, TARGETY)
 Reply moverobotdone  :  moverobotok(ARG)                    for moverobot
 Reply moverobotfailed:  moverobotfailed(PLANDONE, PLANTODO) for moverobot
 
-//CARGOSERVICE
+//CARGOSERVICE   
 Context ctxcargoservice ip [ host="localhost" port=8110]
 
 //BASICROBOT
@@ -211,7 +212,7 @@ QActor cargoservice context ctxcargoservice {
 	
 	
 	State handlealarm{
-	    if[# currentMsg.msgContent() == "alarm(ok)" #] {
+	    if[# currentMsg.msgContent() == "endalarm(ok)" #] {
 	    	println("cargoservice | servizio ripristinato") color green
 	    	returnFromInterrupt
 	    } else {
@@ -219,7 +220,7 @@ QActor cargoservice context ctxcargoservice {
 	    }
 	}
 	Transition t5
-	    whenEvent alarm -> handlealarm
+	    whenEvent endalarm -> handlealarm
 }
 
 
@@ -418,7 +419,7 @@ QActor moveexec context ctxcargoservice {
 		println("moveexec | rilevata sonar failure, interruzione dello spostamento") color yellow
 	}
 	Transition t4
-		whenEvent alarm -> handleendalarm
+		whenEvent endalarm -> handleendalarm
 		
 	State handleendalarm {
 	   println("moveexec | fine della sonar failure, spostamento ripreso") color yellow
@@ -427,24 +428,24 @@ QActor moveexec context ctxcargoservice {
  		whenEvent alarm -> handlealarm
  		whenReply moverobotdone -> movedone
  		whenReply moverobotfailed -> movefailed
- }
-
-QActor sonarmock context ctxcargoservice {
-	State s0 initial{
-		delay 5000
+ } 
+  
+//QActor sonarmock context ctxcargoservice {
+//	State s0 initial{
+//		delay 5000
+////		println("$name| rilevata sonar failure") color blue
+////		emit alarm : alarm(failure)
+////		delay 2000
+////		println("$name| sonar failure terminata") color blue
+////		emit alarm : alarm(ok)
+////		delay 1000
+//		println("$name| rilevato product container all'IOPort") color blue
+//		forward cargoservice -m containerAtIOPort : containerAtIOPort(ok)
+//		delay 5000
 //		println("$name| rilevata sonar failure") color blue
 //		emit alarm : alarm(failure)
 //		delay 2000
 //		println("$name| sonar failure terminata") color blue
 //		emit alarm : alarm(ok)
-//		delay 1000
-		println("$name| rilevato product container all'IOPort") color blue
-		forward cargoservice -m containerAtIOPort : containerAtIOPort(ok)
-		delay 5000
-		println("$name| rilevata sonar failure") color blue
-		emit alarm : alarm(failure)
-		delay 2000
-		println("$name| sonar failure terminata") color blue
-		emit alarm : alarm(ok)
-    }
-}
+//    }
+//}

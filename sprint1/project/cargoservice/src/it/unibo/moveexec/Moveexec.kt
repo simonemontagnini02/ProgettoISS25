@@ -125,7 +125,7 @@ class Moveexec ( name: String, scope: CoroutineScope, isconfined: Boolean=false,
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t433",targetState="handleendalarm",cond=whenEvent("endalarm"))
+					 transition(edgeName="t433",targetState="handleendalarm",cond=whenEvent("alarm"))
 				}	 
 				state("handleendalarm") { //this:State
 					action { //it:State

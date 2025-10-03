@@ -32,15 +32,15 @@ class Sonarmock ( name: String, scope: CoroutineScope, isconfined: Boolean=false
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						delay(3000) 
+						delay(5000) 
+						CommUtils.outblue("$name| rilevato product container all'IOPort")
+						forward("containerAtIOPort", "containerAtIOPort(ok)" ,"cargoservice" ) 
+						delay(5000) 
 						CommUtils.outblue("$name| rilevata sonar failure")
 						emit("alarm", "alarm(failure)" ) 
 						delay(2000) 
 						CommUtils.outblue("$name| sonar failure terminata")
 						emit("alarm", "alarm(ok)" ) 
-						delay(1000) 
-						CommUtils.outblue("$name| rilevato product container all'IOPort")
-						forward("containerAtIOPort", "containerAtIOPort(ok)" ,"cargoservice" ) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002

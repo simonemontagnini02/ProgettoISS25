@@ -30,6 +30,22 @@ Dispatch refused : refused(X)
 Request transport : transport( SlotID )
 Reply robot_home : robot_home(X) for transport
 
+//Cargorobot
+Request move : move(X,Y)
+Reply movedone : movedone(X) for move
+Reply movefailed : movefailed(X) for move
+
+//Basicrobot
+Request engage        : engage(OWNER, STEPTIME)	
+Reply   engagedone    : engagedone(ARG)    for engage
+Reply   engagerefused : engagerefused(ARG) for engage
+Request moverobot    :  moverobot(TARGETX, TARGETY)  
+Reply moverobotdone  :  moverobotok(ARG)                    for moverobot
+Reply moverobotfailed:  moverobotfailed(PLANDONE, PLANTODO) for moverobot
+
+//BASICROBOT
+Context ctxbasicrobot  ip [host= "127.0.0.1" port=8020]
+
 //PRODUCTSERVICE
 Context ctxproductservice ip [ host="127.0.0.1" port=8111]
 
@@ -37,12 +53,10 @@ Context ctxproductservice ip [ host="127.0.0.1" port=8111]
 Context ctxcargoservice ip [ host="localhost" port=8110]
 
 //SONAR
-Context ctxiodevices ip [ host= "localhost" port= 8128 ]
+Context ctxiodevices ip [ host= "localhost" port= 8128]
 
-QActor productservice context ctxproductservice {
-    State s0 initial {
-    }
-}
+ExternalQActor productservice context ctxproductservice
+ExternalQActor basicrobot context ctxbasicrobot
 
 QActor clientmock context ctxcargoservice {
     State s0 initial {
@@ -265,55 +279,170 @@ QActor requestvalidator context ctxcargoservice withobj hold using "main.java.do
 
 
 QActor cargorobot context ctxcargoservice {
-	State s0 initial {
-  	}
+	[#
+		var X = 0
+ 		var Y = 0
+ 		var SlotId = -1
+ 		val slotX = intArrayOf(1, 4, 1, 4)
+ 		val slotY = intArrayOf(1, 1, 3, 3)
+ 	#]
+	State s0 initial{
+ 		delay 1000
+ 		println("cargorobot | start") color yellow
+ 	}
   	Goto work
   	
   	State work {
-  		
+  		println("cargorobot | in attesa di ricevere richieste di movimento del robot da cargoservice") color yellow
   	}
-  	Transition t1
+  	Transition t0
   		whenRequest transport -> go_ioport
-  		whenInterruptEvent  alarm -> handlealarm
-  
-  	State go_ioport {
+  	
+  	State go_ioport{
   		onMsg( transport : transport(SlotID) ) {
             [#
-            	val SlotId = payloadArg(0).toInt()
+            	SlotId = payloadArg(0).toInt()
               	CommUtils.outyellow("cargorobot | ricevuta richiesta di carico allo Slot n."+ SlotId)
-            #]
-            delay 3000
-            [#
-			CommUtils.outyellow("cargorobot | trasporto completato, il robot e' tornato alla HOME")
-			#]
-			replyTo transport with robot_home : robot_home(ok)
+            #]    
         }
-  	}
+ 		[#
+			X=0
+ 			Y=4
+ 		#]
+ 		println("cargorobot | invio richiesta di spostamento del robot alla posizione X=$X Y=$Y") color yellow
+ 		request moveexec -m move : move($X, $Y) 
+ 	}
+ 	Transition t1
+ 		whenReply movedone -> go_slot
+ 		whenReply movefailed -> go_ioport
+ 	
+ 	State go_slot{
+ 		[#
+			X = slotX[SlotId]
+ 			Y = slotY[SlotId]
+ 		#]
+ 		println("cargorobot | invio richiesta di spostamento del robot alla posizione X=$X Y=$Y") color yellow
+ 		request moveexec -m move : move($X, $Y) 
+ 	}
+ 	Transition t2
+ 		whenReply movedone -> go_home
+ 		whenReply movefailed -> go_slot
+ 		
+ 	State go_home{
+ 		[#
+			X=0
+ 			Y=0
+ 		#]
+ 		println("cargorobot | invio richiesta di spostamento del robot alla posizione X=$X Y=$Y") color yellow
+ 		request moveexec -m move : move($X, $Y) 
+ 	}
+ 	Transition t3
+ 		whenReply movedone -> robotAtHome
+ 		whenReply movefailed -> go_home
+ 	
+ 	State robotAtHome {
+ 		println("cargorobot | robot tornato alla HOME") color yellow
+ 		delay 1000
+ 	}
   	Goto work
-  	
-  	
-  	State handlealarm{
-	    if[# currentMsg.msgContent() == "alarm(ok)" #] {
-	    	println("cargorobot | servizio ripristinato") color yellow
-	    	returnFromInterrupt
-	    } else {
-	    	println("cargorobot | servizio interrotto") color yellow
-	    }
-	}
-	Transition t2
-	    whenEvent  alarm -> handlealarm
 }
+
+QActor moveexec context ctxcargoservice {
+	[#
+		val Nome="moveexec"
+		val Step=340
+		var X=0
+		var Y=0
+	#]
+ 	State s0 initial {
+ 		println("moveexec | invio richiesta ingaggiamento con basicrobot") color yellow
+ 		request basicrobot -m engage : engage($Nome, $Step)
+ 	}
+ 	Transition t0
+ 		whenReply engagedone -> waitRequest
+ 		whenReply engagerefused -> engageerror
+ 	
+ 	State engageerror {
+ 		println("moveexec | richiesta di ingaggiamento con basicrobot rifiutata") color yellow
+ 		delay 5000
+ 	}
+ 	Goto s0
+ 	
+ 	State waitRequest {
+ 		println("moveexec | in attesa di ricevere richieste di spostamento da cargorobot") color yellow
+ 	}
+ 	Transition t1
+ 		whenRequest move -> work
+
+ 	State work {
+ 		onMsg( move : move(X, Y) ) {
+ 			[#
+ 				X = payloadArg(0).toInt()
+ 				Y = payloadArg(1).toInt()
+ 			#]
+ 			println("moveexec | ricevuta richiesta di muovere il robot alla posizione X=$X Y=$Y") color yellow
+ 		
+ 			request basicrobot -m moverobot : moverobot($X, $Y)
+ 		}  
+ 	}
+ 	Transition t2
+ 		whenEvent alarm -> handlealarm
+ 		whenReply moverobotdone -> movedone
+ 		whenReply moverobotfailed -> movefailed
+ 	
+ 	State movedone{
+ 		println("moveexec | robot mosso alla posizione X=$X Y=$Y") color yellow
+ 		replyTo move with movedone : movedone(ok)
+ 	}
+ 	Goto waitRequest
+ 		
+ 	State movefailed {
+ 		onMsg(moverobotfailed : moverobotfailed(PLANDONE, PLANTODO)){
+ 			[#
+ 				val Plan=payloadArg(1)	
+ 			#]
+ 				
+ 			println("moveexec | piano da eseguire: ${Plan} ") color yellow
+ 			println("moveexec | richiesta di muovere il robot alla posizione X=$X Y=$Y") color yellow
+			request basicrobot -m moverobot : moverobot($X, $Y)
+ 		}
+ 	}
+ 	Transition t3
+ 		whenEvent alarm -> handlealarm
+ 		whenReply moverobotdone -> movedone
+ 		whenReply moverobotfailed -> movefailed
+ 	
+ 	State handlealarm {
+		println("moveexec | rilevata sonar failure, interruzione dello spostamento") color yellow
+	}
+	Transition t4
+		whenEvent alarm -> handleendalarm
+		
+	State handleendalarm {
+	   println("moveexec | fine della sonar failure, spostamento ripreso") color yellow
+	}
+	Transition t5
+ 		whenEvent alarm -> handlealarm
+ 		whenReply moverobotdone -> movedone
+ 		whenReply moverobotfailed -> movefailed
+ }
 
 QActor sonarmock context ctxcargoservice {
 	State s0 initial{
-		delay 3000
+		delay 5000
+//		println("$name| rilevata sonar failure") color blue
+//		emit alarm : alarm(failure)
+//		delay 2000
+//		println("$name| sonar failure terminata") color blue
+//		emit alarm : alarm(ok)
+//		delay 1000
+		println("$name| rilevato product container all'IOPort") color blue
+		forward cargoservice -m containerAtIOPort : containerAtIOPort(ok)
+		delay 5000
 		println("$name| rilevata sonar failure") color blue
 		emit alarm : alarm(failure)
 		delay 2000
 		println("$name| sonar failure terminata") color blue
 		emit alarm : alarm(ok)
-		delay 1000
-		println("$name| rilevato product container all'IOPort") color blue
-		forward cargoservice -m containerAtIOPort : containerAtIOPort(ok)
     }
 }
