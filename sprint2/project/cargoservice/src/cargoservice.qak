@@ -375,6 +375,7 @@ QActor moveexec context ctxcargoservice {
  		println("moveexec | in attesa di ricevere richieste di spostamento da cargorobot") color yellow
  	}
  	Transition t1
+ 		whenEvent alarm -> handlealarm
  		whenRequest move -> work
 
  	State work {
@@ -426,6 +427,7 @@ QActor moveexec context ctxcargoservice {
 	}
 	Transition t5
  		whenEvent alarm -> handlealarm
+ 		whenRequest move -> work
  		whenReply moverobotdone -> movedone
  		whenReply moverobotfailed -> movefailed
  } 
