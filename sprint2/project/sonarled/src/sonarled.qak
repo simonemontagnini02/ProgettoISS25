@@ -75,7 +75,7 @@ QActor sonarled context ctxiodevices {
             [#
                 val D = payloadArg(0).toInt()
                 if(D <= DFREE){
-                	CommUtils.outred("sonarled | sonarfailure terminata ")
+                	CommUtils.outred("sonarled | sonar failure terminata")
                 	machineExec("python ledOff.py")
                 	counter = 0
                 	

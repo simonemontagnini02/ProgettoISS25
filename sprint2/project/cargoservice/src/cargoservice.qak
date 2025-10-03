@@ -115,8 +115,8 @@ QActor cargoservice context ctxcargoservice {
 	    #]
 	}
     Transition t0 
-          whenRequest load_request -> handle_loadRequest
-          whenInterruptEvent  alarm -> handlealarm
+    	whenEvent  alarm -> handlealarm_load_request
+        whenRequest load_request -> handle_loadRequest
 
 	State handle_loadRequest{
 		onMsg( load_request : load(PID) ) {
@@ -128,8 +128,8 @@ QActor cargoservice context ctxcargoservice {
 	    }
 	}
 	Transition t1
+		whenEvent  alarm -> handlealarm
       	whenReply getProductAnswer -> handle_productcontainer
-      	whenInterruptEvent  alarm -> handlealarm
       	
 	State handle_productcontainer {
     	onMsg( getProductAnswer : product(JSonString) ) {
@@ -156,10 +156,10 @@ QActor cargoservice context ctxcargoservice {
     	}
 	}
 	Transition t2
+		whenEvent  alarm -> handlealarm
 	    whenReply validate_accepted -> handle_load_accepted
 	    whenReply validate_refused -> handle_load_refused
 	    whenMsg refused -> work
-	    whenInterruptEvent  alarm -> handlealarm
 	
 	State handle_load_refused{
 		onMsg( validate_refused : motivation(X) ) {
@@ -183,6 +183,8 @@ QActor cargoservice context ctxcargoservice {
 			#]	
 		}
 	}
+	Goto work
+	
 	State handle_load_accepted{
 		onMsg( validate_accepted : slot(SlotID) ) {
 		[#
@@ -196,8 +198,8 @@ QActor cargoservice context ctxcargoservice {
 		}
     }
     Transition t3
+    	whenEvent  alarm -> handlealarm
 	    whenMsg containerAtIOPort -> handle_container
-	    whenInterruptEvent  alarm -> handlealarm
 	    
 	State handle_container {
 		[#
@@ -206,21 +208,42 @@ QActor cargoservice context ctxcargoservice {
 		request cargorobot -m transport : transport($SlotId)
 	}
 	Transition t4
+		whenEvent  alarm -> handlealarm
 	    whenReply robot_home -> work
-	    whenInterruptEvent  alarm -> handlealarm
 	    
 	
-	
-	State handlealarm{
-	    if[# currentMsg.msgContent() == "endalarm(ok)" #] {
-	    	println("cargoservice | servizio ripristinato") color green
-	    	returnFromInterrupt
-	    } else {
-	    	println("cargoservice | servizio interrotto") color red
-	    }
+	//HANDLE ALARM NEL CASO AVVENGA UNA SONAR FAILURE DURANTE L'ATTESA DI UNA RICHIESTA DI CARICO
+	State handlealarm_load_request {
+		println("cargoservice | servizio interrotto") color red
 	}
 	Transition t5
-	    whenEvent endalarm -> handlealarm
+		whenEvent endalarm -> handleendalarm_load_request
+		
+	State handleendalarm_load_request {
+	   println("cargoservice | servizio ripristinato") color green
+	}
+	Transition t6
+ 		whenEvent alarm -> handlealarm_load_request
+ 		whenRequest load_request -> handle_loadRequest
+	
+	//HANDLE ALARM NEL CASO AVVENGA UNA SONAR FAILURE DURANTE L'ATTESA DI UNA RICHIESTA DI CARICO
+	State handlealarm {
+	    println("cargoservice | servizio interrotto") color red
+	}
+	Transition t7
+		whenEvent endalarm -> handleendalarm
+		
+	State handleendalarm {
+	   println("cargoservice | servizio ripristinato") color green
+	}
+	Transition t8
+ 		whenEvent alarm -> handlealarm
+ 		whenReply getProductAnswer -> handle_productcontainer
+	    whenReply validate_accepted -> handle_load_accepted
+	    whenReply validate_refused -> handle_load_refused
+	    whenMsg refused -> work
+	    whenMsg containerAtIOPort -> handle_container
+	    whenReply robot_home -> work
 }
 
 

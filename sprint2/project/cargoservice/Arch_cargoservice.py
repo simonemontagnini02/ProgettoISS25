@@ -35,6 +35,7 @@ with Diagram('cargoserviceArch', show=False, outformat='png', graph_attr=graphat
           basicrobot=Custom('basicrobot(ext)','./qakicons/externalQActor.png')
      with Cluster('ctxproductservice', graph_attr=nodeattr):
           productservice=Custom('productservice(ext)','./qakicons/externalQActor.png')
+     sys >> Edge( label='alarm', **evattr, decorate='true', fontcolor='darkgreen') >> cargoservice
      sys >> Edge( label='endalarm', **evattr, decorate='true', fontcolor='darkgreen') >> cargoservice
      sys >> Edge( label='alarm', **evattr, decorate='true', fontcolor='darkgreen') >> moveexec
      sys >> Edge( label='endalarm', **evattr, decorate='true', fontcolor='darkgreen') >> moveexec
