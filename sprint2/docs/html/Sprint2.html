@@ -172,8 +172,8 @@
             </li>
             <li><strong>Gestione delle sonar failure</strong>: al rilevamento di un <span class="messaggi">Event alarm :
                     alarm(failure)</span>, l'attore interromperà le sue attività e le riprenderà alla ricezione di un
-                <span class="messaggi">Event alarm :
-                    alarm(ok). Durante questo periodo, quindi, non dovrà inoltrare le richieste di movimento a
+                <span class="messaggi">Event endalarm :
+                    endalarm(X). Durante questo periodo, quindi, non dovrà inoltrare le richieste di movimento a
                     basicrobot.</span>
             </li>
         </ul>
@@ -253,7 +253,7 @@
                 <strong>Rilevazione del termine delle sonar failure</strong>: in seguito a una sonar failure, il
                 componente effettua una misurazione ogni secondo e, quando rileva una distanza D &le; DFREE, procede
                 allo spegnimento del LED e invia un
-                <span class="messaggi">Event alarm : alarm(ok)</span>, indicando a tutti gli attori di ripristinare le
+                <span class="messaggi">Event endalarm : endalarm(X)</span>, indicando a tutti gli attori di ripristinare le
                 loro attività.
             </li>
         </ul>
@@ -353,7 +353,7 @@
                 transita nello stato
                 handlealarm, dove sospende temporaneamente l’esecuzione.
                 Quando l’attore riceve un
-                <span class="messaggi">Event alarm : alarm(ok)</span>, che segnala la fine dell’anomalia, riprende lo
+                <span class="messaggi">Event endalarm : endalarm(X)</span>, che segnala la fine dell’anomalia, riprende lo
                 spostamento interrotto.
                 In questo modo moveexec si occupa di coordinare il comportamento del robot in presenza di situazioni
                 d'errore,
