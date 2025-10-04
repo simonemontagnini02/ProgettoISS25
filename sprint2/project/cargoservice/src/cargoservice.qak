@@ -57,9 +57,12 @@ ExternalQActor productservice context ctxproductservice
 ExternalQActor basicrobot context ctxbasicrobot
 
 QActor clientmock context ctxcargoservice {
+	[#
+		var PRODID=31
+		#]
     State s0 initial {
     	[#
-    	val PROD = "{'\"productId\":31,\"name\":\"p31\",\"weight\":311'}"
+    	val PROD = "{'\"productId\":$PRODID,\"name\":\"p31\",\"weight\":200'}"
     	#]
     	println("clientmock | invio richiesta a productservice per prodotto p31") color blue
 		request productservice -m createProduct : product($PROD)
@@ -85,9 +88,11 @@ QActor clientmock context ctxcargoservice {
         [#
             val ID = payloadArg(0)
             CommUtils.outblue("clientmock | richiesta di carico accettata, product container associato allo Slot n." + ID)
+            PRODID=PRODID+1
         #]
         }
     }
+    Goto s0
       
     State handle_loadrefused{
     	onMsg( load_refused : reason(Motivation) ) {
@@ -198,7 +203,7 @@ QActor cargoservice context ctxcargoservice {
 		}
     }
     Transition t3
-    	whenEvent  alarm -> handlealarm
+    	whenEvent  alarm -> handlealarm_ioport
 	    whenMsg containerAtIOPort -> handle_container
 	    
 	State handle_container {
@@ -226,7 +231,7 @@ QActor cargoservice context ctxcargoservice {
  		whenEvent alarm -> handlealarm_load_request
  		whenRequest load_request -> handle_loadRequest
 	
-	//HANDLE ALARM NEL CASO AVVENGA UNA SONAR FAILURE DURANTE L'ATTESA DI UNA RICHIESTA DI CARICO
+	//HANDLE ALARM
 	State handlealarm {
 	    println("cargoservice | servizio interrotto") color red
 	}
@@ -242,8 +247,21 @@ QActor cargoservice context ctxcargoservice {
 	    whenReply validate_accepted -> handle_load_accepted
 	    whenReply validate_refused -> handle_load_refused
 	    whenMsg refused -> work
-	    whenMsg containerAtIOPort -> handle_container
 	    whenReply robot_home -> work
+	
+	//HANDLE ALARM NEL CASO CARGOSERVICE SIA IN ATTESA DEL PRODUCT CONTAINER ALL'IOPORT
+	State handlealarm_ioport {
+	    println("cargoservice | servizio interrotto") color red
+	}
+	Transition t9
+		whenEvent endalarm -> handleendalarm_ioport
+		
+	State handleendalarm_ioport {
+	   println("cargoservice | servizio ripristinato") color green
+	}
+	Transition t10
+ 		whenEvent alarm -> handlealarm_ioport
+	    whenMsg containerAtIOPort -> handle_container
 }
 
 

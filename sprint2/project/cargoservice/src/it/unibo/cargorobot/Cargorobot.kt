@@ -55,7 +55,7 @@ class Cargorobot ( name: String, scope: CoroutineScope, isconfined: Boolean=fals
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t027",targetState="go_ioport",cond=whenRequest("transport"))
+					 transition(edgeName="t029",targetState="go_ioport",cond=whenRequest("transport"))
 				}	 
 				state("go_ioport") { //this:State
 					action { //it:State
@@ -75,8 +75,8 @@ class Cargorobot ( name: String, scope: CoroutineScope, isconfined: Boolean=fals
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t128",targetState="go_slot",cond=whenReply("movedone"))
-					transition(edgeName="t129",targetState="go_ioport",cond=whenReply("movefailed"))
+					 transition(edgeName="t130",targetState="go_slot",cond=whenReply("movedone"))
+					transition(edgeName="t131",targetState="go_ioport",cond=whenReply("movefailed"))
 				}	 
 				state("go_slot") { //this:State
 					action { //it:State
@@ -92,8 +92,8 @@ class Cargorobot ( name: String, scope: CoroutineScope, isconfined: Boolean=fals
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t230",targetState="go_home",cond=whenReply("movedone"))
-					transition(edgeName="t231",targetState="go_slot",cond=whenReply("movefailed"))
+					 transition(edgeName="t232",targetState="go_home",cond=whenReply("movedone"))
+					transition(edgeName="t233",targetState="go_slot",cond=whenReply("movefailed"))
 				}	 
 				state("go_home") { //this:State
 					action { //it:State
@@ -109,8 +109,8 @@ class Cargorobot ( name: String, scope: CoroutineScope, isconfined: Boolean=fals
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t332",targetState="robotAtHome",cond=whenReply("movedone"))
-					transition(edgeName="t333",targetState="go_home",cond=whenReply("movefailed"))
+					 transition(edgeName="t334",targetState="robotAtHome",cond=whenReply("movedone"))
+					transition(edgeName="t335",targetState="go_home",cond=whenReply("movefailed"))
 				}	 
 				state("robotAtHome") { //this:State
 					action { //it:State

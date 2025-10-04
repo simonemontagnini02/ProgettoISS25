@@ -146,7 +146,7 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t311",targetState="handlealarm",cond=whenEvent("alarm"))
+					 transition(edgeName="t311",targetState="handlealarm_ioport",cond=whenEvent("alarm"))
 					transition(edgeName="t312",targetState="handle_container",cond=whenDispatch("containerAtIOPort"))
 				}	 
 				state("handle_container") { //this:State
@@ -206,8 +206,28 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 					transition(edgeName="t821",targetState="handle_load_accepted",cond=whenReply("validate_accepted"))
 					transition(edgeName="t822",targetState="handle_load_refused",cond=whenReply("validate_refused"))
 					transition(edgeName="t823",targetState="work",cond=whenDispatch("refused"))
-					transition(edgeName="t824",targetState="handle_container",cond=whenDispatch("containerAtIOPort"))
-					transition(edgeName="t825",targetState="work",cond=whenReply("robot_home"))
+					transition(edgeName="t824",targetState="work",cond=whenReply("robot_home"))
+				}	 
+				state("handlealarm_ioport") { //this:State
+					action { //it:State
+						CommUtils.outred("cargoservice | servizio interrotto")
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t925",targetState="handleendalarm_ioport",cond=whenEvent("endalarm"))
+				}	 
+				state("handleendalarm_ioport") { //this:State
+					action { //it:State
+						CommUtils.outgreen("cargoservice | servizio ripristinato")
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t1026",targetState="handlealarm_ioport",cond=whenEvent("alarm"))
+					transition(edgeName="t1027",targetState="handle_container",cond=whenDispatch("containerAtIOPort"))
 				}	 
 			}
 		}

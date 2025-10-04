@@ -88,7 +88,7 @@ class Sonarled ( name: String, scope: CoroutineScope, isconfined: Boolean=false,
 								
 								                val D = payloadArg(0).toInt()
 								                if(D <= DFREE){
-								                	CommUtils.outred("sonarled | sonarfailure terminata ")
+								                	CommUtils.outred("sonarled | sonar failure terminata")
 								                	machineExec("python ledOff.py")
 								                	counter = 0
 								                	

@@ -29,11 +29,13 @@ class Clientmock ( name: String, scope: CoroutineScope, isconfined: Boolean=fals
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		//IF actor.withobj !== null val actor.withobj.name» = actor.withobj.method»ENDIF
+		
+				var PRODID=31
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
 						
-						    	val PROD = "{'\"productId\":31,\"name\":\"p31\",\"weight\":311'}"
+						    	val PROD = "{'\"productId\":$PRODID,\"name\":\"p31\",\"weight\":200'}"
 						CommUtils.outblue("clientmock | invio richiesta a productservice per prodotto p31")
 						request("createProduct", "product($PROD)" ,"productservice" )  
 						//genTimer( actor, state )
@@ -67,12 +69,14 @@ class Clientmock ( name: String, scope: CoroutineScope, isconfined: Boolean=fals
 								
 								            val ID = payloadArg(0)
 								            CommUtils.outblue("clientmock | richiesta di carico accettata, product container associato allo Slot n." + ID)
+								            PRODID=PRODID+1
 						}
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
+					 transition( edgeName="goto",targetState="s0", cond=doswitch() )
 				}	 
 				state("handle_loadrefused") { //this:State
 					action { //it:State
