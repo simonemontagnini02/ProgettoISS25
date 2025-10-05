@@ -173,10 +173,39 @@
             <li><strong>Gestione delle sonar failure</strong>: al rilevamento di un <span class="messaggi">Event alarm :
                     alarm(failure)</span>, l'attore interromperà le sue attività e le riprenderà alla ricezione di un
                 <span class="messaggi">Event endalarm :
-                    endalarm(X). Durante questo periodo, quindi, non dovrà inoltrare le richieste di movimento a
-                    basicrobot.</span>
+                    endalarm(X)</span>. Durante questo periodo, quindi, non dovrà inoltrare le richieste di movimento a
+                basicrobot.
             </li>
         </ul>
+
+        <h3>sonardevice</h3>
+        Il seguente componente, che si occupa di effettuare la misurazione delle distanze, può essere realizzato in 2
+        modi:
+
+        <ul>
+            <li>
+                <strong>Come un Actor</strong>: questo approccio consente una migliore suddivisione delle
+                responsabilità, nel rispetto
+                del <strong>Single Responsibility Principle</strong>. Non è necessario delegare il controllo a
+                componenti passivi e la
+                comunicazione con altri attori risulta semplificata. L’unico svantaggio è un maggiore overhead di
+                comunicazione, dovuto allo scambio di messaggi.
+            </li>
+
+            <li>
+                <strong>Come un POJO</strong>: questo approccio elimina la necessità di scambiare messaggi; tuttavia,
+                trattandosi di un
+                componente passivo, richiede di cedere il controllo.
+            </li>
+
+        </ul>
+        L'approccio scelto si basa sulla realizzazione di sonardevice come un Actor in quanto, nonostante ci sia un
+        maggior overhead di comunicazione, trattandosi di messaggi locali allo stesso nodo esso è minimo.
+        </br>
+        L'attore avrà quindi il compito di comunicare, tramite una <span class="messaggi">Dispatch sonardata :
+            distance(D)</span>, le misurazioni effettutate ogni secondo dal sonar sfruttando uno script python fornito
+        dal committente. La scelta di utilizzare un dispatch è dettata dal fatto che la distanza misurata dal sonar deve
+        essere comunicata solamente all'attore sonarled.
 
 
         <h3>sonarled</h3>
@@ -209,9 +238,16 @@
         </br>
         L'attore dovrà realizzare le seguenti funzionalità:
         <ul>
+
             <li>
-                <strong>Rilevazione della presenza del product container all'IOPort</strong>:
-                il componente effettua una misurazione ogni secondo e, quando rileva una distanza
+                <strong>Ricezione delle misurazioni:</strong> l'attore riceve ogni secondo le misurazioni effettuate dal
+                sonar inviate da <strong>sonardevice</strong>, utilizzando un <span class="messaggi">Dispatch sonardata
+                    : distance(D)</span>
+            </li>
+
+            <li>
+                <strong>Rilevazione della presenza del product container all'IOPort</strong>: quando viene rilevata una
+                distanza
                 D &lt; DFREE / 2 per almeno 3 volte consecutive, invia all'attore cargoservice un
                 messaggio indicando la presenza del product container all'IOPort.
                 La comunicazione con cargoservice può avvenire in 3 modi:
@@ -241,8 +277,8 @@
                 in quanto il messaggio non prevede risposta ed ha un unico destinatario.
             </li>
             <li>
-                <strong>Rilevazione delle sonar failure</strong>: il componente effettua una misurazione ogni secondo e,
-                quando rileva una distanza D &gt; DFREE per almeno 3 volte consecutive, procede all'accensione del LED e
+                <strong>Rilevazione delle sonar failure</strong>: quando viene rilevata una distanza D &gt; DFREE per
+                almeno 3 volte consecutive, procede all'accensione del LED e
                 invia un
                 <span class="messaggi">Event alarm : alarm(failure)</span>, indicando una situazione di errore.
                 La scelta di utilizzare un evento per la comunicazione è motivata dal fatto che l'informazione che
@@ -250,18 +286,239 @@
                 scelta di utilizzare un dispatch non risulterebbe efficiente.
             </li>
             <li>
-                <strong>Rilevazione del termine delle sonar failure</strong>: in seguito a una sonar failure, il
-                componente effettua una misurazione ogni secondo e, quando rileva una distanza D &le; DFREE, procede
+                <strong>Rilevazione del termine delle sonar failure</strong>: in seguito a una sonar failure, quando il
+                componente rileva una distanza D &le; DFREE, procede
                 allo spegnimento del LED e invia un
-                <span class="messaggi">Event endalarm : endalarm(X)</span>, indicando a tutti gli attori di ripristinare le
+                <span class="messaggi">Event endalarm : endalarm(X)</span>, indicando a tutti gli attori di ripristinare
+                le
                 loro attività.
             </li>
         </ul>
 
     </div>
 
+    <h2>Architettura Logica del Sistema</h2>
+    <div>
+        <h3>cargoservice</h3>
+        <img src="./img/cargoservicearch.png">
+
+        <h3>sonarled</h3>
+        <img src="./img/sonarledarch.png">
+
+    </div>
+
+    <h2>Testing</h2>
+    <div>
+        <table>
+            <tr>
+                <th>
+                    ID
+                </th>
+                <th>
+                    Titolo
+                </th>
+                <th>
+                    Tipo
+                </th>
+                <th>
+                    Descrizione
+                </th>
+                <th>
+                    Input
+                </th>
+                <th>
+                    Output
+                </th>
+
+            </tr>
+            <td>
+                T09
+            </td>
+            <td>
+                <strong>Rilevazione di un product container all'IOPOrt</strong>
+            </td>
+            <td>
+                Integration Test
+            </td>
+            <td>
+                L'attore sonarled rileva la presenza di un product container all'IOPort e lo comunica a cargoservice.
+                Successivamente quest'ultimo ordina a cargorobot
+                di iniziare la fase di trasporto del product container.
+            </td>
+            <td>
+                Dispatch containerAtIOPort : containerAtIOPort(X)
+            </td>
+            <td>
+                Request transport : transport(SlotID)
+            </td>
+            </tr>
+
+            <tr>
+                <td>
+                    T10
+                </td>
+                <td>
+                    <strong>Trasporto del product container allo Slot assegnato</strong>
+                </td>
+                <td>
+                    Integration Test
+                </td>
+                <td>
+                    L'attore cargorobot dovrà comunicare correttamente a moveexec le azioni che il basicrobot dovrà
+                    eseguire nel seguente ordine:
+
+                    <ul>
+                        <li>
+                            <strong>Movimento all'IOPort</strong>
+
+                        </li>
+
+                        <li>
+                            <strong>Movimento all'Unload Position dello Slot selezionato</strong>
+                        </li>
+
+                        <li>
+                            <strong>Ritorno alla posizione di HOME</strong>
+                        </li>
+
+                    </ul>
+
+
+                </td>
+                <td>
+                    Request transport : transport(SlotID)
+                </td>
+                <td>
+                    Reply robot_home : robot_home(X)
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    T11
+                </td>
+                <td>
+                    <strong>Rilevazione delle sonar failure</strong>
+                </td>
+                <td>
+                    Integration Test
+                </td>
+                <td>
+                    L'attore sonarled deve rilevare correttamente le situazioni di sonafailure e deve comunicarle a
+                    tutti gli attori interessati.
+                    Inoltre dovrà accendere il led per segnalare l'ingresso in uno stato di interruzione.
+                </td>
+                <td>
+                    Dispatch sonardata : distance(D)
+                </td>
+                <td>
+                    Event alarm : alarm(X)
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    T12
+                </td>
+                <td>
+                    <strong>Rilevazione della fine della sonar failure</strong>
+                </td>
+                <td>
+                    Integration Test
+                </td>
+                <td>
+                    L'attore sonarled deve rilevare correttamente la fine di una sonafailure e deve comunicarlo a tutti
+                    gli attori interessati.
+                    Inoltre dovrà spegnere il led per segnalare la fine dello stato di interruzione.
+                </td>
+                <td>
+                    Dispatch sonardata : distance(D)
+                </td>
+                <td>
+                    Event endalarm : endalarm(X)
+                </td>
+            </tr>
+
+
+            <tr>
+                <td>
+                    T13
+                </td>
+                <td>
+                    <strong>Interruzione del trasporto</strong>
+                </td>
+                <td>
+                    Integration Test
+                </td>
+                <td>
+                    L'attore moveexec dovrà interrompere il trasporto del basicrobot quando riceve una sonar failure
+                </td>
+                <td>
+                    Event alarm : alarm(X)
+                </td>
+                <td>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    T14
+                </td>
+                <td>
+                    <strong>Ripristino del trasporto</strong>
+                </td>
+                <td>
+                    Integration Test
+                </td>
+                <td>
+                    L'attore moveexec dovrà rispristinare il trasporto del basicrobot.
+                </td>
+                <td>
+                    Event endalarm : endalarm(X)
+                </td>
+                <td>
+                </td>
+            </tr>
+
+
+        </table>
+
+    </div>
+
+
+
     <div>
         <h2>Progettazione</h2>
+
+        <h3>cargoservice</h3>
+        A differenza dello Sprint precedente, in questo attora è stata modificata la logica di gestione delle <em>sonar
+            failure</em>, in quanto l'uso dell'<em>interruptEvent</em> presentava delle problematiche. Per risolvere
+        vengono introdotti degli stati aggiuntivi per differenziare le diverse situazioni di fallimento:
+
+        <ul>
+            <li>
+                <strong>handlealarm_load_request</strong>: questo stato viene introdotto per gestire le sonar failure
+                catturate durante l'attesa di richieste di carico. Una volta ricevuta la fine dell'allarme attende
+                l'arrivo di un messaggio
+                <span class="messaggi">Request load_request : load(PID)</span> per riprendere la normale esecuzione.
+
+            </li>
+
+            <li>
+                <strong>handlealarm_ioport</strong>: questo stato viene introdotto per gestire le sonar failure
+                catturate durante l'attesa del product container all'IOPort. Una volta ricevuta la fine dell'allarme
+                attende l'arrivo di un messaggio
+                <span class="messaggi">Dispatch containerAtIOPort : containerAtIOPort(X)</span> per riprendere la
+                normale esecuzione.
+            </li>
+
+            <li>
+                <strong>handlealarm</strong>: questo stato ha il compito di gestire le sonar failure in tutti i restanti
+                stati dell'attore.
+            </li>
+
+        </ul>
+
 
         <h3>cargorobot</h3>
         Dopo avere inizializzato due array, contenenti rispettivamente le coordinate X e Y delle Unload Position di
@@ -351,9 +608,10 @@
                 <span class="messaggi">Event alarm : alarm(failure)</span>, moveexec interrompe lo spostamento in corso
                 e
                 transita nello stato
-                handlealarm, dove sospende temporaneamente l’esecuzione.
+                <strong>handlealarm</strong>, dove sospende temporaneamente l’esecuzione.
                 Quando l’attore riceve un
-                <span class="messaggi">Event endalarm : endalarm(X)</span>, che segnala la fine dell’anomalia, riprende lo
+                <span class="messaggi">Event endalarm : endalarm(X)</span>, che segnala la fine dell’anomalia, si sposta
+                nello stato <strong>handleendalarm</strong>, dove gestisce la fine dell'interruzione e riprende lo
                 spostamento interrotto.
                 In questo modo moveexec si occupa di coordinare il comportamento del robot in presenza di situazioni
                 d'errore,
@@ -361,10 +619,93 @@
             </li>
         </ul>
 
+        <h3>sonardevice</h3>
+        Nello stato <strong>s0</strong> l'attore lancia uno script python che scrive a linea di comando ogni sencondo la
+        distanza rilevata dal sonar.
+        L'attore transita nello stato <strong>readSonarData</strong>, in cui legge queste misurazioni e le invia a
+        <strong>sonarled</strong> tramite un
+        messaggio di <span class="messaggi">Dispatch sonardata : distance(D)</span>.
+
         <h3>sonarled</h3>
+        Nello stato <strong>s0</strong> rimane in attesa del messaggio <span class="messaggi">Dispatch sonardata :
+            distance(D)</span> inviato da <strong>sonardevice</strong>, che una volta
+        arrivato lo fa transitare nello stato <strong>normal</strong>, dove l'attore controlla:
+
+        <ul>
+            <li>
+                <strong>Presenza del product container all'IOPort</strong>: l'attore controlla che la distanza
+                comunicata da sonardevice sia D &lt; DFREE / 2 per almeno 3 secondi. Successivamente invia il messaggio
+                <span class="messaggi">Dispatch containerAtIOPort : containerAtIOPort(X)</span> a
+                <strong>cargoservice</strong>
+                per segnalare l'arrivo del product container.
+            </li>
+            <li>
+                <strong>Situazioni di sonar failure</strong>: nel caso in cui la distanza
+                comunicata da sonardevice sia D &gt; DFREE per almeno 3 secondi, l'attore
+                segnala una situzione di sonar failure tramite l'evento <span class="messaggi">Event alarm :
+                    alarm(X)</span>, transitando di conseguenza nello stato
+                <strong>failure</strong> e accendendo il led. In questo stato non appena viene rilevata una distanza D
+                &le; DFREE, l'attore spegne il led,
+                segnala la fine della situazione di sonar failure,
+                emettendo un <span class="messaggi">Event endalarm : endalarm(X)</span>, e si sposta nello stato
+                <strong>normal</strong>, riprendendo la normale esecuzione.
+            </li>
+
+        </ul>
 
 
     </div>
+
+
+    <h2>Istruzioni per l'esecuzione</h2>
+    <div>
+        Per poter avviare il sistema è necessario seguire i seguenti passi:
+
+        <ul>
+            <li>
+                avviare l'immagine docker <strong>iss2025new.yaml</strong> contenente al suo interno diversi servizi
+                software utili al supporto dell'esecuzione del
+                sistema.
+            </li>
+
+            <li>
+                avviare l'immagine docker <strong>cargoserviceqak.yaml</strong> contenente la logica che realizza il
+                servizio <strong>productservice</strong>
+            </li>
+
+            <li>
+                avviare l'immagine docker <strong>wenv</strong> che conetiene l'interfaccia grafica del robot virtuale
+            </li>
+
+            <li>
+                avviare il servizio <strong>cargoservice</strong> eseguendo il comando <i>gradlew run</i>
+            </li>
+
+            <li>
+                avviare il servizio <strong>basicrobot24</strong> eseguendo il comando <i>gradlew run</i>
+            </li>
+            <li>
+                avviare il servizio <strong>sonarled</strong> presente sul Raspberry lanciando <i>./sonaled</i>
+            </li>
+
+
+
+        </ul>
+
+    </div>
+
+    <h2>Piano di lavoro</h2>
+    <div>
+        In questo Sprint è stata completata la logica core-business del sistema. Nello Sprint 3 si procede con la
+        realizzazione delle ultime funzionalità legate al sistema, ovvero <strong>webgui</strong> e
+        <strong>client</strong>.
+
+        </br>
+        Nello specifico, webgui si occuperà di visualizzare lo stato della stiva tramite un'interfaccia web, mentre
+        client si occuperà di inviare le richieste di registrazione di prodotti e di carico.
+
+    </div>
+
 
 
 </body>
