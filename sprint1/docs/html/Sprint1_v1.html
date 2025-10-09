@@ -88,12 +88,12 @@
             <li><strong>Validazione delle richieste di carico</strong>: per questa responsabilità sono state individuate
                 possibili soluzioni alternative:
                 <ul>
-                    <li><strong>Implementazione all'interno di cargoservice</strong>: in questo modo cargoservice
+                    <li><strong>Modellazione all'interno di cargoservice</strong>: in questo modo cargoservice
                         sarebbe incaricato della gestione delle richieste di carico e della loro validazione. Questo
                         permetterebbe di avere tutta la logica relativa all'interno di un unico attore, tuttavia
                         l'attore sarebbe sovraccaricato di troppe responsabilità</li>
                     <li><strong>Utilizzo di un POJO</strong>: l'utilizzo di classi helper java permette di separare le
-                        responsabilità ed implementare una comunicazione basata su procedure call, che quindi
+                        responsabilità e modellare una comunicazione basata su procedure call, che quindi
                         non necessità scambio di messaggi. Seguendo questa opzione avremmo una comunicazione più
                         efficiente, tuttavia l'attore dovrebbe cedere il controllo al POJO, perdendo così reattività in
                         quanto potrebbe gestire eventuali sonar failure solamente dopo aver ripreso il controllo</li>
@@ -105,7 +105,7 @@
                         in modo più responsivo le eventuali sonar failure che potrebbero avvenire durante la fase di
                         validazione della richiesta</li>
                 </ul>
-                Delle tre opzioni elencate, abbiamo scelto di seguire l'implementazione di un attore separato, di nome
+                Delle tre opzioni elencate, abbiamo scelto di seguire la modellazione di un attore separato, di nome
                 <strong>requestvalidator</strong>, i cui dettagli vengono specificati nel paragrafo sottostante.
                 I messaggi impiegati per la realizzazione della comunicazione sono:
                 <ul>
