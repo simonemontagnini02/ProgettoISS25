@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sprint2</title>
+    <title>Sprint2_v1</title>
     <link rel="stylesheet" href="./css/style.css">
 </head>
 
@@ -50,7 +50,7 @@
             <li>
 
                 <strong>Interazione con basicrobot</strong>: poiché il componente basicrobot, fornito dal committente, è
-                realizzato come attore, scegliere di implementare cargorobot come un POJO renderebbe la comunicazione
+                realizzato come attore, scegliere di modellare cargorobot come un POJO renderebbe la comunicazione
                 con basicrobot intrinsecamente più complessa.
 
             </li>
@@ -58,12 +58,15 @@
         </ul>
 
         Di conseguenza, per i motivi elencati, un POJO non risulta adatto a rappresentare il comportamento di
-        cargorobot. Si sceglie quindi di implementarlo come attore, poiché la comunicazione con cargoservice avviene
-        tramite scambio asincrono di messaggi, che consente a cargoservice di mantenere il controllo dell’esecuzione.
+        cargorobot. Si sceglie quindi di modellarlo come attore, poiché vogliamo realizzare la comunicazione con
+        cargoservice
+        tramite scambio asincrono di messaggi, permettendo così a cargoservice di mantenere il controllo
+        dell’esecuzione.
         Inoltre, in quanto componente attivo e reattivo, un attore rimane sensibile alle situazioni di sonar failure,
         che possono essere gestite attraverso l’utilizzo di stati adeguati. Infine, sebbene l’interazione tra attori
-        comporti lo scambio di messaggi, implementare cargorobot come attore risulta vantaggioso, poiché rende
-        l’integrazione con basicrobot più semplice e diretta.
+        comporti lo scambio di messaggi, modellare cargorobot come attore risulta vantaggioso, poiché rende
+        l’integrazione con basicrobot più semplice e diretta. Questo poichè l'utilizzo del linguaggio QAK fornisce delle
+        astrazioni più elevate per realizzare la comunicazione con basicrobot in modo più semplice e diretto.
 
         </br>
         </br>
@@ -205,13 +208,10 @@
         L'attore avrà quindi il compito di comunicare, tramite una <span class="messaggi">Dispatch sonardata :
             distance(D)</span>, le misurazioni effettutate ogni secondo dal sonar sfruttando uno script python fornito
         dal committente. La scelta di utilizzare un dispatch è dettata dal fatto che la distanza misurata dal sonar deve
-        essere comunicata solamente all'attore sonarled.
+        essere comunicata solamente all'attore sonar.
 
-
-        <h3>sonarled</h3>
-        Nonostante l'analisi svolta all'interno dello Sprint 0 proponeva un modello in cui sonar e LED erano
-        rappresentati da due attori separati, abbiamo deciso di modellare il comportamento del sonar e
-        del LED all'interno di un unico componente, chiamato <strong>sonarled</strong>. I due modelli previsti sono:
+        <h3>sonar</h3>
+        Per la modellazione dei componenti relativi al sonar e al LED sono stati individuati i seguenti modelli:
         <ul>
             <li>
                 <strong>Modello a due attori</strong>: questo modello permetterebbe di rispettare il <strong>Single
@@ -223,7 +223,7 @@
             </li>
             <li>
                 <strong>Modello ad un attore</strong>: questo modello permetterebbe di realizzare all'interno di un
-                singolo attore la logica di entrambi i componenti. In questo modo non sarà necessario implementare una
+                singolo attore la logica di entrambi i componenti. In questo modo non sarà necessario modellare una
                 comunicazione esplicita per la segnalazione delle sonar failure. Ciò permetterebbe di avare un numero
                 minore di comunicazioni, alleggerendo così il servizio. Lo svantaggio principale è dato dalla scarsa
                 portabilità, dato che un modello del genere comporta un elevato accoppiamento delle logiche dei
@@ -231,10 +231,16 @@
                 portando a bassa portabilità.
             </li>
         </ul>
-        La nostra scelta ricade sul modello ad un attore in quanto, nonostante sia meno flessibile, risulta essere
-        facilmente implementabile all'interno del servizio. Inoltre, la creazione di un attore separato dedicato al LED
-        sarebbe eccessiva, poiché il led non possiede logiche autonome ma si limita unicamente a segnalare
-        una condizione già rilevata dal sonar.
+        La nostra scelta ricade sul <strong>modello a due attori</strong>, in quanto consente di mantenere una chiara
+        separazione delle
+        responsabilità tra i componenti. In particolare, l’attore sonar si occupa esclusivamente del rilevamento della
+        distanza e della generazione delle segnalazioni di errore, mentre l’attore led gestisce unicamente la
+        segnalazione visiva dello stato del sistema.Questa scelta, pur introducendo un lieve aumento dell’overhead,
+        migliora la <strong>manutenibilità</strong> e la <strong>riusabilità</strong> del sistema: eventuali modifiche
+        al comportamento del LED o del
+        sonar possono essere effettuate in modo indipendente, senza impattare sull’altro componente. Inoltre, la
+        separazione dei due attori rende il modello più aderente ai principi dell’architettura a microservizi, favorendo
+        la possibilità di scalare o sostituire ciascun componente in modo autonomo.
         </br>
         L'attore dovrà realizzare le seguenti funzionalità:
         <ul>
@@ -278,20 +284,39 @@
             </li>
             <li>
                 <strong>Rilevazione delle sonar failure</strong>: quando viene rilevata una distanza D &gt; DFREE per
-                almeno 3 volte consecutive, procede all'accensione del LED e
-                invia un
-                <span class="messaggi">Event alarm : alarm(failure)</span>, indicando una situazione di errore.
+                almeno 3 volte consecutive, l'attore genera un <span class="messaggi">Event alarm :
+                    alarm(failure)</span>,
+                indicando una situazione di errore.
                 La scelta di utilizzare un evento per la comunicazione è motivata dal fatto che l'informazione che
-                dobbiamo comunicare deve essere ricevuta da più attori (cargoservice, basicrobot) e di conseguenza la
+                dobbiamo comunicare deve essere ricevuta da più attori (cargoservice, basicrobot, moveexec) e di
+                conseguenza la
                 scelta di utilizzare un dispatch non risulterebbe efficiente.
             </li>
             <li>
                 <strong>Rilevazione del termine delle sonar failure</strong>: in seguito a una sonar failure, quando il
-                componente rileva una distanza D &le; DFREE, procede
-                allo spegnimento del LED e invia un
+                componente rileva una distanza D &le; DFREE, genera un
                 <span class="messaggi">Event endalarm : endalarm(X)</span>, indicando a tutti gli attori di ripristinare
                 le
                 loro attività.
+            </li>
+        </ul>
+
+
+        <h3>led</h3>
+        A seguito dell'analisi precedentemente svolta, le funzionalità legate al componente LED vengono incapsulate
+        all'interno di un attore di nome led. L'attore dovrà realizzare le seguenti funzionalità:
+        <ul>
+            <li>
+                <strong>Accensione del led</strong>: alla ricezione del messaggio <span class="messaggi">Dispatch ledOn
+                    : ledOn(X)</span> da parte di cargoservice, l'attore dovrà procedere all'accensione del LED per
+                indicare una situazione di sonar failure.
+            </li>
+
+            <li>
+                <strong>Spegnimento del led</strong>: alla ricezione del messaggio <span class="messaggi">Dispatch
+                    ledOff
+                    : ledOff(X)</span> da parte di cargoservice, l'attore dovrà procedere allo spegnimento del LED per
+                indicare il termine della sonar failure.
             </li>
         </ul>
 
@@ -302,7 +327,7 @@
         <h3>cargoservice</h3>
         <img src="./img/cargoservicearch.png">
 
-        <h3>sonarled</h3>
+        <h3>iodevices</h3>
         <img src="./img/sonarledarch.png">
 
     </div>
@@ -517,12 +542,12 @@
                 stati dell'attore.
             </li>
 
-            <li>
-                <strong>NATALI MERDA</strong>
-            </li>
-
         </ul>
 
+        All'interno di ciascuno stato, dovrà anche gestire l'accensione del led tramite un <span
+            class="messaggi">Dispatch ledOn : ledOn(X)</span>, per segnalare l'inizio di una situazione di sonar failure.
+        Infine, all'interno degli stati relativi alla gestione del termine delle sonar failure, l'attore dovrà inviare un
+        <span class="messaggi">Dispatch ledOff : ledOff(X)</span> all'attore led.
 
         <h3>cargorobot</h3>
         Dopo avere inizializzato due array, contenenti rispettivamente le coordinate X e Y delle Unload Position di
@@ -553,25 +578,15 @@
                 stato work, pronto a ricevere una nuova richiesta di carico da parte di cargoservice.
             </li>
         </ul>
-        All'interno di ciascuna fase, a seguito di una richiesta di movimento, sono possibili due diverse risposte:
-        <ul>
-            <li>
-                <strong>Movimento eseguito con successo</strong>: moveexec risponderà alla request di cargorobot con una
-                <span class="messaggi">Reply movedone : movedone(X)</span>, che gli permetterà di transitare verso un
-                nuovo stato
-            </li>
-            <li>
-                <strong>Movimento fallito</strong>: in questo caso cargorobot riceverà una <span class="messaggi">Reply
-                    movefailed : movefailed(X)</span>. Questa situazione può verificarsi, ad esempio in presenza di una
-                sonar failure o di una collisione del basicrobot. In risposta, cargorobot non avanza nello stato
-                successivo ma reitera la richiesta di movimento, attendendo che moveexec confermi l'avvenuto spostamento
-            </li>
-        </ul>
+        All'interno di ciascuna fase, a seguito di una richiesta di movimento, l'attore attende la ricezione di una
+        <span class="messaggi">Reply movedone : movedone(X)</span> da moveexec, che gli permetterà di transitare verso
+        un nuovo stato.
 
         <h3>moveexec</h3>
         All'interno dello stato s0, moveexec invia una
         <span class="messaggi">Request engage : engage(OWNER, STEPTIME)</span>,
-        con OWNER moveexec e STEPTIME pari a 340, ovvero la dimensione di una cella della Hold.
+        con OWNER moveexec e STEPTIME pari a 340, ovvero il tempo necessario al basicrobot per percorrere una distanza
+        pari a quella di una cella della Hold.
         A questo punto rimane in attesa di ricevere una
         <span class="messaggi">Reply engagedone : engagedone(ARG)</span>,
         che conferma il corretto ingaggiamento con basicrobot.
@@ -597,7 +612,7 @@
                     </li>
                     <li>
                         <strong>Movimento fallito</strong>:
-                        può verificarsi in presenza di sonar failure o in caso di collisione del basicrobot.
+                        può verificarsi in presenza di sonar failure.
                         In tal caso moveexec riceve una
                         <span class="messaggi">Reply moverobotfailed : moverobotfailed(PLANDONE, PLANTODO)</span> e
                         procede a reiterare la richiesta di movimento a basicrobot con una <span
@@ -627,10 +642,10 @@
         Nello stato <strong>s0</strong> l'attore lancia uno script python che scrive a linea di comando ogni sencondo la
         distanza rilevata dal sonar.
         L'attore transita nello stato <strong>readSonarData</strong>, in cui legge queste misurazioni e le invia a
-        <strong>sonarled</strong> tramite un
+        <strong>sonar</strong> tramite un
         messaggio di <span class="messaggi">Dispatch sonardata : distance(D)</span>.
 
-        <h3>sonarled</h3>
+        <h3>sonar</h3>
         Nello stato <strong>s0</strong> rimane in attesa del messaggio <span class="messaggi">Dispatch sonardata :
             distance(D)</span> inviato da <strong>sonardevice</strong>, che una volta
         arrivato lo fa transitare nello stato <strong>normal</strong>, dove l'attore controlla:
@@ -648,15 +663,27 @@
                 comunicata da sonardevice sia D &gt; DFREE per almeno 3 secondi, l'attore
                 segnala una situzione di sonar failure tramite l'evento <span class="messaggi">Event alarm :
                     alarm(X)</span>, transitando di conseguenza nello stato
-                <strong>failure</strong> e accendendo il led. In questo stato non appena viene rilevata una distanza D
-                &le; DFREE, l'attore spegne il led,
-                segnala la fine della situazione di sonar failure,
-                emettendo un <span class="messaggi">Event endalarm : endalarm(X)</span>, e si sposta nello stato
-                <strong>normal</strong>, riprendendo la normale esecuzione.
+                <strong>failure</strong>. In questo stato non appena viene rilevata una distanza D
+                &le; DFREE, l'attore segnala la fine della situazione di sonar failure
+                emettendo un <span class="messaggi">Event endalarm : endalarm(X)</span>, spostandosi nello stato
+                <strong>normal</strong>, così da riprendere la normale esecuzione.
             </li>
 
         </ul>
 
+        <h3>led</h3>
+        Nello stato <strong>s0</strong> l'attore rimane in attesa di ricevere uno di questi messaggi:
+        <ul>
+            <li>
+                <span class="messaggi">Dispatch ledOn: ledOn(X)</span>: permette all'attore di transitare nello stato <strong>ledon</strong>, all'interno del quale provvederà all'accensione del LED.
+            </li>
+
+            <li>
+                <span class="messaggi">Dispatch ledOff: ledOff(X)</span>: permette all'attore di transitare nello stato <strong>ledoff</strong>, all'interno del quale provvederà allo spegnimento del LED.
+            </li>
+        </ul>
+        
+        Al termine di ciascuno stato, l'attore transiterà nuovamente verso lo stato s0, pronto per ricevere un nuovo messaggio. 
 
     </div>
 
@@ -678,7 +705,7 @@
             </li>
 
             <li>
-                avviare l'immagine docker <strong>wenv</strong> che conetiene l'interfaccia grafica del robot virtuale
+                avviare l'immagine docker <strong>wenv</strong> che contiene l'interfaccia grafica del robot virtuale
             </li>
 
             <li>
@@ -689,11 +716,8 @@
                 avviare il servizio <strong>basicrobot24</strong> eseguendo il comando <i>gradlew run</i>
             </li>
             <li>
-                avviare il servizio <strong>sonarled</strong> presente sul Raspberry lanciando <i>./sonaled</i>
+                avviare i servizi <strong>sonar</strong> e <strong>led</strong> presenti sul Raspberry lanciando <i>./sonarled</i>
             </li>
-
-
-
         </ul>
 
     </div>
