@@ -164,6 +164,7 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 				}	 
 				state("handlealarm_load_request") { //this:State
 					action { //it:State
+						forward("ledOn", "ledOn(ok)" ,"led" ) 
 						CommUtils.outred("cargoservice | servizio interrotto")
 						//genTimer( actor, state )
 					}
@@ -174,6 +175,7 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 				}	 
 				state("handleendalarm_load_request") { //this:State
 					action { //it:State
+						forward("ledOff", "ledOff(ok)" ,"led" ) 
 						CommUtils.outgreen("cargoservice | servizio ripristinato")
 						//genTimer( actor, state )
 					}
@@ -185,6 +187,7 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 				}	 
 				state("handlealarm") { //this:State
 					action { //it:State
+						forward("ledOn", "ledOn(ok)" ,"led" ) 
 						CommUtils.outred("cargoservice | servizio interrotto")
 						//genTimer( actor, state )
 					}
@@ -195,6 +198,7 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 				}	 
 				state("handleendalarm") { //this:State
 					action { //it:State
+						forward("ledOff", "ledOff(ok)" ,"led" ) 
 						CommUtils.outgreen("cargoservice | servizio ripristinato")
 						//genTimer( actor, state )
 					}
@@ -210,6 +214,7 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 				}	 
 				state("handlealarm_ioport") { //this:State
 					action { //it:State
+						forward("ledOn", "ledOn(ok)" ,"led" ) 
 						CommUtils.outred("cargoservice | servizio interrotto")
 						//genTimer( actor, state )
 					}
@@ -220,6 +225,7 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 				}	 
 				state("handleendalarm_ioport") { //this:State
 					action { //it:State
+						forward("ledOff", "ledOff(ok)" ,"led" ) 
 						CommUtils.outgreen("cargoservice | servizio ripristinato")
 						//genTimer( actor, state )
 					}

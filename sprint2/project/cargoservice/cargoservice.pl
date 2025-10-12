@@ -14,12 +14,13 @@ reply( getProductAnswer, product(JSonString) ).  %%for getProduct
 dispatch( containerAtIOPort, containerAtIOPort(X) ).
 event( alarm, alarm(X) ).
 event( endalarm, endalarm(X) ).
+dispatch( ledOn, ledOn(X) ).
+dispatch( ledOff, ledOff(X) ).
 dispatch( refused, refused(X) ).
 request( transport, transport(SlotID) ).
 reply( robot_home, robot_home(X) ).  %%for transport
 request( move, move(X,Y) ).
 reply( movedone, movedone(X) ).  %%for move
-reply( movefailed, movefailed(X) ).  %%for move
 request( engage, engage(OWNER,STEPTIME) ).
 reply( engagedone, engagedone(ARG) ).  %%for engage
 reply( engagerefused, engagerefused(ARG) ).  %%for engage
@@ -30,8 +31,10 @@ reply( moverobotfailed, moverobotfailed(PLANDONE,PLANTODO) ).  %%for moverobot
 context(ctxcargoservice, "localhost",  "TCP", "8110").
 context(ctxbasicrobot, "127.0.0.1",  "TCP", "8020").
 context(ctxproductservice, "127.0.0.1",  "TCP", "8111").
+context(ctxiodevices, "localhost",  "TCP", "8180").
  qactor( productservice, ctxproductservice, "external").
   qactor( basicrobot, ctxbasicrobot, "external").
+  qactor( led, ctxiodevices, "external").
   qactor( clientmock, ctxcargoservice, "it.unibo.clientmock.Clientmock").
  static(clientmock).
   qactor( cargoservice, ctxcargoservice, "it.unibo.cargoservice.Cargoservice").

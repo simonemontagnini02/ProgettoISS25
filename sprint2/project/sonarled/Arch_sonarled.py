@@ -26,12 +26,13 @@ with Diagram('sonarledArch', show=False, outformat='png', graph_attr=graphattr) 
      sys = Custom('','./qakicons/system.png')
 ### see https://renenyffenegger.ch/notes/tools/Graphviz/attributes/label/HTML-like/index
      with Cluster('ctxiodevices', graph_attr=nodeattr):
-          sonarled=Custom('sonarled','./qakicons/symActorWithobjSmall.png')
+          sonar=Custom('sonar','./qakicons/symActorWithobjSmall.png')
+          led=Custom('led','./qakicons/symActorWithobjSmall.png')
           sonardevice=Custom('sonardevice','./qakicons/symActorWithobjSmall.png')
      with Cluster('ctxcargoservice', graph_attr=nodeattr):
           cargoservice=Custom('cargoservice(ext)','./qakicons/externalQActor.png')
-     sonarled >> Edge( label='alarm', **eventedgeattr, decorate='true', fontcolor='red') >> sys
-     sonarled >> Edge( label='endalarm', **eventedgeattr, decorate='true', fontcolor='red') >> sys
-     sonarled >> Edge(color='blue', style='solid',  decorate='true', label='<containerAtIOPort &nbsp; >',  fontcolor='blue') >> cargoservice
-     sonardevice >> Edge(color='blue', style='solid',  decorate='true', label='<sonardata &nbsp; >',  fontcolor='blue') >> sonarled
+     sonar >> Edge( label='alarm', **eventedgeattr, decorate='true', fontcolor='red') >> sys
+     sonar >> Edge( label='endalarm', **eventedgeattr, decorate='true', fontcolor='red') >> sys
+     sonar >> Edge(color='blue', style='solid',  decorate='true', label='<containerAtIOPort &nbsp; >',  fontcolor='blue') >> cargoservice
+     sonardevice >> Edge(color='blue', style='solid',  decorate='true', label='<sonardata &nbsp; >',  fontcolor='blue') >> sonar
 diag

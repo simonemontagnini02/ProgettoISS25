@@ -23,6 +23,10 @@ Dispatch containerAtIOPort : containerAtIOPort(X)
 Event alarm : alarm(X)
 Event endalarm : endalarm(X)
 
+//Led
+Dispatch ledOn : ledOn(X)
+Dispatch ledOff : ledOff(X)
+
 //AUTODISPATCH
 //cargoservice
 Dispatch refused : refused(X)
@@ -34,7 +38,6 @@ Reply robot_home : robot_home(X) for transport
 //Cargorobot
 Request move : move(X,Y)
 Reply movedone : movedone(X) for move
-Reply movefailed : movefailed(X) for move
 
 //Basicrobot
 Request engage        : engage(OWNER, STEPTIME)	
@@ -53,8 +56,12 @@ Context ctxbasicrobot  ip [ host= "127.0.0.1" port=8020]
 //PRODUCTSERVICE
 Context ctxproductservice ip [ host="127.0.0.1" port=8111]
 
+//SONARLED   
+Context ctxiodevices ip [ host="localhost" port=8180]
+
 ExternalQActor productservice context ctxproductservice
 ExternalQActor basicrobot context ctxbasicrobot
+ExternalQActor led context ctxiodevices
 
 QActor clientmock context ctxcargoservice {
 	[#
@@ -219,13 +226,15 @@ QActor cargoservice context ctxcargoservice {
 	
 	//HANDLE ALARM NEL CASO AVVENGA UNA SONAR FAILURE DURANTE L'ATTESA DI UNA RICHIESTA DI CARICO
 	State handlealarm_load_request {
+		forward led -m ledOn : ledOn(ok)
 		println("cargoservice | servizio interrotto") color red
 	}
 	Transition t5
 		whenEvent endalarm -> handleendalarm_load_request
 		
 	State handleendalarm_load_request {
-	   println("cargoservice | servizio ripristinato") color green
+		forward led -m ledOff : ledOff(ok)
+	    println("cargoservice | servizio ripristinato") color green
 	}
 	Transition t6
  		whenEvent alarm -> handlealarm_load_request
@@ -233,13 +242,15 @@ QActor cargoservice context ctxcargoservice {
 	
 	//HANDLE ALARM
 	State handlealarm {
+		forward led -m ledOn : ledOn(ok)
 	    println("cargoservice | servizio interrotto") color red
 	}
 	Transition t7
 		whenEvent endalarm -> handleendalarm
 		
 	State handleendalarm {
-	   println("cargoservice | servizio ripristinato") color green
+		forward led -m ledOff : ledOff(ok)
+	    println("cargoservice | servizio ripristinato") color green
 	}
 	Transition t8
  		whenEvent alarm -> handlealarm
@@ -251,13 +262,15 @@ QActor cargoservice context ctxcargoservice {
 	
 	//HANDLE ALARM NEL CASO CARGOSERVICE SIA IN ATTESA DEL PRODUCT CONTAINER ALL'IOPORT
 	State handlealarm_ioport {
+		forward led -m ledOn : ledOn(ok)
 	    println("cargoservice | servizio interrotto") color red
 	}
 	Transition t9
 		whenEvent endalarm -> handleendalarm_ioport
 		
 	State handleendalarm_ioport {
-	   println("cargoservice | servizio ripristinato") color green
+		forward led -m ledOff : ledOff(ok)
+	    println("cargoservice | servizio ripristinato") color green
 	}
 	Transition t10
  		whenEvent alarm -> handlealarm_ioport
@@ -354,7 +367,6 @@ QActor cargorobot context ctxcargoservice {
  	}
  	Transition t1
  		whenReply movedone -> go_slot
- 		whenReply movefailed -> go_ioport
  	
  	State go_slot{
  		[#
@@ -368,7 +380,6 @@ QActor cargorobot context ctxcargoservice {
  	}
  	Transition t2
  		whenReply movedone -> go_home
- 		whenReply movefailed -> go_slot
  		
  	State go_home{
  		[#
@@ -382,7 +393,6 @@ QActor cargorobot context ctxcargoservice {
  	}
  	Transition t3
  		whenReply movedone -> robotAtHome
- 		whenReply movefailed -> go_home
  	
  	State robotAtHome {
  		println("cargorobot | operazione completata, robot tornato alla HOME") color yellow
