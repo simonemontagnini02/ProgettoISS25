@@ -48,7 +48,7 @@ class Requestvalidator ( name: String, scope: CoroutineScope, isconfined: Boolea
 											
 										 val PID = payloadArg(0).toInt()
 										 val  weight = payloadArg(1).toInt()
-										 
+								
 										 if( hold.getTotalWeight() + weight > hold.getMaxLoad() ) {
 										 	CommUtils.outcyan("requestvalidator | peso massimo interno alla stiva superato")
 										 	val RESULT = -1
@@ -56,14 +56,14 @@ class Requestvalidator ( name: String, scope: CoroutineScope, isconfined: Boolea
 								
 										 } else {
 										 	var SlotID = -1
-								        	
+								
 								        	for (slot in hold.getSlots()) {
 											    if (slot.productId == -1) {
 											        SlotID = slot.slotId
 											        break  // esce subito dal ciclo
 											    }
 											}
-								        	
+								
 								        	if ( SlotID == -1 ) {
 								        		CommUtils.outcyan("requestvalidator | slot non disponibile")
 								        		val RESULT = -2

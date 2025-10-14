@@ -77,7 +77,7 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
 									            val jsonStr = payloadArg(0)
-									            
+								
 									            if(jsonStr == "unknown") {
 									            	CommUtils.outred("cargoservice | PID_NOT_REGISTERED")
 									            	val Motivation = "PID_NOT_REGISTERED"
@@ -87,7 +87,7 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 									            } else {
 									            	val obj = org.json.JSONObject(jsonStr)
 									                val Weight = obj.getInt("weight")
-										
+								
 										            CommUtils.outgreen("cargoservice | trovato prodotto con peso:" + Weight)
 								request("validate_request", "validate($PID,$Weight)" ,"requestvalidator" )  
 								

@@ -16,22 +16,12 @@ event( alarm, alarm(X) ).
 dispatch( refused, refused(X) ).
 request( transport, transport(SlotID) ).
 reply( robot_home, robot_home(X) ).  %%for transport
-request( move, move(X,Y) ).
-reply( movedone, movedone(X) ).  %%for move
-reply( movefailed, movefailed(X) ).  %%for move
-request( engage, engage(OWNER,STEPTIME) ).
-reply( engagedone, engagedone(ARG) ).  %%for engage
-reply( engagerefused, engagerefused(ARG) ).  %%for engage
-request( moverobot, moverobot(TARGETX,TARGETY) ).
-reply( moverobotdone, moverobotok(ARG) ).  %%for moverobot
-reply( moverobotfailed, moverobotfailed(PLANDONE,PLANTODO) ).  %%for moverobot
 %====================================================================================
-context(ctxbasicrobot, "127.0.0.1",  "TCP", "8020").
 context(ctxproductservice, "127.0.0.1",  "TCP", "8111").
 context(ctxcargoservice, "localhost",  "TCP", "8110").
 context(ctxiodevices, "localhost",  "TCP", "8128").
- qactor( productservice, ctxproductservice, "external").
-  qactor( basicrobot, ctxbasicrobot, "external").
+ qactor( productservice, ctxproductservice, "it.unibo.productservice.Productservice").
+ static(productservice).
   qactor( clientmock, ctxcargoservice, "it.unibo.clientmock.Clientmock").
  static(clientmock).
   qactor( cargoservice, ctxcargoservice, "it.unibo.cargoservice.Cargoservice").
@@ -40,7 +30,5 @@ context(ctxiodevices, "localhost",  "TCP", "8128").
  static(requestvalidator).
   qactor( cargorobot, ctxcargoservice, "it.unibo.cargorobot.Cargorobot").
  static(cargorobot).
-  qactor( moveexec, ctxcargoservice, "it.unibo.moveexec.Moveexec").
- static(moveexec).
   qactor( sonarmock, ctxcargoservice, "it.unibo.sonarmock.Sonarmock").
  static(sonarmock).

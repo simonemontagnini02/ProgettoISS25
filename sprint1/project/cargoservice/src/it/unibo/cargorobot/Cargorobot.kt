@@ -29,17 +29,9 @@ class Cargorobot ( name: String, scope: CoroutineScope, isconfined: Boolean=fals
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		//val interruptedStateTransitions = mutableListOf<Transition>()
 		//IF actor.withobj !== null val actor.withobj.name» = actor.withobj.method»ENDIF
-		
-				var X = 0
-		 		var Y = 0
-		 		var SlotId = -1
-		 		val slotX = intArrayOf(1, 4, 1, 4)
-		 		val slotY = intArrayOf(1, 1, 3, 3)
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						delay(1000) 
-						CommUtils.outyellow("cargorobot | start")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
@@ -49,75 +41,48 @@ class Cargorobot ( name: String, scope: CoroutineScope, isconfined: Boolean=fals
 				}	 
 				state("work") { //this:State
 					action { //it:State
-						CommUtils.outyellow("cargorobot | in attesa di ricevere richieste di movimento del robot da cargoservice")
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t017",targetState="go_ioport",cond=whenRequest("transport"))
+					 transition(edgeName="t117",targetState="go_ioport",cond=whenRequest("transport"))
+					interrupthandle(edgeName="t118",targetState="handlealarm",cond=whenEvent("alarm"),interruptedStateTransitions)
 				}	 
 				state("go_ioport") { //this:State
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("transport(SlotID)"), Term.createTerm("transport(SlotID)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
-								            	SlotId = payloadArg(0).toInt()
+								            	val SlotId = payloadArg(0).toInt()
 								              	CommUtils.outyellow("cargorobot | ricevuta richiesta di carico allo Slot n."+ SlotId)
+								delay(3000) 
+								
+											CommUtils.outyellow("cargorobot | trasporto completato, il robot e' tornato alla HOME")
+								answer("transport", "robot_home", "robot_home(ok)"   )  
 						}
-						
-									X=0
-						 			Y=4
-						CommUtils.outyellow("cargorobot | invio richiesta di spostamento del robot alla posizione X=$X Y=$Y")
-						request("move", "move($X,$Y)" ,"moveexec" )  
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition(edgeName="t118",targetState="go_slot",cond=whenReply("movedone"))
-					transition(edgeName="t119",targetState="go_ioport",cond=whenReply("movefailed"))
-				}	 
-				state("go_slot") { //this:State
-					action { //it:State
-						
-									X = slotX[SlotId]
-						 			Y = slotY[SlotId]
-						CommUtils.outyellow("cargorobot | invio richiesta di spostamento del robot alla posizione X=$X Y=$Y")
-						request("move", "move($X,$Y)" ,"moveexec" )  
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition(edgeName="t220",targetState="go_home",cond=whenReply("movedone"))
-					transition(edgeName="t221",targetState="go_slot",cond=whenReply("movefailed"))
-				}	 
-				state("go_home") { //this:State
-					action { //it:State
-						
-									X=0
-						 			Y=0
-						CommUtils.outyellow("cargorobot | invio richiesta di spostamento del robot alla posizione X=$X Y=$Y")
-						request("move", "move($X,$Y)" ,"moveexec" )  
-						//genTimer( actor, state )
-					}
-					//After Lenzi Aug2002
-					sysaction { //it:State
-					}	 	 
-					 transition(edgeName="t322",targetState="robotAtHome",cond=whenReply("movedone"))
-					transition(edgeName="t323",targetState="go_home",cond=whenReply("movefailed"))
-				}	 
-				state("robotAtHome") { //this:State
-					action { //it:State
-						CommUtils.outyellow("cargorobot | robot tornato alla HOME")
-						delay(1000) 
 						//genTimer( actor, state )
 					}
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
 					 transition( edgeName="goto",targetState="work", cond=doswitch() )
+				}	 
+				state("handlealarm") { //this:State
+					action { //it:State
+						if(  currentMsg.msgContent() == "alarm(ok)"  
+						 ){CommUtils.outyellow("cargorobot | servizio ripristinato")
+						returnFromInterrupt(interruptedStateTransitions)
+						}
+						else
+						 {CommUtils.outyellow("cargorobot | servizio interrotto")
+						 }
+						//genTimer( actor, state )
+					}
+					//After Lenzi Aug2002
+					sysaction { //it:State
+					}	 	 
+					 transition(edgeName="t219",targetState="handlealarm",cond=whenEvent("alarm"))
 				}	 
 			}
 		}
