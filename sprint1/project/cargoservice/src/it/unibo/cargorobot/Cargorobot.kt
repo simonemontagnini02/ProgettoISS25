@@ -46,8 +46,8 @@ class Cargorobot ( name: String, scope: CoroutineScope, isconfined: Boolean=fals
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t117",targetState="go_ioport",cond=whenRequest("transport"))
-					interrupthandle(edgeName="t118",targetState="handlealarm",cond=whenEvent("alarm"),interruptedStateTransitions)
+					 transition(edgeName="t114",targetState="go_ioport",cond=whenRequest("transport"))
+					interrupthandle(edgeName="t115",targetState="handlealarm",cond=whenEvent("alarm"),interruptedStateTransitions)
 				}	 
 				state("go_ioport") { //this:State
 					action { //it:State
@@ -82,7 +82,7 @@ class Cargorobot ( name: String, scope: CoroutineScope, isconfined: Boolean=fals
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t219",targetState="handlealarm",cond=whenEvent("alarm"))
+					 transition(edgeName="t216",targetState="handlealarm",cond=whenEvent("alarm"))
 				}	 
 			}
 		}

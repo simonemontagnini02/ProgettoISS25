@@ -51,8 +51,8 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t03",targetState="handle_loadRequest",cond=whenRequest("load_request"))
-					interrupthandle(edgeName="t04",targetState="handlealarm",cond=whenEvent("alarm"),interruptedStateTransitions)
+					 transition(edgeName="t00",targetState="handle_loadRequest",cond=whenRequest("load_request"))
+					interrupthandle(edgeName="t01",targetState="handlealarm",cond=whenEvent("alarm"),interruptedStateTransitions)
 				}	 
 				state("handle_loadRequest") { //this:State
 					action { //it:State
@@ -68,8 +68,8 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t15",targetState="handle_productcontainer",cond=whenReply("getProductAnswer"))
-					interrupthandle(edgeName="t16",targetState="handlealarm",cond=whenEvent("alarm"),interruptedStateTransitions)
+					 transition(edgeName="t12",targetState="handle_productcontainer",cond=whenReply("getProductAnswer"))
+					interrupthandle(edgeName="t13",targetState="handlealarm",cond=whenEvent("alarm"),interruptedStateTransitions)
 				}	 
 				state("handle_productcontainer") { //this:State
 					action { //it:State
@@ -77,15 +77,16 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
 									            val jsonStr = payloadArg(0)
+									            val obj = org.json.JSONObject(jsonStr)
 								
-									            if(jsonStr == "unknown") {
+									            if(obj.getString("name").equals("wrong")) {
 									            	CommUtils.outred("cargoservice | PID_NOT_REGISTERED")
 									            	val Motivation = "PID_NOT_REGISTERED"
 								answer("load_request", "load_refused", "reason($Motivation)"   )  
 								forward("refused", "refused($Motivation)" ,name ) 
 								
 									            } else {
-									            	val obj = org.json.JSONObject(jsonStr)
+									            	
 									                val Weight = obj.getInt("weight")
 								
 										            CommUtils.outgreen("cargoservice | trovato prodotto con peso:" + Weight)
@@ -98,10 +99,10 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t27",targetState="handle_load_accepted",cond=whenReply("validate_accepted"))
-					transition(edgeName="t28",targetState="handle_load_refused",cond=whenReply("validate_refused"))
-					transition(edgeName="t29",targetState="work",cond=whenDispatch("refused"))
-					interrupthandle(edgeName="t210",targetState="handlealarm",cond=whenEvent("alarm"),interruptedStateTransitions)
+					 transition(edgeName="t24",targetState="handle_load_accepted",cond=whenReply("validate_accepted"))
+					transition(edgeName="t25",targetState="handle_load_refused",cond=whenReply("validate_refused"))
+					transition(edgeName="t26",targetState="work",cond=whenDispatch("refused"))
+					interrupthandle(edgeName="t27",targetState="handlealarm",cond=whenEvent("alarm"),interruptedStateTransitions)
 				}	 
 				state("handle_load_refused") { //this:State
 					action { //it:State
@@ -128,6 +129,7 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
+					 transition( edgeName="goto",targetState="work", cond=doswitch() )
 				}	 
 				state("handle_load_accepted") { //this:State
 					action { //it:State
@@ -145,8 +147,8 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t311",targetState="handle_container",cond=whenDispatch("containerAtIOPort"))
-					interrupthandle(edgeName="t312",targetState="handlealarm",cond=whenEvent("alarm"),interruptedStateTransitions)
+					 transition(edgeName="t38",targetState="handle_container",cond=whenDispatch("containerAtIOPort"))
+					interrupthandle(edgeName="t39",targetState="handlealarm",cond=whenEvent("alarm"),interruptedStateTransitions)
 				}	 
 				state("handle_container") { //this:State
 					action { //it:State
@@ -158,8 +160,8 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t413",targetState="work",cond=whenReply("robot_home"))
-					interrupthandle(edgeName="t414",targetState="handlealarm",cond=whenEvent("alarm"),interruptedStateTransitions)
+					 transition(edgeName="t410",targetState="work",cond=whenReply("robot_home"))
+					interrupthandle(edgeName="t411",targetState="handlealarm",cond=whenEvent("alarm"),interruptedStateTransitions)
 				}	 
 				state("handlealarm") { //this:State
 					action { //it:State
@@ -175,7 +177,7 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t515",targetState="handlealarm",cond=whenEvent("alarm"))
+					 transition(edgeName="t512",targetState="handlealarm",cond=whenEvent("alarm"))
 				}	 
 			}
 		}

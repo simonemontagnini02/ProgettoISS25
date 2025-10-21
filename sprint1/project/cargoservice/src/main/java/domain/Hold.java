@@ -68,6 +68,18 @@ public class Hold implements IHold {
 	   logger.info( "Hold | createSlot:"+ slotAnswer );
 	   return slotAnswer;
     }
+    
+    public void cleanSlots() {
+    	
+    	Slot[] slots=this.getSlots();
+    	
+    	for (Slot slot : slots) {
+    		
+    		slot.setProductId(-1);
+			
+		}
+    	this.totalWeight=0;
+    }
 
     public int getLength() {
         return length;

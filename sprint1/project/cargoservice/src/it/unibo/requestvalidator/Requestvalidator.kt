@@ -39,7 +39,7 @@ class Requestvalidator ( name: String, scope: CoroutineScope, isconfined: Boolea
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t016",targetState="handle_validate",cond=whenRequest("validate_request"))
+					 transition(edgeName="t013",targetState="handle_validate",cond=whenRequest("validate_request"))
 				}	 
 				state("handle_validate") { //this:State
 					action { //it:State
@@ -62,7 +62,7 @@ class Requestvalidator ( name: String, scope: CoroutineScope, isconfined: Boolea
 											        SlotID = slot.slotId
 											        break  // esce subito dal ciclo
 											    }
-											}
+											}  
 								
 								        	if ( SlotID == -1 ) {
 								        		CommUtils.outcyan("requestvalidator | slot non disponibile")

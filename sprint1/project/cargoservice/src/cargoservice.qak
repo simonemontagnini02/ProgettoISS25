@@ -30,6 +30,9 @@ Dispatch refused : refused(X)
 Request transport : transport( SlotID )
 Reply robot_home : robot_home(X) for transport
 
+//DELETETESTER
+Dispatch delete : delete(x)
+
 //PRODUCTSERVICE
 Context ctxproductservice ip [ host="127.0.0.1" port=8111]
 
@@ -39,52 +42,53 @@ Context ctxcargoservice ip [ host="localhost" port=8110]
 //SONAR
 Context ctxiodevices ip [ host= "localhost" port= 8128 ]
 
+
 QActor productservice context ctxproductservice {
     State s0 initial {
     }
 }
 
-QActor clientmock context ctxcargoservice {
-    State s0 initial {
-    	[#
-    	val PROD = "{'\"productId\":31,\"name\":\"p31\",\"weight\":311'}"
-    	#]
-		request productservice -m createProduct : product($PROD)
-    }
-    Transition t1
-    	whenReply createdProduct -> handle_createdProduct
-
-    State handle_createdProduct{
-    	onMsg( createdProduct : productid(ID) ) {
-        [#
-            val PIDC = payloadArg(0).toInt()
-            CommUtils.outblue("clientmock | prodotto registrato con PID: " + PIDC)
-        #]
-        request cargoservice -m load_request : load($PIDC)
-        }
-    }
-    Transition t2
-    	whenReply load_accepted -> handle_loadaccepted
-	    whenReply load_refused -> handle_loadrefused
-
-    State handle_loadaccepted{
-    	onMsg( load_accepted : slot(SlotID) ) {
-        [#
-            val ID = payloadArg(0)
-            CommUtils.outblue("clientmock | richiesta di carico accettata, product container associato allo Slot n." + ID)
-        #]
-        }
-    }
-
-    State handle_loadrefused{
-    	onMsg( load_refused : reason(Motivation) ) {
-        [#
-            val res = payloadArg(0)
-            CommUtils.outblue("clientmock | richiesta di carico rifiutata, motivo: " + res)
-        #]
-        }
-    }
-}
+//QActor clientmock context ctxcargoservice {
+//    State s0 initial {
+//    	[#
+//    	val PROD = "{'\"productId\":31,\"name\":\"p31\",\"weight\":311'}"
+//    	#]
+//		request productservice -m createProduct : product($PROD)
+//    }
+//    Transition t1
+//    	whenReply createdProduct -> handle_createdProduct
+//
+//    State handle_createdProduct{
+//    	onMsg( createdProduct : productid(ID) ) {
+//        [#
+//            val PIDC = payloadArg(0).toInt()
+//            CommUtils.outblue("clientmock | prodotto registrato con PID: " + PIDC)
+//        #]
+//        request cargoservice -m load_request : load($PIDC)
+//        }
+//    }
+//    Transition t2
+//    	whenReply load_accepted -> handle_loadaccepted
+//	    whenReply load_refused -> handle_loadrefused
+//
+//    State handle_loadaccepted{
+//    	onMsg( load_accepted : slot(SlotID) ) {
+//        [#
+//            val ID = payloadArg(0)
+//            CommUtils.outblue("clientmock | richiesta di carico accettata, product container associato allo Slot n." + ID)
+//        #]
+//        }
+//    }
+//
+//    State handle_loadrefused{
+//    	onMsg( load_refused : reason(Motivation) ) {
+//        [#
+//            val res = payloadArg(0)
+//            CommUtils.outblue("clientmock | richiesta di carico rifiutata, motivo: " + res)
+//        #]
+//        }
+//    }
+//}
 
 QActor cargoservice context ctxcargoservice {
 		[#
@@ -122,8 +126,9 @@ QActor cargoservice context ctxcargoservice {
     	onMsg( getProductAnswer : product(JSonString) ) {
 	        [#
 	            val jsonStr = payloadArg(0)
+	            val obj = org.json.JSONObject(jsonStr)
 
-	            if(jsonStr == "unknown") {
+	            if(obj.getString("name").equals("wrong")) {
 	            	CommUtils.outred("cargoservice | PID_NOT_REGISTERED")
 	            	val Motivation = "PID_NOT_REGISTERED"
             	 	#]
@@ -131,7 +136,7 @@ QActor cargoservice context ctxcargoservice {
 	                autodispatch refused : refused($Motivation)
 	                [#
 	            } else {
-	            	val obj = org.json.JSONObject(jsonStr)
+	            	
 	                val Weight = obj.getInt("weight")
 
 		            CommUtils.outgreen("cargoservice | trovato prodotto con peso:" + Weight)
@@ -170,6 +175,8 @@ QActor cargoservice context ctxcargoservice {
 			#]	
 		}
 	}
+	Goto work
+	
 	State handle_load_accepted{
 		onMsg( validate_accepted : slot(SlotID) ) {
 		[#
@@ -241,7 +248,7 @@ QActor requestvalidator context ctxcargoservice withobj hold using "main.java.do
 			        SlotID = slot.slotId
 			        break  // esce subito dal ciclo
 			    }
-			}
+			}  
 
         	if ( SlotID == -1 ) {
         		CommUtils.outcyan("requestvalidator | slot non disponibile")
@@ -304,18 +311,48 @@ QActor cargorobot context ctxcargoservice {
 	    whenEvent  alarm -> handlealarm
 }
 
-QActor sonarmock context ctxcargoservice {
+
+
+QActor deletetester context ctxcargoservice withobj hold using "main.java.domain.Hold.getInstance()"{
+	
+	import "main.java.domain.*"
+	
 	State s0 initial{
-		delay 3000
-		println("$name| rilevata sonar failure") color blue
-		emit alarm : alarm(failure)
-		delay 2000
-		println("$name| sonar failure terminata") color blue
-		emit alarm : alarm(ok)
-		delay 1000
-		println("$name| rilevato product container all'IOPort") color blue
-		forward cargoservice -m containerAtIOPort : containerAtIOPort(ok)
-    }
-    
-    
-    }
+		println("TESTERRRR") color blue
+		
+	}
+	Goto work
+	
+	State work{
+		
+		
+	}
+	Transition t1
+	
+	 whenMsg delete -> deletehandler
+	 
+	 State deletehandler{
+	 	
+	 	[#
+	 		hold.cleanSlots()
+	 		#]
+	 	
+	 }
+	 Goto work
+}
+
+//QActor sonarmock context ctxcargoservice {
+//	State s0 initial{
+//		delay 3000
+//		println("$name| rilevata sonar failure") color blue
+//		emit alarm : alarm(failure)
+//		delay 2000
+//		println("$name| sonar failure terminata") color blue
+//		emit alarm : alarm(ok)
+//		delay 1000
+//		println("$name| rilevato product container all'IOPort") color blue
+//		forward cargoservice -m containerAtIOPort : containerAtIOPort(ok)
+//    }
+//    
+//    
+//    }

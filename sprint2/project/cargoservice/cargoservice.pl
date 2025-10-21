@@ -31,7 +31,7 @@ reply( moverobotfailed, moverobotfailed(PLANDONE,PLANTODO) ).  %%for moverobot
 context(ctxcargoservice, "localhost",  "TCP", "8110").
 context(ctxbasicrobot, "127.0.0.1",  "TCP", "8020").
 context(ctxproductservice, "127.0.0.1",  "TCP", "8111").
-context(ctxiodevices, "localhost",  "TCP", "8180").
+context(ctxiodevices, "192.168.137.2",  "TCP", "8180").
  qactor( productservice, ctxproductservice, "external").
   qactor( basicrobot, ctxbasicrobot, "external").
   qactor( led, ctxiodevices, "external").

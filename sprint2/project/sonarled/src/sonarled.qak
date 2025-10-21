@@ -109,7 +109,7 @@ QActor led context ctxiodevices {
 			CommUtils.outred("led | rilevata sonar failure")
             machineExec("python ledOn.py")
 		#]
-    }
+    } 
     Goto s0
     
     State ledoff {
