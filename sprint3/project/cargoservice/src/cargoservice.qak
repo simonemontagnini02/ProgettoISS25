@@ -1,0 +1,504 @@
+System cargoservice
+
+//Richiesta di registrazione del prodotto
+Request createProduct : product(String)
+Reply   createdProduct: productid(ID) for createProduct
+
+//Richiesta di carico di un container
+Request load_request : load(PID)
+Reply   load_accepted : slot(SlotID) for load_request
+Reply   load_refused  : reason(Motivation) for load_request
+
+//Richieste di validazione
+Request validate_request : validate(PID, Weight)
+Reply validate_accepted : slot(SlotID) for validate_request
+Reply validate_refused : motivation(X) for validate_request
+
+//Richiesta del prodotto
+Request getProduct : product( PID )
+Reply   getProductAnswer : product( JSonString ) for getProduct
+
+//Sonar
+Dispatch containerAtIOPort : containerAtIOPort(X)
+Event alarm : alarm(X)
+Event endalarm : endalarm(X)
+
+//Led
+Dispatch ledOn : ledOn(X)
+Dispatch ledOff : ledOff(X)
+
+//AUTODISPATCH
+//cargoservice
+Dispatch refused : refused(X)
+
+//Comunicazione con cargorobot
+Request transport : transport( SlotID )
+Reply robot_home : robot_home(X) for transport
+
+//Cargorobot
+Request move : move(X,Y)
+Reply movedone : movedone(X) for move
+
+//Basicrobot
+Request engage        : engage(OWNER, STEPTIME)	
+Reply   engagedone    : engagedone(ARG)    for engage
+Reply   engagerefused : engagerefused(ARG) for engage
+Request moverobot    :  moverobot(TARGETX, TARGETY)  
+Reply moverobotdone  :  moverobotok(ARG)                    for moverobot
+Reply moverobotfailed:  moverobotfailed(PLANDONE, PLANTODO) for moverobot
+
+//CARGOSERVICE   
+Context ctxcargoservice ip [ host="localhost" port=8110]
+
+//BASICROBOT
+Context ctxbasicrobot  ip [ host= "127.0.0.1" port=8020]
+
+//PRODUCTSERVICE
+Context ctxproductservice ip [ host="127.0.0.1" port=8111]
+
+//SONARLED   
+Context ctxiodevices ip [ host="192.168.137.2" port=8180]
+   
+ExternalQActor productservice context ctxproductservice
+ExternalQActor basicrobot context ctxbasicrobot
+ExternalQActor led context ctxiodevices
+
+QActor clientmock context ctxcargoservice {
+	[#
+		var PRODID=31
+		#]
+    State s0 initial {
+    	[#
+    	val PROD = "{'\"productId\":$PRODID,\"name\":\"p31\",\"weight\":200'}"
+    	#]
+    	println("clientmock | invio richiesta a productservice per prodotto p31") color blue
+		request productservice -m createProduct : product($PROD)
+    }
+    Transition t1
+    	whenReply createdProduct -> handle_createdProduct
+      	
+    State handle_createdProduct{
+    	onMsg( createdProduct : productid(ID) ) {
+        [#
+            val PIDC = payloadArg(0).toInt()
+            CommUtils.outblue("clientmock | prodotto registrato con PID: " + PIDC)
+        #]
+        request cargoservice -m load_request : load($PIDC)
+        }
+    }
+    Transition t2
+    	whenReply load_accepted -> handle_loadaccepted
+	    whenReply load_refused -> handle_loadrefused
+      	
+    State handle_loadaccepted{
+    	onMsg( load_accepted : slot(SlotID) ) {
+        [#
+            val ID = payloadArg(0)
+            CommUtils.outblue("clientmock | richiesta di carico accettata, product container associato allo Slot n." + ID)
+            PRODID=PRODID+1
+        #]
+        }
+    }
+    Goto s0
+      
+    State handle_loadrefused{
+    	onMsg( load_refused : reason(Motivation) ) {
+        [#
+            val res = payloadArg(0)
+            CommUtils.outblue("clientmock | richiesta di carico rifiutata, motivo: " + res)
+        #]
+        }
+    }
+}
+
+QActor cargoservice context ctxcargoservice {
+		[#
+		var PID = -1
+		var SlotId = -1
+		#]
+		
+	State s0 initial {
+	}
+	Goto work
+	
+	State work {
+		[#
+	        CommUtils.outgreen("cargoservice | in attesa di ricevere richieste di carico")
+	    #]
+	}
+    Transition t0 
+    	whenEvent  alarm -> handlealarm_load_request
+        whenRequest load_request -> handle_loadRequest
+
+	State handle_loadRequest{
+		onMsg( load_request : load(PID) ) {
+	    [#
+	        PID = payloadArg(0).toInt()
+	        CommUtils.outgreen("cargoservice | ricevuta richiesta di carico per PID:" + PID)
+	    #]
+	    request productservice -m getProduct : product($PID)
+	    }
+	}
+	Transition t1
+		whenEvent  alarm -> handlealarm
+      	whenReply getProductAnswer -> handle_productcontainer
+      	
+	State handle_productcontainer {
+    	onMsg( getProductAnswer : product(JSonString) ) {
+	        [#
+	            val jsonStr = payloadArg(0)
+	            
+	            if(jsonStr == "unknown") {
+	            	CommUtils.outred("cargoservice | PID_NOT_REGISTERED")
+	            	val Motivation = "PID_NOT_REGISTERED"
+            	 	#]
+	                replyTo load_request with load_refused : reason($Motivation)
+	                autodispatch refused : refused($Motivation)
+	                [#
+	            } else {
+	            	val obj = org.json.JSONObject(jsonStr)
+	                val Weight = obj.getInt("weight")
+		
+		            CommUtils.outgreen("cargoservice | trovato prodotto con peso:" + Weight)
+		            #]
+		            request requestvalidator -m validate_request : validate($PID, $Weight)
+	            	[#
+	            }
+	        #]
+    	}
+	}
+	Transition t2
+		whenEvent  alarm -> handlealarm
+	    whenReply validate_accepted -> handle_load_accepted
+	    whenReply validate_refused -> handle_load_refused
+	    whenMsg refused -> work
+	
+	State handle_load_refused{
+		onMsg( validate_refused : motivation(X) ) {
+			[#
+				val RESULT = payloadArg(0).toInt()
+				if(RESULT == -1) {
+	        		CommUtils.outred("cargoservice | MAX_LOAD_EXCEEDED")
+	        		val Motivation = "MAX_LOAD_EXCEEDED"
+	        	 	#]
+	                replyTo load_request with load_refused : reason($Motivation)
+	                [#
+	        	} else {
+	        		if(RESULT == -2) {
+	        			CommUtils.outred("cargoservice | NO_FREE_SLOTS")
+	        			val Motivation = "NO_FREE_SLOTS"
+	            	 	#]
+		                replyTo load_request with load_refused : reason($Motivation)
+		                [#
+	            	}
+	        	}
+			#]	
+		}
+	}
+	Goto work
+	
+	State handle_load_accepted{
+		onMsg( validate_accepted : slot(SlotID) ) {
+		[#
+			SlotId = payloadArg(0).toInt()
+		    CommUtils.outgreen("cargoservice | product container associato allo Slot n." + SlotId)
+        #]
+            replyTo load_request with load_accepted : slot($SlotId)
+        [#
+            CommUtils.outgreen("cargoservice | richiesta di carico accettata: in attesa che il product container arrivi all'IOPort")
+        #]	
+		}
+    }
+    Transition t3
+    	whenEvent  alarm -> handlealarm_ioport
+	    whenMsg containerAtIOPort -> handle_container
+	    
+	State handle_container {
+		[#
+		CommUtils.outgreen("cargoservice | invio richiesta a cargorobot di trasportare il product container PID: "+ PID +" allo Slot n."+ SlotId)
+		#]
+		request cargorobot -m transport : transport($SlotId)
+	}
+	Transition t4
+		whenEvent  alarm -> handlealarm
+	    whenReply robot_home -> work
+	    
+	
+	//HANDLE ALARM NEL CASO AVVENGA UNA SONAR FAILURE DURANTE L'ATTESA DI UNA RICHIESTA DI CARICO
+	State handlealarm_load_request {
+		forward led -m ledOn : ledOn(ok)
+		println("cargoservice | servizio interrotto") color red
+	}
+	Transition t5
+		whenEvent endalarm -> handleendalarm_load_request
+		
+	State handleendalarm_load_request {
+		forward led -m ledOff : ledOff(ok)
+	    println("cargoservice | servizio ripristinato") color green
+	}
+	Transition t6
+ 		whenEvent alarm -> handlealarm_load_request
+ 		whenRequest load_request -> handle_loadRequest
+	
+	//HANDLE ALARM
+	State handlealarm {
+		forward led -m ledOn : ledOn(ok)
+	    println("cargoservice | servizio interrotto") color red
+	}
+	Transition t7
+		whenEvent endalarm -> handleendalarm
+		
+	State handleendalarm {
+		forward led -m ledOff : ledOff(ok)
+	    println("cargoservice | servizio ripristinato") color green
+	}
+	Transition t8
+ 		whenEvent alarm -> handlealarm
+ 		whenReply getProductAnswer -> handle_productcontainer
+	    whenReply validate_accepted -> handle_load_accepted
+	    whenReply validate_refused -> handle_load_refused
+	    whenMsg refused -> work
+	    whenReply robot_home -> work
+	
+	//HANDLE ALARM NEL CASO CARGOSERVICE SIA IN ATTESA DEL PRODUCT CONTAINER ALL'IOPORT
+	State handlealarm_ioport {
+		forward led -m ledOn : ledOn(ok)
+	    println("cargoservice | servizio interrotto") color red
+	}
+	Transition t9
+		whenEvent endalarm -> handleendalarm_ioport
+		
+	State handleendalarm_ioport {
+		forward led -m ledOff : ledOff(ok)
+	    println("cargoservice | servizio ripristinato") color green
+	}
+	Transition t10
+ 		whenEvent alarm -> handlealarm_ioport
+	    whenMsg containerAtIOPort -> handle_container
+}
+
+
+QActor requestvalidator context ctxcargoservice withobj hold using "main.java.domain.Hold.getInstance()"{
+	
+	import "main.java.domain.*"
+	
+	State s0 initial {
+	}
+	Transition t0
+	whenRequest validate_request -> handle_validate
+	
+	State handle_validate {
+		onMsg( validate_request : validate(PID, Weight) ) {
+			
+			[#			
+		 val PID = payloadArg(0).toInt()
+		 val  weight = payloadArg(1).toInt()
+		 
+		 if( hold.getTotalWeight() + weight > hold.getMaxLoad() ) {
+		 	CommUtils.outcyan("requestvalidator | peso massimo interno alla stiva superato")
+		 	val RESULT = -1
+		 #]
+		 	replyTo validate_request with validate_refused : motivation($RESULT)
+		 [#
+		 } else {
+		 	var SlotID = -1
+        	
+        	for (slot in hold.getSlots()) {
+			    if (slot.productId == -1) {
+			        SlotID = slot.slotId
+			        break  // esce subito dal ciclo
+			    }
+			}
+        	
+        	if ( SlotID == -1 ) {
+        		CommUtils.outcyan("requestvalidator | slot non disponibile")
+        		val RESULT = -2
+		 	#]
+		 		replyTo validate_request with validate_refused : motivation($RESULT)
+		 	[#
+		 	} else {
+		 		CommUtils.outcyan("requestvalidator | controlli superati, richiesta accettata per il product container PID: "+ PID)
+		 		hold.addContainer(SlotID, PID, weight)
+		 		#]
+		 		replyTo validate_request with validate_accepted : slot($SlotID)
+		 		[#	
+		 	}
+		 }
+		 #]	
+		}
+	}
+	Goto s0
+}
+
+
+QActor cargorobot context ctxcargoservice {
+	[#
+		var X = 0
+ 		var Y = 0
+ 		var SlotId = -1
+ 		val slotX = intArrayOf(1, 4, 1, 4)
+ 		val slotY = intArrayOf(1, 1, 3, 3)
+ 	#]
+	State s0 initial{
+ 		delay 1000
+ 		println("cargorobot | start") color yellow
+ 	}
+  	Goto work
+  	
+  	State work {
+  		println("cargorobot | in attesa di ricevere richieste di movimento del robot da cargoservice") color yellow
+  	}
+  	Transition t0
+  		whenRequest transport -> go_ioport
+  	
+  	State go_ioport{
+  		onMsg( transport : transport(SlotID) ) {
+            [#
+            	SlotId = payloadArg(0).toInt()
+              	CommUtils.outyellow("cargorobot | ricevuta richiesta di carico allo Slot n."+ SlotId)
+            #]    
+        }
+ 		[#
+			X=0
+ 			Y=4
+ 		#]
+ 		println("cargorobot | invio richiesta di spostamento del robot alla posizione X=$X Y=$Y") color yellow
+ 		request moveexec -m move : move($X, $Y) 
+ 	}
+ 	Transition t1
+ 		whenReply movedone -> go_slot
+ 	
+ 	State go_slot{
+ 		[#
+			X = slotX[SlotId]
+ 			Y = slotY[SlotId]
+ 		#]
+ 		println("cargorobot | carico del product container dall'IOPort") color yellow
+ 		delay 4000
+ 		println("cargorobot | invio richiesta di spostamento del robot alla posizione X=$X Y=$Y") color yellow
+ 		request moveexec -m move : move($X, $Y) 
+ 	}
+ 	Transition t2
+ 		whenReply movedone -> go_home
+ 		
+ 	State go_home{
+ 		[#
+			X=0
+ 			Y=0
+ 		#]
+ 		println("cargorobot | scarico del product container all'Unload Position dello Slot n.$SlotId") color yellow
+ 		delay 4000
+ 		println("cargorobot | invio richiesta di spostamento del robot alla posizione X=$X Y=$Y") color yellow
+ 		request moveexec -m move : move($X, $Y) 
+ 	}
+ 	Transition t3
+ 		whenReply movedone -> robotAtHome
+ 	
+ 	State robotAtHome {
+ 		println("cargorobot | operazione completata, robot tornato alla HOME") color yellow
+ 		replyTo transport with robot_home : robot_home(ok)
+ 	}
+  	Goto work
+}
+
+QActor moveexec context ctxcargoservice {
+	[#
+		val Nome="moveexec"
+		val Step=340
+		var X=0
+		var Y=0
+	#]
+ 	State s0 initial {
+ 		println("moveexec | invio richiesta ingaggiamento con basicrobot") color yellow
+ 		request basicrobot -m engage : engage($Nome, $Step)
+ 	}
+ 	Transition t0
+ 		whenReply engagedone -> waitRequest
+ 		whenReply engagerefused -> engageerror
+ 	
+ 	State engageerror {
+ 		println("moveexec | richiesta di ingaggiamento con basicrobot rifiutata") color yellow
+ 		delay 5000
+ 	}
+ 	Goto s0
+ 	
+ 	State waitRequest {
+ 		println("moveexec | in attesa di ricevere richieste di spostamento da cargorobot") color yellow
+ 	}
+ 	Transition t1
+ 		whenEvent alarm -> handlealarm
+ 		whenRequest move -> work
+
+ 	State work {
+ 		onMsg( move : move(X, Y) ) {
+ 			[#
+ 				X = payloadArg(0).toInt()
+ 				Y = payloadArg(1).toInt()
+ 			#]
+ 			println("moveexec | ricevuta richiesta di muovere il robot alla posizione X=$X Y=$Y") color yellow
+ 		
+ 			request basicrobot -m moverobot : moverobot($X, $Y)
+ 		}  
+ 	}
+ 	Transition t2
+ 		whenEvent alarm -> handlealarm
+ 		whenReply moverobotdone -> movedone
+ 		whenReply moverobotfailed -> movefailed
+ 	
+ 	State movedone{
+ 		println("moveexec | robot mosso alla posizione X=$X Y=$Y") color yellow
+ 		replyTo move with movedone : movedone(ok)
+ 	}
+ 	Goto waitRequest
+ 		
+ 	State movefailed {
+ 		onMsg(moverobotfailed : moverobotfailed(PLANDONE, PLANTODO)){
+ 			[#
+ 				val Plan=payloadArg(1)	
+ 			#]
+ 				
+ 			println("moveexec | piano da eseguire: ${Plan} ") color yellow
+ 			println("moveexec | richiesta di muovere il robot alla posizione X=$X Y=$Y") color yellow
+			request basicrobot -m moverobot : moverobot($X, $Y)
+ 		}
+ 	}
+ 	Transition t3
+ 		whenEvent alarm -> handlealarm
+ 		whenReply moverobotdone -> movedone
+ 		whenReply moverobotfailed -> movefailed
+ 	
+ 	State handlealarm {
+		println("moveexec | rilevata sonar failure, interruzione dello spostamento") color yellow
+	}
+	Transition t4
+		whenEvent endalarm -> handleendalarm
+		
+	State handleendalarm {
+	   println("moveexec | fine della sonar failure, spostamento ripreso") color yellow
+	}
+	Transition t5
+ 		whenEvent alarm -> handlealarm
+ 		whenRequest move -> work
+ 		whenReply moverobotdone -> movedone
+ 		whenReply moverobotfailed -> movefailed
+ } 
+  
+//QActor sonarmock context ctxcargoservice {
+//	State s0 initial{
+//		delay 5000
+////		println("$name| rilevata sonar failure") color blue
+////		emit alarm : alarm(failure)
+////		delay 2000
+////		println("$name| sonar failure terminata") color blue
+////		emit alarm : alarm(ok)
+////		delay 1000
+//		println("$name| rilevato product container all'IOPort") color blue
+//		forward cargoservice -m containerAtIOPort : containerAtIOPort(ok)
+//		delay 5000
+//		println("$name| rilevata sonar failure") color blue
+//		emit alarm : alarm(failure)
+//		delay 2000
+//		println("$name| sonar failure terminata") color blue
+//		emit alarm : alarm(ok)
+//    }
+//}

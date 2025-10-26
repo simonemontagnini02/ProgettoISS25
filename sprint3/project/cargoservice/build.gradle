@@ -1,0 +1,152 @@
+/*
+================================================================================
+build.gradle
+================================================================================
+*/
+plugins {
+    id 'application'
+    id 'java'
+    id 'eclipse'
+    id "org.jetbrains.kotlin.jvm" version "1.9.22"
+    id 'org.springframework.boot' version '2.7.16'
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+}
+
+version '1.0'
+
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+}
+
+kotlin {
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
+repositories {
+    mavenCentral()
+    flatDir { dirs '../unibolibs' }
+}
+
+dependencies {
+    implementation platform('org.jetbrains.kotlin:kotlin-bom')
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+    implementation 'com.google.guava:guava:30.1.1-jre'
+
+    // Coroutines
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinVersion"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:$kotlinVersion"
+
+    // WebSocket / HTTP
+    implementation 'org.java-websocket:Java-WebSocket:1.6.0'
+    implementation 'org.apache.httpcomponents:httpclient:4.5.13'
+
+    // MQTT
+    implementation 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5'
+
+    // JSON
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+    implementation 'org.json:json:20180130'
+
+    // CoAP
+    implementation 'org.eclipse.californium:californium-core:3.5.0'
+    implementation 'org.eclipse.californium:californium-proxy2:3.5.0'
+
+    // OkHttp
+    implementation 'com.squareup.okhttp3:okhttp:4.9.3'
+    testImplementation 'com.squareup.okhttp3:mockwebserver:4.9.3'
+
+    // Logging
+    implementation 'net.logstash.logback:logstash-logback-encoder:7.3'
+    implementation 'ch.qos.logback:logback-classic:1.2.11'
+
+    // Eureka / Jersey
+    implementation 'com.netflix.eureka:eureka-client:1.10.18'
+    implementation 'com.sun.jersey:jersey-client:1.19.1'
+    implementation 'com.netflix.servo:servo-core:0.13.2'
+
+    // Commons IO
+    implementation 'commons-io:commons-io:2.11.0'
+
+    // AIMA
+    implementation name: 'unibo.planner23-1.0'
+    implementation 'com.googlecode.aima-java:aima-core:3.0.0'
+
+    // UNIBO
+    implementation name: 'uniboInterfaces'
+    implementation name: '2p301'
+    implementation name: 'unibo.qakactor23-5.0'
+    implementation name: 'unibo.basicomm23-1.0'
+
+    // MongoDB (driver completo)
+    implementation 'org.mongodb:bson:4.11.1'
+	implementation 'org.mongodb:mongodb-driver-core:4.11.1'
+	implementation 'org.mongodb:mongodb-driver-sync:4.11.1'
+
+    // Test
+    testImplementation 'org.jetbrains.kotlin:kotlin-test'
+    testImplementation 'org.jetbrains.kotlin:kotlin-test-junit'
+}
+
+sourceSets {
+    main.java.srcDirs += 'src'
+    main.java.srcDirs += 'src/main/java'
+    main.java.srcDirs += 'src/main/kotlin'
+    main.java.srcDirs += 'src/main/resources'
+    test.java.srcDirs += 'src/main/java/test'
+    test.java.srcDirs += 'src/main/kotlin/test'
+}
+
+eclipse {
+    classpath {
+        sourceSets -= [sourceSets.main, sourceSets.test]
+    }
+}
+
+application {
+    mainClass.set("it.unibo.ctxcargoservice.MainCtxcargoserviceKt")
+}
+
+// BootJar per Spring Boot, include file .pl e .json
+bootJar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from('./') {
+        include '*.pl'
+        include '*.json'
+    }
+    manifest {
+        attributes 'Main-Class': application.mainClass.get()
+    }
+}
+
+// Distribuzione personalizzata
+distributions {
+    main {
+        distributionBaseName = 'cargoservice'
+        contents {
+            from('./') {
+                include 'cargoservice.pl'
+                include 'sysRules.pl'
+                include 'facadeConfig.json'
+                exclude '**/*.jar'
+            }
+        }
+    }
+}
+
+// Task utility per debug
+task dovesiamo {
+    doLast {
+        println("projectDir= $projectDir")
+        println("buildDir  = $buildDir")
+    }
+}
+
+// Task alternativo per esecuzione
+task run0(type: JavaExec) {
+    group = "Execution"
+    description = "Run the main class with JavaExecTask"
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass.set(application.mainClass)
+}

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprint3</title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+
+    <h1>Sprint 3</h1>
+    <h2>Sprint 1</h2>
+    <div>Lo Sprint 1 è consultabile alla seguente pagina: <a href="../../../sprint1/docs/html/Sprint1_v1.html">Sprint
+            1</a></div>
+
+    <h2>Sprint 2</h2>
+    <div>Lo Sprint 2 è consultabile alla seguente pagina: <a href="../../../sprint2/docs/html/Sprint2_v1.html">Sprint
+            2</a></div>
+
+    <h2>Goal dello sprint</h2>
+    <div>
+        L’obiettivo di questo Sprint è realizzare le ultime funzionalità del sistema, implementando quindi
+        <strong>webgui</strong> e <strong>client</strong>. Il compito di webgui sarà quello di mostrare lo stato della
+        stiva tramite un'interfaccia web, mentre client sarà incaricato dell'invio delle richieste di registrazione di
+        prodotti e di carico.
+    </div>
+
+    <h2>Analisi del Problema</h2>
+    <div>
+
+        <h3>webgui</h3>
+
+
+        <h3>client</h3>
+        Il componente che interagisce con l’utente per raccogliere le informazioni relative alla registrazione di
+        prodotti o carichi può essere implementato come un Actor oppure come una classe Java.
+        Abbiamo scelto di realizzarlo come una classe Java, poiché l’utilizzo di un Actor non comporterebbe vantaggi
+        concreti in questo contesto.
+        Gli Actor risultano utili quando è necessario gestire comunicazioni asincrone o comportamenti reattivi; nel
+        nostro caso, tuttavia, il componente svolge semplicemente un’interazione sincrona con l’utente e l’invio di
+        richieste agli altri componenti, per cui una soluzione più semplice risulta adeguata. Questa classe funge
+        dunque da entry point del sistema: raccoglie i dati inseriti dall'utente e li trasmette ai servizi cargoservice
+        e productservice, senza richiedere autonomia nè reattività proprie di un Actor.
+        </br>
+        La comunicazione con i due attori verrà realizzata come segue:
+        <ul>
+            <li>
+                <strong>Comunicazione con cargoservice</strong>: viene prevista una <span class="messaggi">Request
+                    load_request : load(PID)</span>,
+                con l'utente che dovrà comunicare a client il PID del prodotto che si vuole caricare all'interno della
+                Hold. I possibili esiti di questa richiesta sono due:
+                <ul>
+                    <li>
+                        <strong>Richiesta accettata</strong>: l'attore risponde con una <span class="messaggi">Reply
+                            load_accepted : slot(SlotID)</span> contenente lo SlotId associato al prodotto caricato
+                    </li>
+                    <li>
+                        <strong>Richiesta rifiutata</strong>: l'attore risponde con una <span class="messaggi">Reply
+                            load_refused : reason(Motivation)</span>, avente come payload il motivo del rifiuto
+                    </li>
+                </ul>
+            </li>
+
+            <li>
+                <strong>Comunicazione con productservice</strong>: viene prevista una <span class="messaggi">Request
+                    createProduct : product(String)</span>,
+                con l'utente che dovrà specificare productId, nome e peso del prodotto che si vuole registrare. I
+                possibili esiti di questa richiesta sono due:
+                <ul>
+                    <li>
+                        <strong>Richiesta accettata</strong>: l'attore risponde con una <span class="messaggi">Reply
+                            createdProduct : productid(ID)</span> contenente il PID associato al prodotto registrato
+                    </li>
+                    <li>
+                        <strong>Richiesta rifiutata</strong>: l'attore risponde con una <span class="messaggi">Reply
+                            createdProduct : productid(ID)</span> contenente un PID nullo, ad indicare il rifiuto della
+                        richiesta
+                    </li>
+                </ul>
+            </li>
+        </ul>
+
+    </div>
+
+</body>
+
+</html>

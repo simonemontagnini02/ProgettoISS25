@@ -1,0 +1,163 @@
+System sonarled
+
+//Sonardevice
+Dispatch sonardata : distance(D)
+
+//Comunicazione con contesto cargoservice
+Dispatch containerAtIOPort : containerAtIOPort(X)
+Event alarm : alarm(X)
+Event endalarm : endalarm(X)
+
+//Led
+Dispatch ledOn : ledOn(X)
+Dispatch ledOff : ledOff(X)
+
+//Autodispatch
+Dispatch sonar_normal : sonar_normal(X)
+Dispatch sonar_failure : sonar_failure(X)
+
+Context ctxiodevices ip [ host="localhost" port=8180]
+ 
+//CARGOSERVICE
+Context ctxcargoservice ip [ host="192.168.137.1" port=8110]
+
+//BASICROBOT
+Context ctxbasicrobot  ip [ host= "192.168.137.1" port=8020]
+
+ExternalQActor cargoservice context ctxcargoservice
+
+QActor sonar context ctxiodevices {
+    [#
+    var counter = 0
+    var counterIO = 0
+    val DFREE = 50
+    #]
+    
+	State s0 initial {
+    }
+    Transition t0
+	    whenMsg sonardata -> normal
+    
+    State normal {
+		onMsg( sonardata : distance(D) ) {
+            [#
+                val D = payloadArg(0).toInt()
+                if(D > DFREE){
+                    counter++
+                    if(counter >= 3) {
+                    	CommUtils.outred("sonar | rilevata sonar failure")
+                        #]
+                        emit alarm : alarm(failure)
+		                autodispatch sonar_failure : sonar_failure(ok)
+		                [#
+                    }
+                } else {
+                	if(D < DFREE/2)
+                    {
+                    	counterIO++
+                    	if(counterIO == 3) {
+	                    	CommUtils.outgreen("sonar | rilevata presenza di un container all'IOPort")
+	                        #]
+	                        forward cargoservice -m containerAtIOPort : containerAtIOPort(ok)
+			                [#
+                    	}
+                    } else {
+                    	counter = 0
+                    	counterIO = 0
+                    }
+                }
+            #]
+        }
+    }
+    Transition t1
+	    whenMsg sonardata -> normal
+	    whenMsg sonar_failure -> failure
+	
+	State failure {
+		onMsg( sonardata : distance(D) ) {
+            [#
+                val D = payloadArg(0).toInt()
+                if(D <= DFREE){
+                	CommUtils.outred("sonar | sonar failure terminata")
+                	counter = 0
+                	
+                	if(D < DFREE/2) {
+            			counterIO = 1
+                	}
+                    #]
+                    emit endalarm : endalarm(ok)
+	                autodispatch sonar_normal : sonar_normal(ok)
+	                [#
+                }
+            #]
+        }
+	}
+	Transition t2
+	    whenMsg sonardata -> failure
+	    whenMsg sonar_normal -> normal
+}
+
+QActor led context ctxiodevices {
+	State s0 initial {
+    }
+    Transition t0
+	    whenMsg ledOn -> ledon
+	    whenMsg ledOff -> ledoff
+    
+    State ledon {
+		[#
+			CommUtils.outred("led | rilevata sonar failure")
+            machineExec("python ledOn.py")
+		#]
+    } 
+    Goto s0
+    
+    State ledoff {
+		[#
+			CommUtils.outred("led | sonar failure terminata")
+            machineExec("python ledOff.py")
+		#]
+    }
+    Goto s0
+}
+
+QActor sonardevice context ctxiodevices{
+[# 
+	lateinit var reader : java.io.BufferedReader
+    lateinit var p : Process	
+    var Distance = 0
+#]	
+	State s0 initial{
+		println("$name | start") 
+	 	[#
+			p       = Runtime.getRuntime().exec("python sonar.py")
+			reader  = java.io.BufferedReader(  java.io.InputStreamReader(p.getInputStream() ))	
+		#]		
+	}
+	Goto readSonarData
+	
+	State readSonarData{
+	[# 
+		var data = reader.readLine()
+		//CommUtils.outyellow("$name with python: data = $data"   ) 
+		if( data != null ){
+		try{ 
+			val vd = data.toFloat()
+			val v  = vd.toInt()
+			if( v <= 100 ){	//A first filter ...
+				Distance = v				
+			}else Distance = 0
+		}catch(e: Exception){
+			CommUtils.outred("$name readSonarDataERROR: $e "   )
+		}
+		}//if
+		
+	#]	
+		if [# Distance > 0 #] { 
+		    println("$name with python: data = $data"   ) color yellow
+			forward sonar -m sonardata : distance($Distance)			 
+		}
+	}
+	Goto readSonarData
+}
+ 

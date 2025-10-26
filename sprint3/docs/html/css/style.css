@@ -1,0 +1,170 @@
+/* Reset base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #f5f7fa;
+    color: #333;
+    line-height: 1.6;
+    padding: 20px;
+}
+
+/* Titolo principale */
+h1 {
+    font-size: 2.5em;
+    text-align: center;
+    margin-bottom: 30px;
+    color: #2c3e50;
+    border-bottom: 3px solid #2980b9;
+    padding-bottom: 10px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Immagine */
+img {
+    display: block;
+    margin: 0 auto 40px auto;
+    max-width: 100%;
+    height: auto;
+}
+
+/* Sezioni */
+h2 {
+    font-size: 1.8em;
+    color: #2980b9;
+    margin-bottom: 10px;
+    margin-top: 30px;
+    border-left: 6px solid #2980b9;
+    padding-left: 10px;
+    background-color: #ecf0f1;
+    padding: 8px 12px;
+    border-radius: 4px;
+}
+
+h3 {
+    font-size: 1.4em;
+    color: #3498db;
+    margin-bottom: 8px;
+    margin-top: 20px;
+    border-left: 4px solid #3498db;
+    padding-left: 8px;
+    background-color: #f5f7f8;
+    padding: 6px 10px;
+    border-radius: 3px;
+}
+
+/* Link */
+a {
+    color: #2980b9;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease, text-decoration 0.3s ease;
+}
+
+a:hover {
+    color: #1c5980;
+    text-decoration: underline;
+}
+
+a:visited {
+    color: #6c5ce7;
+}
+
+
+/* Testo nei div */
+div {
+    background-color: #ffffff;
+    padding: 15px 20px;
+    border: 1px solid #dcdde1;
+    border-radius: 5px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+}
+
+/* Liste puntate */
+ul {
+    margin-top: 6px;
+    margin-bottom: 6px;
+    padding-left: 25px;
+}
+
+ul.morespace > li{
+
+  margin-bottom: 15px;
+
+}
+
+ol {
+    margin-bottom: 6px;
+    padding-left: 25px;
+}
+
+li{
+    margin-bottom: 4px;
+}
+
+.cerchio{
+
+    list-style-type: disc;
+}
+
+/* Tabelle */
+table {
+    font-size: 15px;
+    width: 90%;
+    border-collapse: collapse;
+    margin:auto;
+    margin-bottom: 30px;
+    background-color: #ffffff;
+    border: 2px solid #2980b9;
+    overflow: hidden;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+
+thead {
+    background-color: #2980b9;
+    text-align: left;
+}
+
+
+th, td {
+    padding: 12px 15px;
+    border: 2px solid #2980b9;
+}
+
+
+@media (max-width: 600px) {
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}
+
+
+span.messaggi{
+
+    background-color: lightblue;
+
+}
+
+
+/* Responsive */
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    h2 {
+        font-size: 1.5em;
+    }
+}
