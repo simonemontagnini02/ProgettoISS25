@@ -31,11 +31,54 @@
     <div>
 
         <h3>webgui</h3>
-
+        La webgui ha il compito di fornire una visualizzazione dello stato della Hold. Non interviene nei processi di
+        controllo o gestione del carico, ma ha funzione puramente osservativa, offrendo un'interfaccia utente di sola
+        lettura aggiornata in tempo reale.
+        Il componente che si occupa comunicare le informazioni relative allo stato della Hold alla gui, può essere
+        modellato nei seguenti modi:
+        <ul>
+            <li>
+                <strong>Modellazione dipendente da cargoservice</strong>: questa soluzione prevede tre differenti
+                varianti di modellazione:
+                <ul>
+                    <li>
+                        <strong>Modellazione interna all'attore cargoservice</strong>: in questo approccio sarebbe
+                        cargoservice stesso che, alla
+                        corretta registrazione del product container all'interno di uno Slot, si occupa di notificare
+                        alla gui il nuovo stato aggiornato della Hold.
+                    </li>
+                    <li>
+                        <strong>Modellazione interna alla classe Hold</strong>: in questa variante verrebbe introdotto
+                        un nuovo metodo
+                        all'interno della classe Hold, incaricato di comunicare alla gui ogni aggiornamento di stato.
+                        Tale metodo verrebbe invocato al momento opportuno da cargoservice.
+                    </li>
+                    <li>
+                        <strong>Modellazione di un POJO separato</strong>: in questo caso la comunicazione con la gui
+                        verrebbe gestita da un componente dedicato (un POJO separato), così da mantenere una chiara
+                        distinzione delle responsabilità tra i diversi elementi del sistema.
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <strong>Utilizzo di un attore separato</strong>: in questa soluzione la responsabilità della
+                comunicazione
+                con la pagina verrebbe separata da cargoservice, introducendo un nuovo attore dedicato. Sarebbe così
+                possibile garantire disaccoppiamento completo tra logica applicativa e interfaccia utente, facilitando
+                anche la scalabilità del sistema in quanto sarebbe possibile aggiungere più interfacce di
+                visualizzazione senza modificare cargoservice. Infine, questa scelta permetterebbe di rispettare il
+                Single Responsibility Principle e diminuendo le responsabilità di cargoservice.
+            </li>
+        </ul>
+        Tra le alternative discusse, abbiamo scelto la modellazione di un attore separato poichè assicura una <strong>netta
+        indipendenza tra componenti</strong>, lasciando a cargoservice il compito di gestire soltanto le richieste di carico.
+        In questo modo è anche possibile migliorare la <strong>manutenibilità</strong> e <strong>testabilità</strong> dei componenti, dato che l'attore
+        dedicato può essere testato e sostituito indipendentemente dagli altri componenti.
+        </br>
 
         <h3>client</h3>
         Il componente che interagisce con l’utente per raccogliere le informazioni relative alla registrazione di
-        prodotti o carichi può essere implementato come un Actor oppure come una classe Java.
+        prodotti o carichi può essere modellato come un Actor oppure come una classe Java.
         Abbiamo scelto di realizzarlo come una classe Java, poiché l’utilizzo di un Actor non comporterebbe vantaggi
         concreti in questo contesto.
         Gli Actor risultano utili quando è necessario gestire comunicazioni asincrone o comportamenti reattivi; nel
