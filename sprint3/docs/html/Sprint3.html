@@ -70,11 +70,74 @@
                 Single Responsibility Principle e diminuendo le responsabilità di cargoservice.
             </li>
         </ul>
-        Tra le alternative discusse, abbiamo scelto la modellazione di un attore separato poichè assicura una <strong>netta
-        indipendenza tra componenti</strong>, lasciando a cargoservice il compito di gestire soltanto le richieste di carico.
-        In questo modo è anche possibile migliorare la <strong>manutenibilità</strong> e <strong>testabilità</strong> dei componenti, dato che l'attore
-        dedicato può essere testato e sostituito indipendentemente dagli altri componenti.
+        Tra le alternative discusse, abbiamo scelto la modellazione di un attore separato denominato
+        <strong>webgui</strong>.
+        Queta scelta assicura una <strong>netta
+            indipendenza tra componenti</strong>, delegando a cargoservice il compito di gestire le richieste
+        di carico, senza introdurre logiche legate alla presentazione.
+        L'introduzione di un attore dedicato migliorara inoltre la <strong>manutenibilità</strong> e la
+        <strong>testabilità</strong>
+        del sistema, poichè webgui
+        può essere testato e sostituito indipendentemente dagli altri componenti.
         </br>
+        La comunicazione tra cargoservice e webgui avviene tramite un <span class="messaggi">Dispatch updategui :
+            updategui(PID, SlotID, weight)</span>. Si tratta di un'interazione asincrona di tipo "fire-and-forget", che
+        consente di avere un
+        disaccoppiamento maggiore tra la gestione della logica applicativa e la componente di visualizzazione.
+        </br></br>
+
+        La comunicazione con la pagina web potrebbe avvenire direttamente dal componente logico, tuttavia, per garantire
+        una maggiore separazione delle responsabilità, si è ritenuto opportuno introdurre un componente intermedio
+        denominato <strong>WebGuiController</strong>.
+        Questo POJO separato non necessita di conoscere i dettagli implementativi della pagina, ma si limita a inviare
+        dati strutturati in un formato concordato.
+        In tal modo, WebGuiController diventa l’unico responsabile della comunicazione verso la GUI, consentendo di
+        mantenere il resto del sistema indipendente dai meccanismi di visualizzazione.
+        I principali vantaggi di questo approccio sono il <strong>massimo disaccoppiamento</strong> tra logica e
+        presentazione, una
+        <strong>maggiore testabilità</strong> dei singoli componenti e una superiore <strong>flessibilità</strong> nella
+        futura evoluzione
+        dell’interfaccia.
+
+        </br>
+
+        Per la comunicazione tra webgui e WebGuiMqtt sono state prese in considerazione tre possibili
+        alternative:
+        </p>
+        <ul>
+            <li>
+                <strong>Comunicazione tramite TCP</strong>: questa soluzione prevede l’instaurazione di una connessione
+                diretta tra i due componenti.
+                Offre <strong>bassa latenza</strong> e un controllo preciso sulla trasmissione dei dati, ma comporta una
+                <strong>maggiore complessità gestionale</strong> e un forte accoppiamento tra i nodi. Inoltre, non è
+                facilmente scalabile in un’architettura distribuita
+            </li>
+            <li>
+                <strong>Comunicazione tramite CoAP</strong>: è un protocollo leggero basato su UDP, progettato per
+                sistemi distribuiti con risorse limitate.
+                Offre un <strong>basso overhead</strong> e supporta in modo nativo <strong>interazioni
+                    asincrone</strong>. Tuttavia, richiede una gestione più
+                complessa della consegna dei messaggi,
+                poiché non garantisce i livelli di Quality of Service forniti da MQTT, rendendo necessario
+                implementare meccanismi aggiuntivi
+                per assicurare l’affidabilità della comunicazione.
+            </li>
+            <li>
+                <strong>Comunicazione tramite MQTT</strong>: in questo approccio webgui pubblica messaggi su un
+                <strong>topic dedicato</strong>,
+                mentre WebGuiMqtt li riceve come sottoscrittore. Questo garantisce un elevato livello di
+                <strong>disaccoppiamento</strong>, un modello di comunicazione asincrono e la
+                possibilità di
+                distribuire facilmente i componenti su nodi distinti. L’unico svantaggio è un leggero
+                incremento della latenza dovuto al passaggio attraverso il broker.
+            </li>
+        </ul>
+        <p>
+            Tra le alternative considerate, abbiamo scelto di utilizzare <strong>MQTT</strong> come meccanismo di
+            comunicazione tra i due componenti
+            poiché garantisce una comunicazione flessibile e scalabile, facilmente estendibile anche a nuovi nodi distribuiti
+            senza modifiche significative a livello di architettura.
+
 
         <h3>client</h3>
         Il componente che interagisce con l’utente per raccogliere le informazioni relative alla registrazione di
