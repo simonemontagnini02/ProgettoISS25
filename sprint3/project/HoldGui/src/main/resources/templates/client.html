@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestione Prodotti</title>
+    <link rel="stylesheet" href="clientStyle.css">
+    <script src="client.js"></script>
+</head>
+<body>
+
+    <h1>Gestione Prodotti</h1>
+
+    <div class="container">
+
+        <!-- Registrazione prodotto -->
+        <div class="card">
+            <h2>Registrazione Prodotto</h2>
+
+            <label for="pid">PID:</label>
+            <input type="text" id="pid" name="pid" required>
+
+            <label for="peso">Peso:</label>
+            <input type="number" id="peso" name="peso" min="1" required>
+
+            <label for="nome">Nome:</label>
+            <input type="text" id="nome" name="nome" required>
+
+            <button id="registerBtn" onclick="onRegisterClick(event)">Registra</button>
+            <div id="registerError" class="error"></div>
+        </div>
+
+        <!-- Richiesta di carico -->
+        <div class="card">
+            <h2>Richiesta di Carico</h2>
+
+            <label for="pidLoad">PID:</label>
+            <input type="text" id="pidLoad" name="pidLoad" required>
+
+            <button id="loadBtn" onclick="onLoadClick(event)">Richiedi</button>
+        </div>
+
+    </div>
+
+    <div id="output">
+        <h3>Output richieste</h3>
+        <div id="result"></div>
+    </div>
+
+</body>
+</html>

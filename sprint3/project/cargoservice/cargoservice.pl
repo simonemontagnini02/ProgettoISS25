@@ -16,6 +16,7 @@ event( alarm, alarm(X) ).
 event( endalarm, endalarm(X) ).
 dispatch( ledOn, ledOn(X) ).
 dispatch( ledOff, ledOff(X) ).
+dispatch( updategui, updategui(PID,SlotID,weight) ).
 dispatch( refused, refused(X) ).
 request( transport, transport(SlotID) ).
 reply( robot_home, robot_home(X) ).  %%for transport
@@ -32,11 +33,11 @@ context(ctxcargoservice, "localhost",  "TCP", "8110").
 context(ctxbasicrobot, "127.0.0.1",  "TCP", "8020").
 context(ctxproductservice, "127.0.0.1",  "TCP", "8111").
 context(ctxiodevices, "192.168.137.2",  "TCP", "8180").
+context(ctxwebgui, "127.0.0.1",  "TCP", "8169").
  qactor( productservice, ctxproductservice, "external").
   qactor( basicrobot, ctxbasicrobot, "external").
   qactor( led, ctxiodevices, "external").
-  qactor( clientmock, ctxcargoservice, "it.unibo.clientmock.Clientmock").
- static(clientmock).
+  qactor( webgui, ctxwebgui, "external").
   qactor( cargoservice, ctxcargoservice, "it.unibo.cargoservice.Cargoservice").
  static(cargoservice).
   qactor( requestvalidator, ctxcargoservice, "it.unibo.requestvalidator.Requestvalidator").

@@ -39,7 +39,7 @@ class Requestvalidator ( name: String, scope: CoroutineScope, isconfined: Boolea
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t028",targetState="handle_validate",cond=whenRequest("validate_request"))
+					 transition(edgeName="t025",targetState="handle_validate",cond=whenRequest("validate_request"))
 				}	 
 				state("handle_validate") { //this:State
 					action { //it:State

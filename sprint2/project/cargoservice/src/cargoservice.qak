@@ -115,6 +115,7 @@ QActor cargoservice context ctxcargoservice {
 		[#
 		var PID = -1
 		var SlotId = -1
+		var Weight = -1
 		#]
 		
 	State s0 initial {
@@ -147,8 +148,9 @@ QActor cargoservice context ctxcargoservice {
     	onMsg( getProductAnswer : product(JSonString) ) {
 	        [#
 	            val jsonStr = payloadArg(0)
-	            
-	            if(jsonStr == "unknown") {
+	            val obj = org.json.JSONObject(jsonStr)
+
+	            if(obj.getString("name").equals("wrong")) {
 	            	CommUtils.outred("cargoservice | PID_NOT_REGISTERED")
 	            	val Motivation = "PID_NOT_REGISTERED"
             	 	#]
@@ -156,8 +158,8 @@ QActor cargoservice context ctxcargoservice {
 	                autodispatch refused : refused($Motivation)
 	                [#
 	            } else {
-	            	val obj = org.json.JSONObject(jsonStr)
-	                val Weight = obj.getInt("weight")
+	            	
+	                Weight = obj.getInt("weight")
 		
 		            CommUtils.outgreen("cargoservice | trovato prodotto con peso:" + Weight)
 		            #]

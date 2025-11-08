@@ -1,0 +1,12 @@
+body { font-family: Arial, sans-serif; padding: 20px; }
+.slot {
+  border: 2px solid #333;
+  padding: 15px;
+  border-radius: 10px;
+  width: 200px;
+  margin-bottom: 10px;
+}
+.occupied { background-color: #f5b5b5; }
+.free { background-color: #b5f5c6; }
+label { display: block; margin-top: 5px; }
+strong { display: inline-block; margin-right: 6px; }

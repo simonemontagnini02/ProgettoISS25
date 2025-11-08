@@ -44,8 +44,8 @@ class Moveexec ( name: String, scope: CoroutineScope, isconfined: Boolean=false,
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t033",targetState="waitRequest",cond=whenReply("engagedone"))
-					transition(edgeName="t034",targetState="engageerror",cond=whenReply("engagerefused"))
+					 transition(edgeName="t030",targetState="waitRequest",cond=whenReply("engagedone"))
+					transition(edgeName="t031",targetState="engageerror",cond=whenReply("engagerefused"))
 				}	 
 				state("engageerror") { //this:State
 					action { //it:State
@@ -66,8 +66,8 @@ class Moveexec ( name: String, scope: CoroutineScope, isconfined: Boolean=false,
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t135",targetState="handlealarm",cond=whenEvent("alarm"))
-					transition(edgeName="t136",targetState="work",cond=whenRequest("move"))
+					 transition(edgeName="t132",targetState="handlealarm",cond=whenEvent("alarm"))
+					transition(edgeName="t133",targetState="work",cond=whenRequest("move"))
 				}	 
 				state("work") { //this:State
 					action { //it:State
@@ -84,9 +84,9 @@ class Moveexec ( name: String, scope: CoroutineScope, isconfined: Boolean=false,
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t237",targetState="handlealarm",cond=whenEvent("alarm"))
-					transition(edgeName="t238",targetState="movedone",cond=whenReply("moverobotdone"))
-					transition(edgeName="t239",targetState="movefailed",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t234",targetState="handlealarm",cond=whenEvent("alarm"))
+					transition(edgeName="t235",targetState="movedone",cond=whenReply("moverobotdone"))
+					transition(edgeName="t236",targetState="movefailed",cond=whenReply("moverobotfailed"))
 				}	 
 				state("movedone") { //this:State
 					action { //it:State
@@ -114,9 +114,9 @@ class Moveexec ( name: String, scope: CoroutineScope, isconfined: Boolean=false,
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t340",targetState="handlealarm",cond=whenEvent("alarm"))
-					transition(edgeName="t341",targetState="movedone",cond=whenReply("moverobotdone"))
-					transition(edgeName="t342",targetState="movefailed",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t337",targetState="handlealarm",cond=whenEvent("alarm"))
+					transition(edgeName="t338",targetState="movedone",cond=whenReply("moverobotdone"))
+					transition(edgeName="t339",targetState="movefailed",cond=whenReply("moverobotfailed"))
 				}	 
 				state("handlealarm") { //this:State
 					action { //it:State
@@ -126,7 +126,7 @@ class Moveexec ( name: String, scope: CoroutineScope, isconfined: Boolean=false,
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t443",targetState="handleendalarm",cond=whenEvent("endalarm"))
+					 transition(edgeName="t440",targetState="handleendalarm",cond=whenEvent("endalarm"))
 				}	 
 				state("handleendalarm") { //this:State
 					action { //it:State
@@ -136,10 +136,10 @@ class Moveexec ( name: String, scope: CoroutineScope, isconfined: Boolean=false,
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t544",targetState="handlealarm",cond=whenEvent("alarm"))
-					transition(edgeName="t545",targetState="work",cond=whenRequest("move"))
-					transition(edgeName="t546",targetState="movedone",cond=whenReply("moverobotdone"))
-					transition(edgeName="t547",targetState="movefailed",cond=whenReply("moverobotfailed"))
+					 transition(edgeName="t541",targetState="handlealarm",cond=whenEvent("alarm"))
+					transition(edgeName="t542",targetState="work",cond=whenRequest("move"))
+					transition(edgeName="t543",targetState="movedone",cond=whenReply("moverobotdone"))
+					transition(edgeName="t544",targetState="movefailed",cond=whenReply("moverobotfailed"))
 				}	 
 			}
 		}

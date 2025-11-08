@@ -55,7 +55,7 @@ class Cargorobot ( name: String, scope: CoroutineScope, isconfined: Boolean=fals
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t029",targetState="go_ioport",cond=whenRequest("transport"))
+					 transition(edgeName="t026",targetState="go_ioport",cond=whenRequest("transport"))
 				}	 
 				state("go_ioport") { //this:State
 					action { //it:State
@@ -75,7 +75,7 @@ class Cargorobot ( name: String, scope: CoroutineScope, isconfined: Boolean=fals
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t130",targetState="go_slot",cond=whenReply("movedone"))
+					 transition(edgeName="t127",targetState="go_slot",cond=whenReply("movedone"))
 				}	 
 				state("go_slot") { //this:State
 					action { //it:State
@@ -91,7 +91,7 @@ class Cargorobot ( name: String, scope: CoroutineScope, isconfined: Boolean=fals
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t231",targetState="go_home",cond=whenReply("movedone"))
+					 transition(edgeName="t228",targetState="go_home",cond=whenReply("movedone"))
 				}	 
 				state("go_home") { //this:State
 					action { //it:State
@@ -107,7 +107,7 @@ class Cargorobot ( name: String, scope: CoroutineScope, isconfined: Boolean=fals
 					//After Lenzi Aug2002
 					sysaction { //it:State
 					}	 	 
-					 transition(edgeName="t332",targetState="robotAtHome",cond=whenReply("movedone"))
+					 transition(edgeName="t329",targetState="robotAtHome",cond=whenReply("movedone"))
 				}	 
 				state("robotAtHome") { //this:State
 					action { //it:State

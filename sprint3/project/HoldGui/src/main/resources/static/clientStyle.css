@@ -1,0 +1,115 @@
+/* Stile generale della pagina */
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background-color: #f4f6f8;
+    color: #333;
+    margin: 0;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Titolo principale */
+h1 {
+    color: #222;
+    margin-bottom: 40px;
+}
+
+/* Contenitore delle card */
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 40px;
+    width: 100%;
+    max-width: 900px;
+}
+
+/* Singola card */
+.card {
+    background-color: #fff;
+    border-radius: 14px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    padding: 25px;
+    width: 320px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+}
+
+/* Titolo della card */
+.card h2 {
+    font-size: 1.3em;
+    color: #0056b3;
+    margin-bottom: 15px;
+}
+
+/* Campi input */
+input[type="text"], 
+input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0 16px 0;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1em;
+    box-sizing: border-box;
+}
+
+input:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0,123,255,0.2);
+}
+
+/* Pulsanti */
+button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.2s ease;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Area output */
+#output {
+    margin-top: 40px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    width: 100%;
+    max-width: 700px;
+    min-height: 100px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+}
+
+#output h3 {
+    margin-top: 0;
+    color: #007bff;
+}
+
+/* Messaggi di errore */
+.error {
+    color: #c00;
+    font-size: 0.9em;
+    margin-top: -8px;
+    margin-bottom: 10px;
+}
+
+/* Messaggi di risultato */
+#result p {
+    margin: 5px 0;
+    font-size: 0.95em;
+}

@@ -27,6 +27,9 @@ Event endalarm : endalarm(X)
 Dispatch ledOn : ledOn(X)
 Dispatch ledOff : ledOff(X)
 
+//GUI
+Dispatch updategui : updategui(PID, SlotID, weight)
+
 //AUTODISPATCH
 //cargoservice
 Dispatch refused : refused(X)
@@ -58,63 +61,68 @@ Context ctxproductservice ip [ host="127.0.0.1" port=8111]
 
 //SONARLED   
 Context ctxiodevices ip [ host="192.168.137.2" port=8180]
+
+//WEBGUI
+Context ctxwebgui ip [ host= "127.0.0.1" port=8169 ] 
    
 ExternalQActor productservice context ctxproductservice
 ExternalQActor basicrobot context ctxbasicrobot
 ExternalQActor led context ctxiodevices
+ExternalQActor webgui context ctxwebgui
 
-QActor clientmock context ctxcargoservice {
-	[#
-		var PRODID=31
-		#]
-    State s0 initial {
-    	[#
-    	val PROD = "{'\"productId\":$PRODID,\"name\":\"p31\",\"weight\":200'}"
-    	#]
-    	println("clientmock | invio richiesta a productservice per prodotto p31") color blue
-		request productservice -m createProduct : product($PROD)
-    }
-    Transition t1
-    	whenReply createdProduct -> handle_createdProduct
-      	
-    State handle_createdProduct{
-    	onMsg( createdProduct : productid(ID) ) {
-        [#
-            val PIDC = payloadArg(0).toInt()
-            CommUtils.outblue("clientmock | prodotto registrato con PID: " + PIDC)
-        #]
-        request cargoservice -m load_request : load($PIDC)
-        }
-    }
-    Transition t2
-    	whenReply load_accepted -> handle_loadaccepted
-	    whenReply load_refused -> handle_loadrefused
-      	
-    State handle_loadaccepted{
-    	onMsg( load_accepted : slot(SlotID) ) {
-        [#
-            val ID = payloadArg(0)
-            CommUtils.outblue("clientmock | richiesta di carico accettata, product container associato allo Slot n." + ID)
-            PRODID=PRODID+1
-        #]
-        }
-    }
-    Goto s0
-      
-    State handle_loadrefused{
-    	onMsg( load_refused : reason(Motivation) ) {
-        [#
-            val res = payloadArg(0)
-            CommUtils.outblue("clientmock | richiesta di carico rifiutata, motivo: " + res)
-        #]
-        }
-    }
-}
+//QActor clientmock context ctxcargoservice {
+//	[#
+//		var PRODID=31
+//		#]
+//    State s0 initial {  
+//    	[#
+//    	val PROD = "{'\"productId\":$PRODID,\"name\":\"p31\",\"weight\":200'}"
+//    	#]
+//    	println("clientmock | invio richiesta a productservice per prodotto p31") color blue
+//		request productservice -m createProduct : product($PROD)
+//    }
+//    Transition t1
+//    	whenReply createdProduct -> handle_createdProduct
+//      	
+//    State handle_createdProduct{
+//    	onMsg( createdProduct : productid(ID) ) {
+//        [#
+//            val PIDC = payloadArg(0).toInt()
+//            CommUtils.outblue("clientmock | prodotto registrato con PID: " + PIDC)
+//        #]
+//        request cargoservice -m load_request : load($PIDC)
+//        }
+//    }
+//    Transition t2
+//    	whenReply load_accepted -> handle_loadaccepted
+//	    whenReply load_refused -> handle_loadrefused
+//      	
+//    State handle_loadaccepted{
+//    	onMsg( load_accepted : slot(SlotID) ) {
+//        [#
+//            val ID = payloadArg(0)
+//            CommUtils.outblue("clientmock | richiesta di carico accettata, product container associato allo Slot n." + ID)
+//            PRODID=PRODID+1
+//        #]
+//        }
+//    }
+//    Goto s0
+//      
+//    State handle_loadrefused{
+//    	onMsg( load_refused : reason(Motivation) ) {
+//        [#
+//            val res = payloadArg(0)
+//            CommUtils.outblue("clientmock | richiesta di carico rifiutata, motivo: " + res)
+//        #]
+//        }
+//    }
+//}
 
 QActor cargoservice context ctxcargoservice {
 		[#
 		var PID = -1
 		var SlotId = -1
+		var Weight = -1
 		#]
 		
 	State s0 initial {
@@ -147,8 +155,9 @@ QActor cargoservice context ctxcargoservice {
     	onMsg( getProductAnswer : product(JSonString) ) {
 	        [#
 	            val jsonStr = payloadArg(0)
-	            
-	            if(jsonStr == "unknown") {
+	            val obj = org.json.JSONObject(jsonStr)
+
+	            if(obj.getString("name").equals("wrong")) {
 	            	CommUtils.outred("cargoservice | PID_NOT_REGISTERED")
 	            	val Motivation = "PID_NOT_REGISTERED"
             	 	#]
@@ -156,8 +165,8 @@ QActor cargoservice context ctxcargoservice {
 	                autodispatch refused : refused($Motivation)
 	                [#
 	            } else {
-	            	val obj = org.json.JSONObject(jsonStr)
-	                val Weight = obj.getInt("weight")
+	            	
+	                Weight = obj.getInt("weight")
 		
 		            CommUtils.outgreen("cargoservice | trovato prodotto con peso:" + Weight)
 		            #]
@@ -204,9 +213,10 @@ QActor cargoservice context ctxcargoservice {
 		    CommUtils.outgreen("cargoservice | product container associato allo Slot n." + SlotId)
         #]
             replyTo load_request with load_accepted : slot($SlotId)
+            forward webgui -m updategui : updategui($PID,$SlotId,$Weight)
         [#
             CommUtils.outgreen("cargoservice | richiesta di carico accettata: in attesa che il product container arrivi all'IOPort")
-        #]	
+        #]	 
 		}
     }
     Transition t3

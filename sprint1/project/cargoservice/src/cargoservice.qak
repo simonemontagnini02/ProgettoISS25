@@ -94,6 +94,7 @@ QActor cargoservice context ctxcargoservice {
 		[#
 		var PID = -1
 		var SlotId = -1
+		var Weight = -1
 		#]
 
 	State s0 initial {
@@ -137,7 +138,7 @@ QActor cargoservice context ctxcargoservice {
 	                [#
 	            } else {
 	            	
-	                val Weight = obj.getInt("weight")
+	                 Weight = obj.getInt("weight")
 
 		            CommUtils.outgreen("cargoservice | trovato prodotto con peso:" + Weight)
 		            #]

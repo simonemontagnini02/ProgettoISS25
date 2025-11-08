@@ -1,0 +1,54 @@
+System webgui 
+mqttBroker "localhost" : 1883 eventTopic "guiin"
+
+//GUI
+Dispatch updategui : updategui(PID, SlotID, Weight)
+Event guin : guin(JsonStr)
+
+Context ctxwebgui ip [ host= "localhost" port=8169 ]
+
+QActor webgui context ctxwebgui {
+	
+	State s0 initial {
+		
+		println("webgui | Start") color blue
+		
+	}
+	Goto work
+	
+	State work {
+			
+	}
+	Transition t0 
+	whenMsg updategui -> handledispatch
+	
+	
+	State handledispatch {
+		[#
+			var Jsonmsg=""
+			#]
+		onMsg( updategui : updategui(PID, SlotID, Weight)) {
+        [#
+            val PIDC = payloadArg(0).toInt()
+            val SlotIDC=payloadArg(1).toInt()
+            val WeightC=payloadArg(2).toInt()
+            CommUtils.outblue("webgui | ricevuto aggiornamento")
+            
+            val Json = JSONObject() 
+    		Json.put("id", PIDC)
+    		Json.put("slotID", SlotIDC)
+    		Json.put("peso", WeightC)
+    		Jsonmsg = Json.toJSONString()           
+    		CommUtils.outblue("webgui | invio " + Jsonmsg)
+    		
+        #]
+         
+        }
+        
+		publish "guiin" -m guin : guin($Jsonmsg)
+		
+	}
+	Goto work
+	
+	
+}
