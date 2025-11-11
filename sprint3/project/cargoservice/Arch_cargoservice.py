@@ -30,6 +30,7 @@ with Diagram('cargoserviceArch', show=False, outformat='png', graph_attr=graphat
           requestvalidator=Custom('requestvalidator','./qakicons/symActorWithobjSmall.png')
           cargorobot=Custom('cargorobot','./qakicons/symActorWithobjSmall.png')
           moveexec=Custom('moveexec','./qakicons/symActorWithobjSmall.png')
+          deletetester=Custom('deletetester','./qakicons/symActorWithobjSmall.png')
      with Cluster('ctxbasicrobot', graph_attr=nodeattr):
           basicrobot=Custom('basicrobot(ext)','./qakicons/externalQActor.png')
      with Cluster('ctxproductservice', graph_attr=nodeattr):

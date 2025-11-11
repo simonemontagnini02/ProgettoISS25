@@ -38,6 +38,9 @@ Dispatch refused : refused(X)
 Request transport : transport( SlotID )
 Reply robot_home : robot_home(X) for transport
 
+//DELETETESTER
+Dispatch delete : delete(x)
+
 //Cargorobot
 Request move : move(X,Y)
 Reply movedone : movedone(X) for move
@@ -493,22 +496,30 @@ QActor moveexec context ctxcargoservice {
  		whenReply moverobotfailed -> movefailed
  } 
   
-//QActor sonarmock context ctxcargoservice {
-//	State s0 initial{
-//		delay 5000
-////		println("$name| rilevata sonar failure") color blue
-////		emit alarm : alarm(failure)
-////		delay 2000
-////		println("$name| sonar failure terminata") color blue
-////		emit alarm : alarm(ok)
-////		delay 1000
-//		println("$name| rilevato product container all'IOPort") color blue
-//		forward cargoservice -m containerAtIOPort : containerAtIOPort(ok)
-//		delay 5000
-//		println("$name| rilevata sonar failure") color blue
-//		emit alarm : alarm(failure)
-//		delay 2000
-//		println("$name| sonar failure terminata") color blue
-//		emit alarm : alarm(ok)
-//    }
-//}
+QActor deletetester context ctxcargoservice withobj hold using "main.java.domain.Hold.getInstance()"{
+	
+	import "main.java.domain.*"
+	
+	State s0 initial{
+		println("TESTERRRR") color blue
+		
+	}
+	Goto work
+	
+	State work{
+		
+		
+	}
+	Transition t1
+	
+	 whenMsg delete -> deletehandler
+	 
+	 State deletehandler{
+	 	
+	 	[#
+	 		hold.cleanSlots()
+	 		#]
+	 	
+	 }
+	 Goto work
+}

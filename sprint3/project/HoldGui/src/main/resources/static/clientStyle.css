@@ -1,4 +1,4 @@
-/* Stile generale della pagina */
+
 body {
     font-family: "Segoe UI", Arial, sans-serif;
     background-color: #f4f6f8;
@@ -10,13 +10,11 @@ body {
     align-items: center;
 }
 
-/* Titolo principale */
 h1 {
     color: #222;
     margin-bottom: 40px;
 }
 
-/* Contenitore delle card */
 .container {
     display: flex;
     flex-wrap: wrap;
@@ -26,7 +24,7 @@ h1 {
     max-width: 900px;
 }
 
-/* Singola card */
+
 .card {
     background-color: #fff;
     border-radius: 14px;
@@ -41,14 +39,14 @@ h1 {
     box-shadow: 0 6px 14px rgba(0,0,0,0.15);
 }
 
-/* Titolo della card */
+
 .card h2 {
     font-size: 1.3em;
     color: #0056b3;
     margin-bottom: 15px;
 }
 
-/* Campi input */
+
 input[type="text"], 
 input[type="number"] {
     width: 100%;
@@ -66,7 +64,7 @@ input:focus {
     box-shadow: 0 0 5px rgba(0,123,255,0.2);
 }
 
-/* Pulsanti */
+
 button {
     background-color: #007bff;
     color: white;
@@ -82,25 +80,37 @@ button:hover {
     background-color: #0056b3;
 }
 
-/* Area output */
+
 #output {
     margin-top: 40px;
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    padding: 20px;
-    width: 100%;
-    max-width: 700px;
-    min-height: 100px;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 20px;
+  width: 100%;
+  max-width: 700px;
+  min-height: 100px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+
+}
+
+.output-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; 
+  width: 100%;
 }
 
 #output h3 {
-    margin-top: 0;
-    color: #007bff;
+
+  margin: 0;
+  color: #007bff;
 }
 
-/* Messaggi di errore */
+
+
 .error {
     color: #c00;
     font-size: 0.9em;
@@ -108,8 +118,10 @@ button:hover {
     margin-bottom: 10px;
 }
 
-/* Messaggi di risultato */
+
 #result p {
     margin: 5px 0;
     font-size: 0.95em;
 }
+
+

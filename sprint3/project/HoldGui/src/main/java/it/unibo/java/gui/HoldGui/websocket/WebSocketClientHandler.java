@@ -47,15 +47,19 @@ public class WebSocketClientHandler extends TextWebSocketHandler{
 	protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
 			
 		JsonObject obj = JsonParser.parseString(message.getPayload()).getAsJsonObject();
+		String risposta="";
 		
 		if(obj.get("Type").getAsString().equals("Register")) {
-			service.productserviceMessage(obj.get("PID").getAsString(), obj.get("Nome").getAsString(), obj.get("Peso").getAsInt());
+			
+			risposta=service.productserviceMessage(obj.get("PID").getAsString(), obj.get("Nome").getAsString(), obj.get("Peso").getAsInt());
+	
 		}
 		else {
 			
-			service.cargoserviceMessage(obj.get("PID").getAsString());
+			risposta=service.cargoserviceMessage(obj.get("PID").getAsString());
 		}
 		
+		session.sendMessage(new TextMessage(risposta));
 		
 	}
 	

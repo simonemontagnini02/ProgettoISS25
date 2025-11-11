@@ -20,6 +20,7 @@ dispatch( updategui, updategui(PID,SlotID,weight) ).
 dispatch( refused, refused(X) ).
 request( transport, transport(SlotID) ).
 reply( robot_home, robot_home(X) ).  %%for transport
+dispatch( delete, delete(x) ).
 request( move, move(X,Y) ).
 reply( movedone, movedone(X) ).  %%for move
 request( engage, engage(OWNER,STEPTIME) ).
@@ -46,3 +47,5 @@ context(ctxwebgui, "127.0.0.1",  "TCP", "8169").
  static(cargorobot).
   qactor( moveexec, ctxcargoservice, "it.unibo.moveexec.Moveexec").
  static(moveexec).
+  qactor( deletetester, ctxcargoservice, "it.unibo.deletetester.Deletetester").
+ static(deletetester).
