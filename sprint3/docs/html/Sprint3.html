@@ -23,7 +23,7 @@
     <div>
         L’obiettivo di questo Sprint è realizzare le ultime funzionalità del sistema, implementando quindi
         <strong>webgui</strong> e <strong>client</strong>. Il compito di webgui sarà quello di mostrare lo stato della
-        stiva tramite un'interfaccia web, mentre client sarà incaricato dell'invio delle richieste di registrazione di
+        Hold tramite un'interfaccia web, mentre client sarà incaricato dell'invio delle richieste di registrazione di
         prodotti e di carico.
     </div>
 
@@ -87,11 +87,11 @@
         </br></br>
 
         La comunicazione con la pagina web potrebbe avvenire direttamente dal componente logico, tuttavia, per garantire
-        una maggiore separazione delle responsabilità, si è ritenuto opportuno introdurre un componente intermedio
-        denominato <strong>WebGuiController</strong>.
+        una maggiore separazione delle responsabilità, si è ritenuto opportuno introdurre un componente
+        <strong>Holdgui</strong>.
         Questo POJO separato non necessita di conoscere i dettagli implementativi della pagina, ma si limita a inviare
         dati strutturati in un formato concordato.
-        In tal modo, WebGuiController diventa l’unico responsabile della comunicazione verso la GUI, consentendo di
+        In tal modo, Holdgui diventa l’unico responsabile della comunicazione verso la GUI, consentendo di
         mantenere il resto del sistema indipendente dai meccanismi di visualizzazione.
         I principali vantaggi di questo approccio sono il <strong>massimo disaccoppiamento</strong> tra logica e
         presentazione, una
@@ -125,7 +125,7 @@
             <li>
                 <strong>Comunicazione tramite MQTT</strong>: in questo approccio webgui pubblica messaggi su un
                 <strong>topic dedicato</strong>,
-                mentre WebGuiMqtt li riceve come sottoscrittore. Questo garantisce un elevato livello di
+                mentre Holdgui li riceve come sottoscrittore. Questo garantisce un elevato livello di
                 <strong>disaccoppiamento</strong>, un modello di comunicazione asincrono e la
                 possibilità di
                 distribuire facilmente i componenti su nodi distinti. L’unico svantaggio è un leggero
@@ -135,7 +135,8 @@
         <p>
             Tra le alternative considerate, abbiamo scelto di utilizzare <strong>MQTT</strong> come meccanismo di
             comunicazione tra i due componenti
-            poiché garantisce una comunicazione flessibile e scalabile, facilmente estendibile anche a nuovi nodi distribuiti
+            poiché garantisce una comunicazione flessibile e scalabile, facilmente estendibile anche a nuovi nodi
+            distribuiti
             senza modifiche significative a livello di architettura.
 
 
@@ -189,6 +190,220 @@
         </ul>
 
     </div>
+
+    <h2>Architettura Logica del Sistema</h2>
+    <div>
+        <h3>cargoservice</h3>
+        <img src="./img/cargoserviceArch.png">
+        <h3>webgui</h3>
+        <img src="./img/webguiArch.png">
+    </div>
+    <h2>Testing</h2>
+    <div>
+
+        <table>
+            <tr>
+                <th>
+                    ID
+                </th>
+                <th>
+                    Titolo
+                </th>
+                <th>
+                    Tipo
+                </th>
+                <th>
+                    Descrizione
+                </th>
+                <th>
+                    Input
+                </th>
+                <th>
+                    Output
+                </th>
+
+            </tr>
+            <td>
+                T14
+            </td>
+            <td>
+                <strong>Corretto aggiornamento di webgui</strong>
+            </td>
+            <td>
+                Integration Test
+            </td>
+            <td>
+                L'attore cargoservice, dopo aver salvato le informazioni relative a un product container caricato,
+                comunica lo stato della Hold
+                all'attore webgui.
+            </td>
+            <td>
+                Request load_request : load(PID)
+            </td>
+            <td>
+                Dispatch updategui : updategui(PID, SlotID, weight)
+            </td>
+            </tr>
+
+            <tr>
+                <td>
+                    T15
+                </td>
+                <td>
+                    <strong>Richiesta di carico</strong>
+                </td>
+                <td>
+                    Integration Test
+                </td>
+                <td>
+
+                    Il client invia correttamente una richiesta all'attore cargoservice, che risponderà con una reply
+                    contenente l'esito della richiesta
+
+                </td>
+                <td>
+                    Request load_request : load(PID)
+                </td>
+                <td>
+                    <ul>
+                        <li><strong>Reply load_accepted : slot(SlotID)</strong> : in caso di richiesta accettata</li>
+                        <li><strong>Reply load_refused : reason(Motivation)</strong> : in caso di richiesta rifutata
+                        </li>
+
+                    </ul>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    T16
+                </td>
+                <td>
+                    <strong>Creazione Prodotto</strong>
+                </td>
+                <td>
+                    Integration Test
+                </td>
+                <td>
+                    Il client invia una richiesta di registrazione di un prodotto all'attore productservice, che
+                    risponderà con l'esito della richiesta
+                </td>
+                <td>
+                    Request createProduct : product(String)
+                </td>
+                <td>
+                    <ul>
+                        <li><strong>Reply createdProduct : productid(ID) </strong> : in caso di richiesta accettata</li>
+                        <li><strong>Reply createdProduct : productid(ID)</strong> : in caso di richiesta rifutata</li>
+
+                    </ul>
+                </td>
+            </tr>
+
+        </table>
+
+    </div>
+
+    <h2>Progettazione</h2>
+    <div>
+        <h3>webgui</h3>
+        Questo attore si collega a un broker MQTT utilizzando il topic “guiin”, sul quale pubblica gli aggiornamenti
+        sullo stato della Hold inviati da cargoservice. In particolare, quando riceve il messaggio <span
+            class="messaggi">Dispatch updategui : updategui(PID, SlotID, Weight)</span>, estrae il payload, lo converte
+        in una stringa JSON e lo pubblica sul topic.
+        <h3>HoldGui</h3>
+        Per realizzare questo componente è stato utilizzato Spring, che offre un framework flessibile per la
+        gestione delle dipendenze, la configurazione dell’applicazione e una rapida integrazione con un ambiente web.
+        L’impiego di Spring ha reso possibile strutturare il sistema in modo modulare, semplificare la comunicazione tra
+        i vari componenti e integrare con facilità tecnologie come MQTT e WebSocket. Inoltre, grazie al server web
+        integrato fornito dal framework (come Tomcat embedded), è stato possibile esporre interfacce e servizi senza la
+        necessità di configurare un server esterno, migliorando manutenibilità, estendibilità e gestione complessiva dei
+        flussi di dati.
+        </br>
+        Il componente è formato da diversi Bean che hanno il compito di gestire la logica di
+        visualizzazione dello stato della Hold:
+
+        <ul>
+            <li>
+                <strong>MqttPahoMessageDrivenChannelAdapter</strong>: questo bean gestisce la connessione al broker
+                MQTT, la sottoscrizione al topic “guiin” e la registrazione del bean <strong>MqttHandler</strong> come
+                handler incaricato di elaborare i messaggi in arrivo su quel topic.
+            </li>
+
+            <li>
+                <strong>WebSocketGuiHandler</strong>: questo bean viene registrato come handler della WebSocket che
+                collega il componente Spring alla pagina web dedicata alla visualizzazione dello stato della Hold. Ogni
+                volta che arriva un messaggio sul topic, il bean <strong>MqttHandler</strong> provvede a inoltrarlo alla
+                pagina tramite la WebSocket associata.
+            </li>
+
+        </ul>
+
+        Il componente è formato inoltre dai Bean che hanno il compito di gestire la logica associata alle richieste da
+        parte del client:
+
+        <ul>
+            <li>
+                <strong>ClientMessageService</strong>: questo bean si occupa di creare le connessioni con gli attori
+                <strong>cargoservice</strong> e <strong>productservice</strong> ed espone i metodi necessari per creare
+                e gestire le richieste rivolte a questi ultimi.
+            </li>
+            <li>
+                <strong>WebSocketClientHandler</strong>: questo bean funge da handler per i messaggi in arrivo sulla
+                WebSocket associata al client. In base al tipo di messaggio ricevuto, il bean provvede a inviare una
+                richiesta di carico oppure una richiesta di creazione di un prodotto, restituendo poi l’esito
+                dell’operazione al client.
+            </li>
+        </ul>
+
+        </br>
+
+    </div>
+
+    <h2>Istruzioni per l'esecuzione</h2>
+     <div>
+        Per poter avviare il sistema è necessario seguire i seguenti passi:
+
+        <ul>
+            <li>
+                avviare l'immagine docker <strong>iss2025new.yaml</strong> contenente al suo interno diversi servizi
+                software utili al supporto dell'esecuzione del
+                sistema.
+            </li>
+
+            <li>
+                avviare l'immagine docker <strong>cargoserviceqak.yaml</strong> contenente la logica che realizza il
+                servizio <strong>productservice</strong>
+            </li>
+
+            <li>
+                avviare l'immagine docker <strong>wenv</strong> che contiene l'interfaccia grafica del robot virtuale
+            </li>
+
+            <li>
+                avviare il servizio <strong>cargoservice</strong> eseguendo il comando <i>gradlew run</i>
+            </li>
+
+            <li>
+                avviare il servizio <strong>basicrobot24</strong> eseguendo il comando <i>gradlew run</i>
+            </li>
+            <li>
+                avviare i servizi <strong>sonar</strong> e <strong>led</strong> presenti sul Raspberry lanciando <i>./sonarled</i>
+            </li>
+            <li>
+                avviare il servizio <strong>webgui</strong> eseguendo il comando <i>gradlew run</i>
+            </li>
+            <li>
+                creare l'immagine utilizzando il file <strong>Dockerfile</strong> eseguendo il comando <i>docker build -t holdgui:1.0 .</i>
+            </li>
+            <li>
+                avviare in un container Docker l'immagine appena creata, tramite il comando <i>docker-compose -f holdgui.yml -p holdgui up</i>
+            </li>
+
+        </ul>
+
+    </div>
+
 
 </body>
 

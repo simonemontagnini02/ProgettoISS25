@@ -21,7 +21,7 @@ QActor webgui context ctxwebgui {
 	}
 	Transition t0 
 	whenMsg updategui -> handledispatch
-	
+	    
 	
 	State handledispatch {
 		[#
