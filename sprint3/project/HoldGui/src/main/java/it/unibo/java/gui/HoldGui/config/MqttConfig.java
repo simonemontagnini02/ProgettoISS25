@@ -17,7 +17,7 @@ import it.unibo.java.gui.HoldGui.mqtt.MqttHandler;
 @Configuration
 public class MqttConfig {
 
-    private static final String BROKER_URL = "tcp://localhost:1883";
+	private static final String BROKER_URL = "tcp://host.docker.internal:1883";
     private static final String CLIENT_ID = "spring";
     private static final String TOPIC = "guiin";
 

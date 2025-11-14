@@ -32,6 +32,7 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 		
 				var PID = -1
 				var SlotId = -1
+				var Weight = -1
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -77,16 +78,17 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								
 									            val jsonStr = payloadArg(0)
-									            
-									            if(jsonStr == "unknown") {
+									            val obj = org.json.JSONObject(jsonStr)
+								
+									            if(obj.getString("name").equals("wrong")) {
 									            	CommUtils.outred("cargoservice | PID_NOT_REGISTERED")
 									            	val Motivation = "PID_NOT_REGISTERED"
 								answer("load_request", "load_refused", "reason($Motivation)"   )  
 								forward("refused", "refused($Motivation)" ,name ) 
 								
 									            } else {
-									            	val obj = org.json.JSONObject(jsonStr)
-									                val Weight = obj.getInt("weight")
+									            	
+									                Weight = obj.getInt("weight")
 										
 										            CommUtils.outgreen("cargoservice | trovato prodotto con peso:" + Weight)
 								request("validate_request", "validate($PID,$Weight)" ,"requestvalidator" )  

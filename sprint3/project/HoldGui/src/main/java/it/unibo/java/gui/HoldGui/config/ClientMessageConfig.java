@@ -24,7 +24,7 @@ public class ClientMessageConfig {
 
    
     public static final ProtocolType protocol = ProtocolType.tcp;
-    public static final String HOST_ADDR = "localhost";
+    public static final String HOST_ADDR = "host.docker.internal";
     public static final String PRODUCT_SERVICE_PORT = "8111";
     public static final String CARGO_SERVICE_PORT = "8110";
 }

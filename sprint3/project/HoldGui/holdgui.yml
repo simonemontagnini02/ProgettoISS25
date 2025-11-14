@@ -1,0 +1,15 @@
+services:
+  holdgui:
+    image: holdgui      # sostituisci con il nome esatto della tua immagine
+    container_name: holdgui
+    ports:
+      - "8080:8080"          # mappa porta 8080 container → host
+    networks:
+      - iss-network          # se vuoi farlo entrare nella rete esistente
+    restart: unless-stopped  # opzionale, riavvia se si blocca
+
+networks:
+  iss-network:
+    external: true
+
+#docker-compose -f holdgui.yml -p holdgui up

@@ -32,6 +32,7 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 		
 				var PID = -1
 				var SlotId = -1
+				var Weight = -1
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -87,7 +88,7 @@ class Cargoservice ( name: String, scope: CoroutineScope, isconfined: Boolean=fa
 								
 									            } else {
 									            	
-									                val Weight = obj.getInt("weight")
+									                 Weight = obj.getInt("weight")
 								
 										            CommUtils.outgreen("cargoservice | trovato prodotto con peso:" + Weight)
 								request("validate_request", "validate($PID,$Weight)" ,"requestvalidator" )  
