@@ -56,13 +56,14 @@ public class TesterRobotCoap {
 	
 	private static IApplMessage Container_at_IOPort=CommUtils.buildDispatch(tester, "containerAtIOPort", "containerAtIOPort(ok)", "cargoservice");
 	
-	private static Interaction ProductServiceConn, CargoserviceConn,BasicRobotConn;
+	private static Interaction ProductServiceConn, CargoserviceConn, PlanexecConn, BasicrobotConn;
 
 	static volatile String risposta = null;
+	static volatile String rispostaBasicrobot=null;
 	
-	static CoapConnection coapConn;
-	static CoapClient client;
-	static CoapObserveRelation relation;
+	static CoapConnection coapConn,coapConnBasicrobot;
+	static CoapClient client,clientBasicrobot;
+	static CoapObserveRelation relation,relationBasicrobot;
 	
 	@BeforeClass
 	public static void setup() {
@@ -82,20 +83,25 @@ public class TesterRobotCoap {
 		try {
 			ProductServiceConn = ConnectionFactory.createClientSupport23(protocol, hostAddr, "8111");
 			CargoserviceConn = ConnectionFactory.createClientSupport23(protocol, hostAddr, "8110");
-			BasicRobotConn = ConnectionFactory.createClientSupport23(ProtocolType.coap, hostAddr+":"+"8020", "ctxbasicrobot/planexec");
+			PlanexecConn = ConnectionFactory.createClientSupport23(ProtocolType.coap, hostAddr+":"+"8020", "ctxbasicrobot/planexec");
+			BasicrobotConn = ConnectionFactory.createClientSupport23(ProtocolType.coap, hostAddr+":"+"8020", "ctxbasicrobot/basicrobot");
 			
-			coapConn = (CoapConnection)BasicRobotConn;
+			
+			coapConn = (CoapConnection)PlanexecConn;
 			client = coapConn.getClient();
+			
+			coapConnBasicrobot = (CoapConnection)BasicrobotConn;
+			clientBasicrobot = coapConnBasicrobot.getClient();
 			
 			relation = client.observe(
 					new CoapHandler() {
 						@Override public void onLoad(CoapResponse response) {
 							String msg = response.getResponseText();
-							 if(msg.contains("planfailed")) {   // <--- FILTRO QUI
+							 if(msg.contains("planfailed")) {  
 									risposta = msg;
-									CommUtils.outgreen("ActorObserver | FILTRATO -> " + risposta );
+									CommUtils.outgreen("PlanexecObserver | " + risposta );
 								} else {
-									CommUtils.outblue("ActorObserver | ignorato -> " + msg );
+									CommUtils.outblue("PlanexecObserver | ignorato -> " + msg );
 								}
 							
 							
@@ -104,6 +110,7 @@ public class TesterRobotCoap {
 							CommUtils.outred("OBSERVING FAILED  ");
 						}
 					});	
+			
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -121,7 +128,7 @@ public class TesterRobotCoap {
 	
 	
 	@Test
-	public void sonarFailure() {
+	public void sonarFailureAndsonarRestoration() {
 		
 		try {
 			ProductServiceConn.request(createProduct);
@@ -138,7 +145,7 @@ public class TesterRobotCoap {
 		
 		try {
 			CargoserviceConn.forward(sonarFailure);
-			BasicRobotConn.forward(sonarFailure);
+			PlanexecConn.forward(sonarFailure);
 		} catch (Exception e) {
 		
 			e.printStackTrace();
@@ -154,14 +161,44 @@ public class TesterRobotCoap {
 		assertNotNull("Non è arrivato nessun update CoAP", risposta);
 	    assertTrue(risposta.contains("planfailed"));
 	    
+	    
 	    CommUtils.delay(2000);
+	    
+	    
+	    relationBasicrobot = clientBasicrobot.observe(
+				new CoapHandler() {
+					@Override public void onLoad(CoapResponse response) {
+						String msg = response.getResponseText();
+						 if(msg.contains("stepDone")) {  
+								rispostaBasicrobot = msg;
+								CommUtils.outmagenta("BasicrobotObserver | " + risposta );
+							} else {
+								CommUtils.outblue("BasicrobotObserver | ignorato -> " + msg );
+							}
+						
+						
+					}					
+					@Override public void onError() {
+						CommUtils.outred("OBSERVING FAILED  ");
+					}
+				});	
+	    
 	    
 	    try {
 			CargoserviceConn.forward(sonarFailureEnd);
-			BasicRobotConn.forward(sonarFailureEnd);
+			PlanexecConn.forward(sonarFailureEnd);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	    
+	    while(rispostaBasicrobot == null && attempts < 1000) {
+	        CommUtils.delay(200);
+	        attempts++;
+	    }
+	    
+	    assertNotNull("Non è arrivato nessun update CoAP", rispostaBasicrobot);
+	    assertTrue(rispostaBasicrobot.contains("stepDone"));
+	    
 		
 	}
 	
@@ -186,7 +223,7 @@ public class TesterRobotCoap {
 		try {
 			ProductServiceConn.close();
 			CargoserviceConn.close();
-			BasicRobotConn.close();
+			PlanexecConn.close();
 			relation.proactiveCancel();
 		} catch (Exception e) {
 			
