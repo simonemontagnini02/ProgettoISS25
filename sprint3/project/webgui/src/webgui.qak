@@ -16,7 +16,7 @@ QActor webgui context ctxwebgui {
 	}
 	Goto work
 	
-	State work {
+	State work {  
 			
 	}
 	Transition t0 
