@@ -85,9 +85,14 @@ function onRegisterClick (event){
 
         errorDiv.textContent = "";
 
-            const pid = document.getElementById("pid").value.trim();
-            const peso = parseInt(document.getElementById("peso").value);
+            const pid = Number(document.getElementById("pid").value.trim());
+            const peso = Number(document.getElementById("peso").value.trim());
             const nome = document.getElementById("nome").value.trim();
+			
+			if (isNaN(pid) || pid <= 0) {
+			                errorDiv.textContent = "Il PID deve essere un numero positivo.";
+			                return;
+			            }
 
              if (isNaN(peso) || peso <= 0) {
                 errorDiv.textContent = "Il peso deve essere un numero positivo.";

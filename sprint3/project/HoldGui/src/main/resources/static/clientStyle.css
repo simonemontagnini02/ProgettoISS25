@@ -114,7 +114,7 @@ button:hover {
 .error {
     color: #c00;
     font-size: 0.9em;
-    margin-top: -8px;
+    margin-top: 8px;
     margin-bottom: 10px;
 }
 
