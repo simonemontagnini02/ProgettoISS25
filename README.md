@@ -13,3 +13,7 @@ Membri del gruppo:
 [Sprint1_V1](https://github.com/simonemontagnini02/ProgettoISS25/blob/main/sprint1/docs/html/Sprint1_v1.html)
 
 [Sprint2](https://github.com/simonemontagnini02/ProgettoISS25/blob/main/sprint2/docs/html/Sprint2.html)
+
+[Sprint2_V1](https://github.com/simonemontagnini02/ProgettoISS25/blob/main/sprint2/docs/html/Sprint2_v1.html)
+
+[Sprint3](https://github.com/simonemontagnini02/ProgettoISS25/blob/main/sprint3/docs/html/Sprint3.html)
